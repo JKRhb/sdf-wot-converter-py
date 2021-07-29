@@ -38,7 +38,3 @@ def main():
     thing_model = convert_sdf_to_wot_tm(sdf_model)
     validate_wot_tm(thing_model)
     pprint(thing_model)
-
-
-if __name__ == '__main__':
-    main()
