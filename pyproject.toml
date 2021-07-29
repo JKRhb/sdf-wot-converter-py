@@ -4,5 +4,6 @@ requires = [
     "wheel",
     "jsonschema",
     "jsonpointer",
+    "json-merge-patch",
 ]
 build-backend = "setuptools.build_meta"
