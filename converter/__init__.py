@@ -1,6 +1,4 @@
 import json
-from pprint import pprint
-from pathlib import Path
 from jsonschema import validate
 from typing import Dict
 from .sdf_to_wot import convert_sdf_to_wot_tm
@@ -23,15 +21,18 @@ def validate_wot_td(thing_description: Dict):
 
 
 def load_model(input_path: str) -> Dict:
-    path = Path(__file__).parent / input_path
-    file = open(path)
+    file = open(input_path)
     return json.load(file)
 
 
-def main():
-    sdf_model = load_model("examples/sdf/sdfobject-level.sdf.json")
-    # sdf_model = load_model("examples/sdf/example.sdf.json")
+def save_model(output_path: str, model: Dict, indent=4):
+    file = open(output_path, "w")
+    json.dump(model, file,  indent=indent)
+
+
+def main(args):
+    sdf_model = load_model(args.from_sdf)
     validate_sdf(sdf_model)
     thing_model = convert_sdf_to_wot_tm(sdf_model)
     validate_wot_tm(thing_model)
-    pprint(thing_model)
+    save_model(args.to_tm, thing_model)
