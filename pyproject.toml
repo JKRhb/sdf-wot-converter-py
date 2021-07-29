@@ -3,6 +3,6 @@ requires = [
     "setuptools>=42",
     "wheel",
     "jsonschema",
-    "json_pointer",
+    "jsonpointer",
 ]
 build-backend = "setuptools.build_meta"
