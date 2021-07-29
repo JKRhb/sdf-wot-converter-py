@@ -5,24 +5,21 @@ from jsonschema import validate
 from typing import Dict
 from .sdf_to_wot import convert_sdf_to_wot_tm
 
-
-def validate_model(jso_path: str, model: Dict):
-    path = Path(__file__).parent / jso_path
-    file = open(path)
-    validation_syntax = json.load(file)
-    validate(model, validation_syntax)
+from .schemas.sdf_framework_schema import sdf_framework_schema
+from .schemas.td_schema import td_schema
+from .schemas.tm_schema import tm_schema
 
 
 def validate_sdf(sdf_model: Dict):
-    validate_model("JSO/sdf-framework.jso.json", sdf_model)
+    validate(sdf_model, sdf_framework_schema)
 
 
-def validate_wot_tm(sdf_model: Dict):
-    validate_model("JSO/tm-json-schema-validation.json", sdf_model)
+def validate_wot_tm(thing_model: Dict):
+    validate(thing_model, tm_schema)
 
 
-def validate_wot_td(sdf_model: Dict):
-    validate_model("JSO/td-json-schema-validation.json", sdf_model)
+def validate_wot_td(thing_description: Dict):
+    validate(thing_description, td_schema)
 
 
 def load_model(input_path: str) -> Dict:

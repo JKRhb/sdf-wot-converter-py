@@ -1,4 +1,4 @@
-{
+sdf_validation_schema ={
   "title": "sdf-validation.cddl",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$ref": "#/definitions/sdf-syntax",
@@ -61,7 +61,7 @@
           }
         }
       },
-      "additionalProperties": false
+      "additionalProperties": False
     },
     "sdfinfo": {
       "type": "object",
@@ -85,7 +85,7 @@
           "type": "string"
         }
       },
-      "additionalProperties": false
+      "additionalProperties": False
     },
     "thingqualities": {
       "type": "object",
@@ -118,7 +118,7 @@
           }
         }
       },
-      "additionalProperties": false
+      "additionalProperties": False
     },
     "sdf-pointer": {
       "type": "string"
@@ -178,7 +178,7 @@
           }
         }
       },
-      "additionalProperties": false
+      "additionalProperties": False
     },
     "propertyqualities": {
       "$ref": "#/definitions/dataqualities"
@@ -315,7 +315,7 @@
                       "type": "number"
                     }
                   },
-                  "additionalProperties": false
+                  "additionalProperties": False
                 },
                 {
                   "type": "object",
@@ -369,7 +369,7 @@
                       "type": "number"
                     }
                   },
-                  "additionalProperties": false
+                  "additionalProperties": False
                 },
                 {
                   "type": "object",
@@ -412,7 +412,7 @@
                       "type": "number"
                     }
                   },
-                  "additionalProperties": false
+                  "additionalProperties": False
                 }
               ]
             },
@@ -457,7 +457,7 @@
               "type": "string"
             }
           },
-          "additionalProperties": false
+          "additionalProperties": False
         },
         {
           "type": "object",
@@ -596,7 +596,7 @@
                       "type": "number"
                     }
                   },
-                  "additionalProperties": false
+                  "additionalProperties": False
                 },
                 {
                   "type": "object",
@@ -650,7 +650,7 @@
                       "type": "number"
                     }
                   },
-                  "additionalProperties": false
+                  "additionalProperties": False
                 },
                 {
                   "type": "object",
@@ -693,7 +693,7 @@
                       "type": "number"
                     }
                   },
-                  "additionalProperties": false
+                  "additionalProperties": False
                 }
               ]
             },
@@ -738,7 +738,7 @@
               "type": "string"
             }
           },
-          "additionalProperties": false
+          "additionalProperties": False
         },
         {
           "type": "object",
@@ -866,7 +866,7 @@
                       "type": "number"
                     }
                   },
-                  "additionalProperties": false
+                  "additionalProperties": False
                 },
                 {
                   "type": "object",
@@ -920,7 +920,7 @@
                       "type": "number"
                     }
                   },
-                  "additionalProperties": false
+                  "additionalProperties": False
                 },
                 {
                   "type": "object",
@@ -963,7 +963,7 @@
                       "type": "number"
                     }
                   },
-                  "additionalProperties": false
+                  "additionalProperties": False
                 }
               ]
             },
@@ -1008,7 +1008,7 @@
               "type": "string"
             }
           },
-          "additionalProperties": false
+          "additionalProperties": False
         }
       ]
     },
@@ -1082,7 +1082,7 @@
           }
         }
       },
-      "additionalProperties": false
+      "additionalProperties": False
     },
     "parameter-list": {
       "$ref": "#/definitions/dataqualities"
@@ -1115,7 +1115,7 @@
           }
         }
       },
-      "additionalProperties": false
+      "additionalProperties": False
     },
     "productqualities": {
       "$ref": "#/definitions/thingqualities"

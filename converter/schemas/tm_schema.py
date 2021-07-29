@@ -1,4 +1,4 @@
-{
+tm_schema = {
   "title": "Thing Model",
   "version": "1.1-04-June-2021",
   "description": "JSON Schema for validating Thing Models. This is automatically generated from the WoT TD Schema.",
@@ -154,7 +154,7 @@
         "enum": {
           "type": "array",
           "minItems": 1,
-          "uniqueItems": true
+          "uniqueItems": True
         },
         "format": {
           "type": "string"
@@ -332,7 +332,7 @@
           "$ref": "#/definitions/tm_ref"
         }
       },
-      "additionalProperties": true
+      "additionalProperties": True
     },
     "form_element_action": {
       "type": "object",
@@ -394,7 +394,7 @@
           "$ref": "#/definitions/tm_ref"
         }
       },
-      "additionalProperties": true
+      "additionalProperties": True
     },
     "form_element_event": {
       "type": "object",
@@ -456,7 +456,7 @@
           "$ref": "#/definitions/tm_ref"
         }
       },
-      "additionalProperties": true
+      "additionalProperties": True
     },
     "form_element_root": {
       "type": "object",
@@ -518,7 +518,7 @@
           "$ref": "#/definitions/tm_ref"
         }
       },
-      "additionalProperties": true
+      "additionalProperties": True
     },
     "property_element": {
       "type": "object",
@@ -593,7 +593,7 @@
         "enum": {
           "type": "array",
           "minItems": 1,
-          "uniqueItems": true
+          "uniqueItems": True
         },
         "format": {
           "type": "string"
@@ -704,7 +704,7 @@
           "$ref": "#/definitions/tm_ref"
         }
       },
-      "additionalProperties": true
+      "additionalProperties": True
     },
     "action_element": {
       "type": "object",
@@ -767,7 +767,7 @@
           "$ref": "#/definitions/tm_ref"
         }
       },
-      "additionalProperties": true
+      "additionalProperties": True
     },
     "event_element": {
       "type": "object",
@@ -813,7 +813,7 @@
           "$ref": "#/definitions/tm_ref"
         }
       },
-      "additionalProperties": true
+      "additionalProperties": True
     },
     "base_link_element": {
       "type": "object",
@@ -831,7 +831,7 @@
           "$ref": "#/definitions/anyUri"
         }
       },
-      "additionalProperties": true
+      "additionalProperties": True
     },
     "link_element": {
       "allOf": [
@@ -1289,5 +1289,5 @@
       "$ref": "#/definitions/tm_required"
     }
   },
-  "additionalProperties": true
+  "additionalProperties": True
 }

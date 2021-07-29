@@ -1,4 +1,4 @@
-{
+td_schema = {
     "title": "Thing Description",
     "version": "1.1-04-June-2021",
     "description": "JSON Schema for validating TD instances against the TD information model. TD instances can be with or without terms that have default values",
@@ -147,7 +147,7 @@
                 "enum": {
                     "type": "array",
                     "minItems": 1,
-                    "uniqueItems": true
+                    "uniqueItems": True
                 },
                 "format": {
                     "type": "string"
@@ -307,7 +307,7 @@
             "required": [
                 "href"
             ],
-            "additionalProperties": true
+            "additionalProperties": True
         },
         "form_element_action": {
             "type": "object",
@@ -364,7 +364,7 @@
             "required": [
                 "href"
             ],
-            "additionalProperties": true
+            "additionalProperties": True
         },
         "form_element_event": {
             "type": "object",
@@ -423,7 +423,7 @@
             "required": [
                 "href"
             ],
-            "additionalProperties": true
+            "additionalProperties": True
         },
         "form_element_root": {
             "type": "object",
@@ -494,7 +494,7 @@
             "required": [
                 "href"
             ],
-            "additionalProperties": true
+            "additionalProperties": True
         },
         "property_element": {
             "type": "object",
@@ -548,7 +548,7 @@
                 "enum": {
                     "type": "array",
                     "minItems": 1,
-                    "uniqueItems": true
+                    "uniqueItems": True
                 },
                 "format": {
                     "type": "string"
@@ -626,7 +626,7 @@
             "required": [
                 "forms"
             ],
-            "additionalProperties": true
+            "additionalProperties": True
         },
         "action_element": {
             "type": "object",
@@ -675,7 +675,7 @@
             "required": [
                 "forms"
             ],
-            "additionalProperties": true
+            "additionalProperties": True
         },
         "event_element": {
             "type": "object",
@@ -721,7 +721,7 @@
             "required": [
                 "forms"
             ],
-            "additionalProperties": true
+            "additionalProperties": True
         },
         "base_link_element": {
             "type": "object",
@@ -742,7 +742,7 @@
             "required": [
                 "href"
             ],
-            "additionalProperties": true
+            "additionalProperties": True
         },
         "link_element": {
             "allOf": [
@@ -1272,5 +1272,5 @@
         "securityDefinitions",
         "@context"
     ],
-    "additionalProperties": true
+    "additionalProperties": True
 }
