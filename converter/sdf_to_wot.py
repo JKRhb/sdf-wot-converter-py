@@ -125,7 +125,7 @@ def map_data_qualities(sdf_model: Dict, data_qualities: Dict, data_schema: Dict,
 
     for field_name in ["type", "unit", "enum", "const", "default", "multipleOf", "minLength",
                        "maxLength", "minItems", "maxItems", "minimum", "maximum",
-                       "multipleOf", "required", "format", "uniqueItems",
+                       "multipleOf", "required", "format", "uniqueItems", "pattern",
                        "exclusiveMinimum", "exclusiveMaximum"]:
         map_field(data_qualities, data_schema, field_name, field_name)
 
