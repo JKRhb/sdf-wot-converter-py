@@ -1,4 +1,5 @@
 import json
+import argparse
 from jsonschema import validate
 from typing import Dict, Callable
 from .sdf_to_wot import convert_sdf_to_wot_tm
@@ -27,7 +28,27 @@ def convert_model(from_path: str, to_path: str, from_schema: Dict, to_schema: Di
     save_model(to_path, to_model)
 
 
-def main(args):
+def parse_arguments():
+    parser = argparse.ArgumentParser(
+        description='Convert from SDF to WoT and vice versa.')
+
+    from_group = parser.add_mutually_exclusive_group(required=True)
+    from_group.add_argument('--from-sdf', metavar='SDF',
+                            dest="from_sdf", help='SDF input JSON file')
+    from_group.add_argument('--from-tm', metavar='TM',
+                            dest="from_tm", help='WoT TM input JSON file')
+
+    to_group = parser.add_mutually_exclusive_group(required=True)
+    to_group.add_argument('--to-tm', metavar='TM',
+                          dest="to_tm", help='WoT TM output file')
+    to_group.add_argument('--to-sdf', metavar='SDF',
+                          dest="to_sdf", help='SDF output file')
+
+    return parser.parse_args()
+
+
+def main():
+    args = parse_arguments()
     if args.from_sdf and args.to_tm:
         convert_model(args.from_sdf, args.to_tm,
                       sdf_framework_schema, tm_schema,
