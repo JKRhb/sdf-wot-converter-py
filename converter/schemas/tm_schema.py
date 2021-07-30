@@ -60,7 +60,11 @@ tm_schema = {
       ]
     },
     "thing-context-w3c-uri": {
-      "type": "string"
+      "type": "string",
+      "enum": [
+        "https://www.w3.org/2019/wot/td/v1",
+        "http://www.w3.org/ns/td"
+      ]
     },
     "thing-context": {
       "oneOf": [
@@ -90,16 +94,12 @@ tm_schema = {
     "type_declaration": {
       "oneOf": [
         {
-          "type": "string",
-          "const": "tm:ThingModel"
+          "type": "string"
         },
         {
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "contains": {
-            "const": "tm:ThingModel"
           }
         }
       ]
@@ -167,7 +167,16 @@ tm_schema = {
           "type": "string"
         },
         "type": {
-          "type": "string"
+          "type": "string",
+          "enum": [
+            "boolean",
+            "integer",
+            "number",
+            "string",
+            "object",
+            "array",
+            "null"
+          ]
         },
         "items": {
           "oneOf": [
@@ -247,12 +256,14 @@ tm_schema = {
           ]
         },
         "multipleOf": {
-          "oneOf": [
+          "anyOf": [
             {
-              "type": "integer"
+              "type": "integer",
+              "exclusiveMinimum": 0
             },
             {
-              "type": "number"
+              "type": "number",
+              "exclusiveMinimum": 0
             }
           ]
         },
@@ -272,18 +283,47 @@ tm_schema = {
         }
       }
     },
+    "additionalResponsesDefinition": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "contentType": {
+            "type": "string"
+          },
+          "schema": {
+            "type": "string"
+          },
+          "success": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
     "form_element_property": {
       "type": "object",
       "properties": {
         "op": {
           "oneOf": [
             {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "readproperty",
+                "writeproperty",
+                "observeproperty",
+                "unobserveproperty"
+              ]
             },
             {
               "type": "array",
               "items": {
-                "type": "string"
+                "type": "string",
+                "enum": [
+                  "readproperty",
+                  "writeproperty",
+                  "observeproperty",
+                  "unobserveproperty"
+                ]
               }
             }
           ]
@@ -315,18 +355,7 @@ tm_schema = {
           }
         },
         "additionalResponses": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "contentType": {
-                "type": "string"
-              },
-              "schema": {
-                "type": "string"
-              }
-            }
-          }
+          "$ref": "#/definitions/additionalResponsesDefinition"
         },
         "tm:ref": {
           "$ref": "#/definitions/tm_ref"
@@ -340,12 +369,18 @@ tm_schema = {
         "op": {
           "oneOf": [
             {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "invokeaction"
+              ]
             },
             {
               "type": "array",
               "items": {
-                "type": "string"
+                "type": "string",
+                "enum": [
+                  "invokeaction"
+                ]
               }
             }
           ]
@@ -377,18 +412,7 @@ tm_schema = {
           }
         },
         "additionalResponses": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "contentType": {
-                "type": "string"
-              },
-              "schema": {
-                "type": "string"
-              }
-            }
-          }
+          "$ref": "#/definitions/additionalResponsesDefinition"
         },
         "tm:ref": {
           "$ref": "#/definitions/tm_ref"
@@ -402,12 +426,20 @@ tm_schema = {
         "op": {
           "oneOf": [
             {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "subscribeevent",
+                "unsubscribeevent"
+              ]
             },
             {
               "type": "array",
               "items": {
-                "type": "string"
+                "type": "string",
+                "enum": [
+                  "subscribeevent",
+                  "unsubscribeevent"
+                ]
               }
             }
           ]
@@ -439,18 +471,7 @@ tm_schema = {
           }
         },
         "additionalResponses": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "contentType": {
-                "type": "string"
-              },
-              "schema": {
-                "type": "string"
-              }
-            }
-          }
+          "$ref": "#/definitions/additionalResponsesDefinition"
         },
         "tm:ref": {
           "$ref": "#/definitions/tm_ref"
@@ -464,12 +485,32 @@ tm_schema = {
         "op": {
           "oneOf": [
             {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "readallproperties",
+                "writeallproperties",
+                "readmultipleproperties",
+                "writemultipleproperties",
+                "observeallproperties",
+                "unobserveallproperties",
+                "subscribeallevents",
+                "unsubscribeallevents"
+              ]
             },
             {
               "type": "array",
               "items": {
-                "type": "string"
+                "type": "string",
+                "enum": [
+                  "readallproperties",
+                  "writeallproperties",
+                  "readmultipleproperties",
+                  "writemultipleproperties",
+                  "observeallproperties",
+                  "unobserveallproperties",
+                  "subscribeallevents",
+                  "unsubscribeallevents"
+                ]
               }
             }
           ]
@@ -501,18 +542,7 @@ tm_schema = {
           }
         },
         "additionalResponses": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "contentType": {
-                "type": "string"
-              },
-              "schema": {
-                "type": "string"
-              }
-            }
-          }
+          "$ref": "#/definitions/additionalResponsesDefinition"
         },
         "tm:ref": {
           "$ref": "#/definitions/tm_ref"
@@ -600,7 +630,16 @@ tm_schema = {
         },
         "const": {},
         "type": {
-          "type": "string"
+          "type": "string",
+          "enum": [
+            "boolean",
+            "integer",
+            "number",
+            "string",
+            "object",
+            "array",
+            "null"
+          ]
         },
         "items": {
           "oneOf": [
@@ -680,12 +719,14 @@ tm_schema = {
           ]
         },
         "multipleOf": {
-          "oneOf": [
+          "anyOf": [
             {
-              "type": "integer"
+              "type": "integer",
+              "exclusiveMinimum": 0
             },
             {
-              "type": "number"
+              "type": "number",
+              "exclusiveMinimum": 0
             }
           ]
         },
@@ -844,15 +885,25 @@ tm_schema = {
             "type": "object",
             "properties": {
               "sizes": {}
-            }
+            },
+            "required": [
+              "sizes"
+            ]
           }
         },
         {
           "not": {
-            "description": "A basic link element should not contain icon or tm:extends",
+            "description": "A basic link element should not contain icon",
             "properties": {
-              "rel": {}
-            }
+              "rel": {
+                "enum": [
+                  "icon"
+                ]
+              }
+            },
+            "required": [
+              "rel"
+            ]
           }
         }
       ]
@@ -871,7 +922,10 @@ tm_schema = {
               "type": "string",
               "pattern": "[0-9]*x[0-9]+"
             }
-          }
+          },
+          "required": [
+            "rel"
+          ]
         }
       ]
     },
@@ -893,7 +947,10 @@ tm_schema = {
               "$ref": "#/definitions/anyUri"
             },
             "scheme": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "nosec"
+              ]
             },
             "tm:ref": {
               "$ref": "#/definitions/tm_ref"
@@ -916,7 +973,10 @@ tm_schema = {
               "$ref": "#/definitions/anyUri"
             },
             "scheme": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "combo"
+              ]
             },
             "oneOf": {
               "type": "array",
@@ -946,7 +1006,10 @@ tm_schema = {
               "$ref": "#/definitions/anyUri"
             },
             "scheme": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "combo"
+              ]
             },
             "allOf": {
               "type": "array",
@@ -976,10 +1039,19 @@ tm_schema = {
               "$ref": "#/definitions/anyUri"
             },
             "scheme": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "basic"
+              ]
             },
             "in": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "header",
+                "query",
+                "body",
+                "cookie"
+              ]
             },
             "name": {
               "type": "string"
@@ -1005,13 +1077,26 @@ tm_schema = {
               "$ref": "#/definitions/anyUri"
             },
             "scheme": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "digest"
+              ]
             },
             "qop": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "auth",
+                "auth-int"
+              ]
             },
             "in": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "header",
+                "query",
+                "body",
+                "cookie"
+              ]
             },
             "name": {
               "type": "string"
@@ -1037,10 +1122,19 @@ tm_schema = {
               "$ref": "#/definitions/anyUri"
             },
             "scheme": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "apikey"
+              ]
             },
             "in": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "header",
+                "query",
+                "body",
+                "cookie"
+              ]
             },
             "name": {
               "type": "string"
@@ -1066,7 +1160,10 @@ tm_schema = {
               "$ref": "#/definitions/anyUri"
             },
             "scheme": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "bearer"
+              ]
             },
             "authorization": {
               "$ref": "#/definitions/anyUri"
@@ -1078,7 +1175,13 @@ tm_schema = {
               "type": "string"
             },
             "in": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "header",
+                "query",
+                "body",
+                "cookie"
+              ]
             },
             "name": {
               "type": "string"
@@ -1104,7 +1207,10 @@ tm_schema = {
               "$ref": "#/definitions/anyUri"
             },
             "scheme": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "psk"
+              ]
             },
             "identity": {
               "type": "string"
@@ -1130,7 +1236,10 @@ tm_schema = {
               "$ref": "#/definitions/anyUri"
             },
             "scheme": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "oauth2"
+              ]
             },
             "authorization": {
               "$ref": "#/definitions/anyUri"
@@ -1155,11 +1264,31 @@ tm_schema = {
               ]
             },
             "flow": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "code"
+              ]
             },
             "tm:ref": {
               "$ref": "#/definitions/tm_ref"
             }
+          }
+        }
+      ]
+    },
+    "tm_type_declaration": {
+      "oneOf": [
+        {
+          "type": "string",
+          "const": "tm:ThingModel"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "contains": {
+            "const": "tm:ThingModel"
           }
         }
       ]
@@ -1280,7 +1409,7 @@ tm_schema = {
       ]
     },
     "@type": {
-      "$ref": "#/definitions/type_declaration"
+      "$ref": "#/definitions/tm_type_declaration"
     },
     "@context": {
       "$ref": "#/definitions/thing-context"
@@ -1289,5 +1418,9 @@ tm_schema = {
       "$ref": "#/definitions/tm_required"
     }
   },
-  "additionalProperties": True
+  "additionalProperties": True,
+  "required": [
+    "@context",
+    "@type"
+  ]
 }
