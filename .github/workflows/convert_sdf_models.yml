@@ -1,0 +1,46 @@
+name: SDF to WoT TM Conversion
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  convert:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -q build
+        python -m build
+        pip install dist/sdf-wot-converter-py-0.0.1.tar.gz
+    - name: Convert SDF models to WoT TM
+      run: |
+        sudo chmod +x convert_playground.sh
+        ./convert_playground.sh
+    - name: Export conversion results
+      uses: actions/upload-artifact@v2
+      with:
+        name: WoT Thing Models
+        path: |
+          output/tm
+    - name: Push to playground results repo
+      uses: dmnemec/copy_file_to_another_repo_action@main
+      env:
+        API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+      with:
+        source_file: 'output/tm'
+        destination_repo: 'JKRhb/onedm-playground-wot-tm'
+        user_email: 'jan.romann@uni-bremen.de'
+        user_name: 'JKRhb'
+        commit_message: 'Update converted oneDM playground models'
+      if: ${{ github.ref == 'refs/heads/main' }}
