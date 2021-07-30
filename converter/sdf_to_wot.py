@@ -112,8 +112,8 @@ def map_common_qualities(sdf_definition: Dict, wot_definition: Dict):
     map_field(sdf_definition, wot_definition, "$comment", "sdf:$comment")
 
 
-def map_data_qualities(sdf_model: Dict, data_qualities: Dict, data_schema: Dict):
-    # TODO: Unmapped fields: sdfChoice, observable, nullable, sdfType, contentFormat, uniqueItems
+def map_data_qualities(sdf_model: Dict, data_qualities: Dict, data_schema: Dict, is_property=False):
+    # TODO: Unmapped fields: sdfChoice, nullable, sdfType, contentFormat, uniqueItems
 
     data_qualities = resolve_sdf_ref(sdf_model, data_qualities, None, [])
 
@@ -128,6 +128,11 @@ def map_data_qualities(sdf_model: Dict, data_qualities: Dict, data_schema: Dict)
                        "multipleOf", "required", "format",
                        "exclusiveMinimum", "exclusiveMaximum"]:
         map_field(data_qualities, data_schema, field_name, field_name)
+
+    if is_property:
+        map_field(data_qualities, data_schema, "observable", "observable")
+    else:
+        map_field(data_qualities, data_schema, "observable", "sdf:observable")
 
     if "items" in data_qualities:
         data_schema["items"] = {}
@@ -172,7 +177,7 @@ def map_property_qualities(sdf_model: Dict, thing_model: Dict, sdf_property: Dic
     }
     collect_sdf_required(thing_model, sdf_property)
 
-    map_data_qualities(sdf_model, sdf_property, wot_property)
+    map_data_qualities(sdf_model, sdf_property, wot_property, is_property=True)
 
     thing_model["properties"][affordance_key] = wot_property
 
