@@ -1,23 +1,11 @@
 import json
 from jsonschema import validate
-from typing import Dict
+from typing import Dict, Callable
 from .sdf_to_wot import convert_sdf_to_wot_tm
 
 from .schemas.sdf_framework_schema import sdf_framework_schema
 from .schemas.td_schema import td_schema
 from .schemas.tm_schema import tm_schema
-
-
-def validate_sdf(sdf_model: Dict):
-    validate(sdf_model, sdf_framework_schema)
-
-
-def validate_wot_tm(thing_model: Dict):
-    validate(thing_model, tm_schema)
-
-
-def validate_wot_td(thing_description: Dict):
-    validate(thing_description, td_schema)
 
 
 def load_model(input_path: str) -> Dict:
@@ -30,9 +18,16 @@ def save_model(output_path: str, model: Dict, indent=4):
     json.dump(model, file,  indent=indent)
 
 
+def convert_model(from_path: str, to_path: str, from_schema: Dict, to_schema: Dict, converter_function: Callable):
+    from_model = load_model(from_path)
+    validate(from_model, from_schema)
+    to_model = converter_function(from_model)
+    validate(to_model, to_schema)
+    save_model(to_path, to_model)
+
+
 def main(args):
-    sdf_model = load_model(args.from_sdf)
-    validate_sdf(sdf_model)
-    thing_model = convert_sdf_to_wot_tm(sdf_model)
-    validate_wot_tm(thing_model)
-    save_model(args.to_tm, thing_model)
+    if args.from_sdf and args.to_tm:
+        convert_model(args.from_sdf, args.to_tm,
+                      sdf_framework_schema, tm_schema,
+                      convert_sdf_to_wot_tm)
