@@ -42,5 +42,4 @@ jobs:
         destination_repo: 'JKRhb/onedm-playground-wot-tm'
         user_email: 'jan.romann@uni-bremen.de'
         user_name: 'JKRhb'
-        commit_message: 'Update converted oneDM playground models'
       if: ${{ github.ref == 'refs/heads/main' }}
