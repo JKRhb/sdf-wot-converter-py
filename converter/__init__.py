@@ -5,7 +5,7 @@ from typing import Dict, Callable
 from .sdf_to_wot import convert_sdf_to_wot_tm
 from .wot_to_sdf import convert_wot_tm_to_sdf
 
-from .schemas.sdf_framework_schema import sdf_framework_schema
+from .schemas.sdf_validation_schema import sdf_validation_schema
 from .schemas.td_schema import td_schema
 from .schemas.tm_schema import tm_schema
 
@@ -51,9 +51,9 @@ def main():
     args = parse_arguments()
     if args.from_sdf and args.to_tm:
         convert_model(args.from_sdf, args.to_tm,
-                      sdf_framework_schema, tm_schema,
+                      sdf_validation_schema, tm_schema,
                       convert_sdf_to_wot_tm)
     elif args.from_tm and args.to_sdf:
         convert_model(args.from_tm, args.to_sdf,
-                      tm_schema, sdf_framework_schema,
+                      tm_schema, sdf_validation_schema,
                       convert_wot_tm_to_sdf)
