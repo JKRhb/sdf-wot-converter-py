@@ -2,6 +2,7 @@ import json
 from jsonschema import validate
 from typing import Dict, Callable
 from .sdf_to_wot import convert_sdf_to_wot_tm
+from .wot_to_sdf import convert_wot_tm_to_sdf
 
 from .schemas.sdf_framework_schema import sdf_framework_schema
 from .schemas.td_schema import td_schema
@@ -31,3 +32,7 @@ def main(args):
         convert_model(args.from_sdf, args.to_tm,
                       sdf_framework_schema, tm_schema,
                       convert_sdf_to_wot_tm)
+    elif args.from_tm and args.to_sdf:
+        convert_model(args.from_tm, args.to_sdf,
+                      tm_schema, sdf_framework_schema,
+                      convert_wot_tm_to_sdf)
