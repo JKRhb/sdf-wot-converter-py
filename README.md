@@ -23,7 +23,7 @@ You need at least Python 3.6 and pip installed.
 
 ## Using the command line tool
 
-After installing the libary you should be able to call the converter in your terminal using `sdf-wot-converter`. You can display available parameters by typing  `sdf-wot-converter --help`. You far, you can convert from SDF to WoT Thing models.
+After installing the libary you should be able to call the converter in your terminal using `sdf-wot-converter`. You can display available parameters by typing  `sdf-wot-converter --help`. So far, you can only convert from SDF to WoT Thing models but the other direction will be added soon.
 
 ### Example
 
