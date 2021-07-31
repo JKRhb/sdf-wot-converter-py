@@ -231,7 +231,7 @@ td_schema = {
                 }
             }
         },
-        "additionalResponsesDefinition":{
+        "additionalResponsesDefinition": {
             "type": "array",
             "items": {
                 "type": "object",
@@ -242,8 +242,8 @@ td_schema = {
                     "schema": {
                         "type": "string"
                     },
-                    "success":{
-                        "type":"boolean"
+                    "success": {
+                        "type": "boolean"
                     }
                 }
             }
@@ -303,7 +303,7 @@ td_schema = {
                     }
                 },
                 "additionalResponses": {
-                    "$ref":"#/definitions/additionalResponsesDefinition"
+                    "$ref": "#/definitions/additionalResponsesDefinition"
                 }
             },
             "required": [
@@ -360,7 +360,7 @@ td_schema = {
                     }
                 },
                 "additionalResponses": {
-                    "$ref":"#/definitions/additionalResponsesDefinition"
+                    "$ref": "#/definitions/additionalResponsesDefinition"
                 }
             },
             "required": [
@@ -419,7 +419,7 @@ td_schema = {
                     }
                 },
                 "additionalResponses": {
-                    "$ref":"#/definitions/additionalResponsesDefinition"
+                    "$ref": "#/definitions/additionalResponsesDefinition"
                 }
             },
             "required": [
@@ -490,7 +490,7 @@ td_schema = {
                     }
                 },
                 "additionalResponses": {
-                    "$ref":"#/definitions/additionalResponsesDefinition"
+                    "$ref": "#/definitions/additionalResponsesDefinition"
                 }
             },
             "required": [
