@@ -95,7 +95,7 @@ def map_version(infoblock: Dict, thing_model: Dict):
 def map_infoblock(sdf_model: Dict, thing_model: Dict):
     infoblock = sdf_model.get("info")
     if infoblock:
-        map_field(infoblock, thing_model, "label", "title")
+        map_field(infoblock, thing_model, "title", "title")
         map_field(infoblock, thing_model, "copyright", "description")
         map_license(infoblock, thing_model)
         map_version(infoblock, thing_model)
