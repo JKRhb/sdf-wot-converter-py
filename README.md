@@ -14,7 +14,7 @@ After cloning the repository run the following commands in the repo's directory:
 ```sh
 pip install -q build
 python -m build
-pip install dist/sdf-wot-converter-py-0.0.1.tar.gz
+pip install --find-links dist/ sdf-wot-converter-py
 ```
 
 You need at least Python 3.6 and pip installed.
