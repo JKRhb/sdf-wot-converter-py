@@ -5,6 +5,10 @@ import urllib.request
 from urllib.error import HTTPError, URLError
 import json
 
+class SdfRefLoopError(Exception):
+    """Raised when an sdfRef cannot be resolved due to a loop"""
+    pass
+
 
 def resolve_namespace(sdf_model: dict, namespace: Optional[str]):
     if not namespace:
@@ -23,7 +27,7 @@ def resolve_sdf_ref(sdf_model: Dict, sdf_definition: Dict, namespace: Optional[s
         resolved_sdf_ref = sdf_ref.replace("#", namespace)
 
         if resolved_sdf_ref in sdf_ref_list:
-            return sdf_definition
+            raise SdfRefLoopError(f"Encountered a looping sdfRef: {resolved_sdf_ref}")
         if root == "#":
             original = resolve_pointer(sdf_model, "/" + pointer)
             original = resolve_sdf_ref(
