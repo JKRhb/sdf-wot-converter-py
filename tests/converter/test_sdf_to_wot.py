@@ -309,6 +309,11 @@ def test_sdf_tm_nested_model():
     input = {
         "sdfThing": {
             "foo": {
+                "sdfRequired": [
+                    "#/sdfThing/foo/sdfThing/bar/sdfObject/baz/sdfProperty/foobar",
+                    "#/sdfThing/foo/sdfThing/bar/sdfObject/baz/sdfAction/foobar",
+                    "#/sdfThing/foo/sdfThing/bar/sdfObject/baz/sdfEvent/foobar",
+                ],
                 "sdfThing": {
                     "bar": {
                         "sdfObject": {
@@ -359,7 +364,12 @@ def test_sdf_tm_nested_model():
                 "sdf:jsonPointer": "#/sdfThing/foo/sdfThing/bar/sdfObject/baz/sdfEvent/foobar",
                 "title": "hi"
             },
-        }
+        },
+        "tm:required": [
+            "#/actions/foo_bar_baz_foobar",
+            "#/properties/foo_bar_baz_foobar",
+            "#/events/foo_bar_baz_foobar",
+        ]
     }
 
     perform_conversion_test(input, expected_result, sdf_tm_helper)
