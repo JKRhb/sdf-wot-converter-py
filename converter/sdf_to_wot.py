@@ -130,9 +130,16 @@ def map_common_qualities(sdf_definition: Dict, wot_definition: Dict):
     map_field(sdf_definition, wot_definition, "$comment", "sdf:$comment")
 
 
-def map_data_qualities(sdf_model: Dict, data_qualities: Dict, data_schema: Dict, is_property=False):
-    # TODO: Unmapped fields: sdfChoice
+def map_sdf_choice(sdf_model: Dict, data_qualities: Dict, data_schema: Dict):
+    if "sdfChoice" in data_qualities:
+        initialize_list_field(data_schema, "enum")
+        for choice_name, choice in data_qualities["sdfChoice"].items():
+            mapped_choice = {"sdf:choiceName": choice_name}
+            map_data_qualities(sdf_model, choice, mapped_choice)
+            data_schema["enum"].append(mapped_choice)
 
+
+def map_data_qualities(sdf_model: Dict, data_qualities: Dict, data_schema: Dict, is_property=False):
     data_qualities = resolve_sdf_ref(sdf_model, data_qualities, None, [])
 
     map_common_qualities(data_qualities, data_schema)
@@ -152,6 +159,8 @@ def map_data_qualities(sdf_model: Dict, data_qualities: Dict, data_schema: Dict,
     # TODO: Revisit the mapping of these two fields
     map_field(data_qualities, data_schema, "nullable", "sdf:nullable")
     map_field(data_qualities, data_schema, "sdfType", "sdf:sdfType")
+
+    map_sdf_choice(sdf_model, data_qualities, data_schema)
 
     if is_property:
         map_field(data_qualities, data_schema, "observable", "observable")
