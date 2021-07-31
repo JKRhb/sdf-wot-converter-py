@@ -2,6 +2,7 @@ from converter import convert_sdf_to_wot_tm
 from jsonschema import validate
 from converter.schemas.tm_schema import tm_schema
 from converter.schemas.sdf_validation_schema import sdf_validation_schema
+import pytest
 
 
 def perform_conversion_test(input, expected_result, conversion_function):
@@ -373,3 +374,23 @@ def test_sdf_tm_nested_model():
     }
 
     perform_conversion_test(input, expected_result, sdf_tm_helper)
+
+
+def test_sdf_tm_looping_sdf_ref():
+    input = {
+        "sdfProperty": {
+            "foo": {
+                "sdfRef": "#/sdfProperty/bar"
+            },
+            "bar": {
+                "sdfRef": "#/sdfProperty/foo"
+            },
+        },
+    }
+
+    expected_result = None
+
+    with pytest.raises(Exception) as e_info:
+        perform_conversion_test(input, expected_result, sdf_tm_helper)
+
+    assert str(e_info.value) == "Encountered a looping sdfRef: #/sdfProperty/bar"
