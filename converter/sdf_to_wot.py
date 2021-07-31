@@ -5,8 +5,19 @@ import urllib.request
 from urllib.error import HTTPError, URLError
 import json
 
+
 class SdfRefLoopError(Exception):
     """Raised when an sdfRef cannot be resolved due to a loop"""
+    pass
+
+
+class InvalidSdfRefError(Exception):
+    """Raised when an unparsable sdfRef has been included in an SDF Model"""
+    pass
+
+
+class SdfRefUrlRetrievalError(Exception):
+    """Raised when an sdfRef pointing to a URL could not be resolved"""
     pass
 
 
@@ -27,7 +38,8 @@ def resolve_sdf_ref(sdf_model: Dict, sdf_definition: Dict, namespace: Optional[s
         resolved_sdf_ref = sdf_ref.replace("#", namespace)
 
         if resolved_sdf_ref in sdf_ref_list:
-            raise SdfRefLoopError(f"Encountered a looping sdfRef: {resolved_sdf_ref}")
+            raise SdfRefLoopError(
+                f"Encountered a looping sdfRef: {resolved_sdf_ref}")
         if root == "#":
             original = resolve_pointer(sdf_model, "/" + pointer)
             original = resolve_sdf_ref(
@@ -42,10 +54,12 @@ def resolve_sdf_ref(sdf_model: Dict, sdf_definition: Dict, namespace: Optional[s
                         retrieved_sdf_model, "/" + pointer)
                     original = resolve_sdf_ref(
                         retrieved_sdf_model, original, resolved_url, sdf_ref_list)
-            except (AttributeError, HTTPError, URLError):
-                return sdf_definition
+            except Exception:
+                raise SdfRefUrlRetrievalError(
+                    f"No valid SDF model could be retrieved from {resolved_url}")
         else:
-            return sdf_definition
+            raise InvalidSdfRefError(
+                f"sdfRef {resolved_sdf_ref} could not be resolved")
 
         return json_merge_patch.merge(original, sdf_definition)
     return sdf_definition

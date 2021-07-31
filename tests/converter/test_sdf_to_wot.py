@@ -394,3 +394,77 @@ def test_sdf_tm_looping_sdf_ref():
         perform_conversion_test(input, expected_result, sdf_tm_helper)
 
     assert str(e_info.value) == "Encountered a looping sdfRef: #/sdfProperty/bar"
+
+
+def test_sdf_tm_unparsabable_sdf_ref():
+    input = {
+        "sdfProperty": {
+            "foo": {
+                "sdfRef": "bla/sdfProperty/bar"
+            },
+        },
+    }
+
+    expected_result = None
+
+    with pytest.raises(Exception) as e_info:
+        perform_conversion_test(input, expected_result, sdf_tm_helper)
+
+    assert str(e_info.value) == "sdfRef bla/sdfProperty/bar could not be resolved"
+
+
+def test_sdf_tm_failing_URL_sdf_ref():
+    input = {
+        "namespace": {
+            "bla": "https://example.org"
+        },
+        "sdfProperty": {
+            "foo": {
+                "sdfRef": "bla:/sdfProperty/bar"
+            },
+        },
+    }
+
+    expected_result = None
+
+    with pytest.raises(Exception) as e_info:
+        perform_conversion_test(input, expected_result, sdf_tm_helper)
+
+    error_message = "No valid SDF model could be retrieved from https://example.org"
+
+    assert str(e_info.value) == error_message
+
+
+def test_sdf_tm_succeeding_URL_sdf_ref():
+    input = {
+        "namespace": {
+            "test": "https://raw.githubusercontent.com/one-data-model/playground/master/sdfObject/sdfobject-accelerometer.sdf.json"
+        },
+        "sdfProperty": {
+            "foo": {
+                "sdfRef": "test:/sdfObject/Accelerometer/sdfProperty/X_Value"
+            },
+        },
+    }
+
+    expected_result = {
+        "@context": [
+            "http://www.w3.org/ns/td",
+            {
+                "sdf": "https://example.com/sdf",
+                "test": "https://raw.githubusercontent.com/one-data-model/playground/master/sdfObject/sdfobject-accelerometer.sdf.json"
+            }
+        ],
+        "@type": "tm:ThingModel",
+        "properties": {
+            "foo": {
+                "title": "X Value",
+                "description": "The measured value along the X axis.",
+                "readOnly": True,
+                "type": "number",
+                "sdf:jsonPointer": "#/sdfProperty/foo"
+            },
+        },
+    }
+
+    perform_conversion_test(input, expected_result, sdf_tm_helper)
