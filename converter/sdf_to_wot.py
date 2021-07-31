@@ -155,6 +155,7 @@ def map_action_qualities(sdf_model: Dict, thing_model: Dict, sdf_action: Dict, a
         "sdf:jsonPointer": json_pointer
     }
     collect_sdf_required(thing_model, sdf_action)
+    sdf_action = resolve_sdf_ref(sdf_model, sdf_action, None, [])
 
     map_common_qualities(sdf_action, wot_action)
 
@@ -229,6 +230,7 @@ def map_event_qualities(sdf_model: Dict, thing_model: Dict, sdf_event: Dict, aff
         "sdf:jsonPointer": json_pointer
     }
     collect_sdf_required(thing_model, sdf_event)
+    sdf_event = resolve_sdf_ref(sdf_model, sdf_event, None, [])
 
     map_common_qualities(sdf_event, wot_event)
 
