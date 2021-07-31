@@ -22,7 +22,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -q build
         python -m build
-        pip install dist/sdf-wot-converter-py-0.0.1.tar.gz
+        pip install --find-links dist/ sdf-wot-converter-py
     - name: Convert SDF models to WoT TM
       run: |
         sudo chmod +x convert_playground.sh
