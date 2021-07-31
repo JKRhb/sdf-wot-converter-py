@@ -303,3 +303,63 @@ def test_sdf_tm_sdf_ref_conversion():
     }
 
     perform_conversion_test(input, expected_result, sdf_tm_helper)
+
+
+def test_sdf_tm_nested_model():
+    input = {
+        "sdfThing": {
+            "foo": {
+                "sdfThing": {
+                    "bar": {
+                        "sdfObject": {
+                            "baz": {
+                                "sdfProperty": {
+                                    "foobar": {
+                                        "label": "hi"
+                                    },
+                                },
+                                "sdfAction": {
+                                    "foobar": {
+                                        "label": "hi"
+                                    },
+                                },
+                                "sdfEvent": {
+                                    "foobar": {
+                                        "label": "hi"
+                                    },
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    expected_result = {
+        "@context": [
+            "http://www.w3.org/ns/td",
+            {"sdf": "https://example.com/sdf"}
+        ],
+        "@type": "tm:ThingModel",
+        "actions": {
+            "foo_bar_baz_foobar": {
+                "sdf:jsonPointer": "#/sdfThing/foo/sdfThing/bar/sdfObject/baz/sdfAction/foobar",
+                "title": "hi"
+            },
+        },
+        "properties": {
+            "foo_bar_baz_foobar": {
+                "sdf:jsonPointer": "#/sdfThing/foo/sdfThing/bar/sdfObject/baz/sdfProperty/foobar",
+                "title": "hi"
+            },
+        },
+        "events": {
+            "foo_bar_baz_foobar": {
+                "sdf:jsonPointer": "#/sdfThing/foo/sdfThing/bar/sdfObject/baz/sdfEvent/foobar",
+                "title": "hi"
+            },
+        }
+    }
+
+    perform_conversion_test(input, expected_result, sdf_tm_helper)
