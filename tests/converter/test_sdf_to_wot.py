@@ -66,6 +66,7 @@ def test_sdf_tm_type_conversion():
         "sdfProperty": {
             "foo": {
                 "type": "integer",
+                "readable": True,
                 "minimum": 0,
                 "maximum": 9002,
                 "exclusiveMinimum": 0,
@@ -74,6 +75,7 @@ def test_sdf_tm_type_conversion():
             },
             "bar": {
                 "type": "number",
+                "writable": True,
                 "minimum": 0.0,
                 "maximum": 9002.0,
                 "exclusiveMinimum": 0.0,
@@ -108,6 +110,7 @@ def test_sdf_tm_type_conversion():
         "@type": "tm:ThingModel",
         "properties": {
             "foo": {
+                "writeOnly": False,
                 "type": "integer",
                 "minimum": 0,
                 "maximum": 9002,
@@ -117,6 +120,7 @@ def test_sdf_tm_type_conversion():
                 'sdf:jsonPointer': '#/sdfProperty/foo',
             },
             "bar": {
+                "readOnly": False,
                 "type": "number",
                 "minimum": 0.0,
                 "maximum": 9002.0,
