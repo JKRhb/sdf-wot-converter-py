@@ -119,7 +119,7 @@ def map_data_qualities(sdf_model: Dict, data_qualities: Dict, data_schema: Dict,
 
     map_common_qualities(data_qualities, data_schema)
 
-    for sdf_field, wot_field in [("writeable", "readOnly"), ("readable", "writeOnly")]:
+    for sdf_field, wot_field in [("writable", "readOnly"), ("readable", "writeOnly")]:
         if sdf_field in data_qualities:
             data_schema[wot_field] = not data_qualities[sdf_field]
 
