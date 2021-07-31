@@ -158,14 +158,13 @@ def map_action_qualities(sdf_model: Dict, thing_model: Dict, sdf_action: Dict, a
 
     map_common_qualities(sdf_action, wot_action)
 
-    data_map_pairs = [("sdfInputData", "inputData"),
-                      ("sdfOutputData", "outputData")]
+    data_map_pairs = [("sdfInputData", "input"),
+                      ("sdfOutputData", "output")]
 
     for sdf_field, wot_field in data_map_pairs:
-        for data_quality in sdf_action.get(sdf_field, []):
-            initialize_list_field(wot_action, wot_field)
-            data_schema = map_data_qualities(sdf_model, data_quality, {})
-            wot_action[wot_field].append(data_schema)
+        if sdf_field in sdf_action:
+            wot_action[wot_field] = {}
+            map_data_qualities(sdf_model, sdf_action[sdf_field], wot_action[wot_field])
 
     thing_model["actions"][affordance_key] = wot_action
 
