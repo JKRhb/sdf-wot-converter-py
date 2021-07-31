@@ -55,7 +55,8 @@ def test_sdf_tm_type_conversion():
                 "minLength": 3,
                 "maxLength": 5,
                 "pattern": "email",
-                "format": "uri-reference"
+                "format": "uri-reference",
+                "contentFormat": "audio/mpeg"
             },
             "foobar": {
                 "type": "array",
@@ -100,6 +101,7 @@ def test_sdf_tm_type_conversion():
                 "maxLength": 5,
                 "pattern": "email",
                 "format": "uri-reference",
+                "contentMediaType": "audio/mpeg",
                 'sdf:jsonPointer': '#/sdfProperty/baz',
             },
             "foobar": {
