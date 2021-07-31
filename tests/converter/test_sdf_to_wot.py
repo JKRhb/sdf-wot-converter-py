@@ -100,6 +100,11 @@ def test_sdf_tm_type_conversion():
             },
             "barfoo": {
                 "type": "object",
+                "properties": {
+                    "foo": {
+                        "type": "string"
+                    }
+                },
                 "required": ["foo"]
             }
         }
@@ -152,6 +157,11 @@ def test_sdf_tm_type_conversion():
             },
             "barfoo": {
                 "type": "object",
+                "properties": {
+                    "foo": {
+                        "type": "string"
+                    }
+                },
                 "required": ["foo"],
                 'sdf:jsonPointer': '#/sdfProperty/barfoo',
             }
