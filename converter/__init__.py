@@ -11,17 +11,17 @@ from .schemas.td_schema import td_schema
 from .schemas.tm_schema import tm_schema
 
 
-def load_model(input_path: str) -> Dict:
+def load_model(input_path: str) -> Dict: # pragma: no cover
     file = open(input_path)
     return json.load(file)
 
 
-def save_model(output_path: str, model: Dict, indent=4):
+def save_model(output_path: str, model: Dict, indent=4): # pragma: no cover
     file = open(output_path, "w")
     json.dump(model, file,  indent=indent)
 
 
-def convert_model(from_path: str, to_path: str, from_schema: Dict, to_schema: Dict, converter_function: Callable):
+def convert_model(from_path: str, to_path: str, from_schema: Dict, to_schema: Dict, converter_function: Callable): # pragma: no cover
     from_model = load_model(from_path)
     validate(from_model, from_schema)
     to_model = converter_function(from_model)
@@ -48,7 +48,7 @@ def parse_arguments(args):
     return parser.parse_args(args)
 
 
-def use_converter_cli(args):
+def use_converter_cli(args): # pragma: no cover
     if args.from_sdf and args.to_tm:
         convert_model(args.from_sdf, args.to_tm,
                       sdf_validation_schema, tm_schema,
