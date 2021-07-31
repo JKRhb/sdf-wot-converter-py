@@ -166,7 +166,8 @@ def map_action_qualities(sdf_model: Dict, thing_model: Dict, sdf_action: Dict, a
     for sdf_field, wot_field in data_map_pairs:
         if sdf_field in sdf_action:
             wot_action[wot_field] = {}
-            map_data_qualities(sdf_model, sdf_action[sdf_field], wot_action[wot_field])
+            map_data_qualities(
+                sdf_model, sdf_action[sdf_field], wot_action[wot_field])
 
     thing_model["actions"][affordance_key] = wot_action
 
@@ -251,7 +252,7 @@ def map_sdf_event(sdf_model: Dict, sdf_definition: Dict, thing_model: Dict, pref
     for key, sdf_event in sdf_definition.get("sdfEvent", {}).items():
         affordance_key = "_".join(prefix_list + [key])
         map_event_qualities(sdf_model, thing_model, sdf_event,
-                               affordance_key, f"{json_pointer_prefix}/sdfEvent/{key}")
+                            affordance_key, f"{json_pointer_prefix}/sdfEvent/{key}")
 
 
 def map_sdf_required(thing_model: Dict):
