@@ -31,6 +31,36 @@ def test_empty_sdf_tm_conversion():
     perform_conversion_test(input, expected_result, sdf_tm_helper)
 
 
+def test__sdf_tm_infoblock_conversion():
+    input = {
+        "info": {
+            "title": "Test",
+            "version": "2021-07-31",
+            "copyright": "Copyright (c) 2021 Example Corp",
+            "license": "https://example.com/LICENSE"
+        }
+    }
+
+    expected_result = {
+        "@context": [
+            "http://www.w3.org/ns/td",
+            {"sdf": "https://example.com/sdf"}
+        ],
+        "@type": "tm:ThingModel",
+        "title": "Test",
+        "description": "Copyright (c) 2021 Example Corp",
+        "version": {
+            "instance": "2021-07-31",
+        },
+        "links": [{
+            "href": "https://example.com/LICENSE",
+            "rel": "license"
+        }]
+    }
+
+    perform_conversion_test(input, expected_result, sdf_tm_helper)
+
+
 def test_sdf_tm_type_conversion():
     input = {
         "sdfProperty": {

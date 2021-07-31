@@ -83,8 +83,7 @@ def add_link(thing_model: Dict, href: str, type: Optional[str],  rel: Optional[s
 def map_license(infoblock: Dict, thing_model: Dict):
     license_href = infoblock.get("license")
     if license_href:
-        pass
-        # add_link(thing_model, license_href, None, "license", None, None)
+        add_link(thing_model, license_href, None, "license", None, None)
 
 
 def map_version(infoblock: Dict, thing_model: Dict):
@@ -96,7 +95,7 @@ def map_version(infoblock: Dict, thing_model: Dict):
 def map_infoblock(sdf_model: Dict, thing_model: Dict):
     infoblock = sdf_model.get("info")
     if infoblock:
-        map_field(infoblock, thing_model, "label", "title")
+        map_field(infoblock, thing_model, "title", "title")
         map_field(infoblock, thing_model, "copyright", "description")
         map_license(infoblock, thing_model)
         map_version(infoblock, thing_model)
@@ -167,7 +166,8 @@ def map_action_qualities(sdf_model: Dict, thing_model: Dict, sdf_action: Dict, a
     for sdf_field, wot_field in data_map_pairs:
         if sdf_field in sdf_action:
             wot_action[wot_field] = {}
-            map_data_qualities(sdf_model, sdf_action[sdf_field], wot_action[wot_field])
+            map_data_qualities(
+                sdf_model, sdf_action[sdf_field], wot_action[wot_field])
 
     thing_model["actions"][affordance_key] = wot_action
 
@@ -252,7 +252,7 @@ def map_sdf_event(sdf_model: Dict, sdf_definition: Dict, thing_model: Dict, pref
     for key, sdf_event in sdf_definition.get("sdfEvent", {}).items():
         affordance_key = "_".join(prefix_list + [key])
         map_event_qualities(sdf_model, thing_model, sdf_event,
-                               affordance_key, f"{json_pointer_prefix}/sdfEvent/{key}")
+                            affordance_key, f"{json_pointer_prefix}/sdfEvent/{key}")
 
 
 def map_sdf_required(thing_model: Dict):
