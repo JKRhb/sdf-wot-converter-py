@@ -15,6 +15,11 @@ class InvalidSdfRefError(Exception):
     pass
 
 
+class SdfRefUrlRetrievalError(Exception):
+    """Raised when an sdfRef pointing to a URL could not be resolved"""
+    pass
+
+
 def resolve_namespace(sdf_model: dict, namespace: Optional[str]):
     if not namespace:
         namespace = sdf_model.get("defaultNamespace", "#")
@@ -47,8 +52,9 @@ def resolve_sdf_ref(sdf_model: Dict, sdf_definition: Dict, namespace: Optional[s
                         retrieved_sdf_model, "/" + pointer)
                     original = resolve_sdf_ref(
                         retrieved_sdf_model, original, resolved_url, sdf_ref_list)
-            except (AttributeError, HTTPError, URLError):
-                return sdf_definition
+            except Exception:
+                raise SdfRefUrlRetrievalError(
+                    f"No valid SDF model could be retrieved from {resolved_url}")
         else:
             raise InvalidSdfRefError(
                 f"sdfRef {resolved_sdf_ref} could not be resolved")
