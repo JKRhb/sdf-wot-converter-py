@@ -411,3 +411,25 @@ def test_sdf_tm_unparsabable_sdf_ref():
         perform_conversion_test(input, expected_result, sdf_tm_helper)
 
     assert str(e_info.value) == "sdfRef bla/sdfProperty/bar could not be resolved"
+
+
+def test_sdf_tm_failing_URL_sdf_ref():
+    input = {
+        "namespace": {
+            "bla": "https://example.org"
+        },
+        "sdfProperty": {
+            "foo": {
+                "sdfRef": "bla:/sdfProperty/bar"
+            },
+        },
+    }
+
+    expected_result = None
+
+    with pytest.raises(Exception) as e_info:
+        perform_conversion_test(input, expected_result, sdf_tm_helper)
+
+    error_message = "No valid SDF model could be retrieved from https://example.org"
+
+    assert str(e_info.value) == error_message
