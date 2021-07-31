@@ -394,3 +394,20 @@ def test_sdf_tm_looping_sdf_ref():
         perform_conversion_test(input, expected_result, sdf_tm_helper)
 
     assert str(e_info.value) == "Encountered a looping sdfRef: #/sdfProperty/bar"
+
+
+def test_sdf_tm_unparsabable_sdf_ref():
+    input = {
+        "sdfProperty": {
+            "foo": {
+                "sdfRef": "bla/sdfProperty/bar"
+            },
+        },
+    }
+
+    expected_result = None
+
+    with pytest.raises(Exception) as e_info:
+        perform_conversion_test(input, expected_result, sdf_tm_helper)
+
+    assert str(e_info.value) == "sdfRef bla/sdfProperty/bar could not be resolved"
