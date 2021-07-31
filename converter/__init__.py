@@ -59,6 +59,6 @@ def use_converter_cli(args):
                       convert_wot_tm_to_sdf)
 
 
-def main():
+def main(): # pragma: no cover
     args = parse_arguments(sys.argv[1:])
     use_converter_cli(args)
