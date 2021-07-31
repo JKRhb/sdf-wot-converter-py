@@ -1,5 +1,6 @@
 import json
 import argparse
+import sys
 from jsonschema import validate
 from typing import Dict, Callable
 from .sdf_to_wot import convert_sdf_to_wot_tm
@@ -10,17 +11,17 @@ from .schemas.td_schema import td_schema
 from .schemas.tm_schema import tm_schema
 
 
-def load_model(input_path: str) -> Dict:
+def load_model(input_path: str) -> Dict: # pragma: no cover
     file = open(input_path)
     return json.load(file)
 
 
-def save_model(output_path: str, model: Dict, indent=4):
+def save_model(output_path: str, model: Dict, indent=4): # pragma: no cover
     file = open(output_path, "w")
     json.dump(model, file,  indent=indent)
 
 
-def convert_model(from_path: str, to_path: str, from_schema: Dict, to_schema: Dict, converter_function: Callable):
+def convert_model(from_path: str, to_path: str, from_schema: Dict, to_schema: Dict, converter_function: Callable): # pragma: no cover
     from_model = load_model(from_path)
     validate(from_model, from_schema)
     to_model = converter_function(from_model)
@@ -28,7 +29,7 @@ def convert_model(from_path: str, to_path: str, from_schema: Dict, to_schema: Di
     save_model(to_path, to_model)
 
 
-def parse_arguments():
+def parse_arguments(args):
     parser = argparse.ArgumentParser(
         description='Convert from SDF to WoT and vice versa.')
 
@@ -44,11 +45,10 @@ def parse_arguments():
     to_group.add_argument('--to-sdf', metavar='SDF',
                           dest="to_sdf", help='SDF output file')
 
-    return parser.parse_args()
+    return parser.parse_args(args)
 
 
-def main():
-    args = parse_arguments()
+def use_converter_cli(args): # pragma: no cover
     if args.from_sdf and args.to_tm:
         convert_model(args.from_sdf, args.to_tm,
                       sdf_validation_schema, tm_schema,
@@ -57,3 +57,8 @@ def main():
         convert_model(args.from_tm, args.to_sdf,
                       tm_schema, sdf_validation_schema,
                       convert_wot_tm_to_sdf)
+
+
+def main(): # pragma: no cover
+    args = parse_arguments(sys.argv[1:])
+    use_converter_cli(args)
