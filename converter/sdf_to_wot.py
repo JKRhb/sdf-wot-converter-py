@@ -114,7 +114,7 @@ def map_common_qualities(sdf_definition: Dict, wot_definition: Dict):
 
 
 def map_data_qualities(sdf_model: Dict, data_qualities: Dict, data_schema: Dict, is_property=False):
-    # TODO: Unmapped fields: sdfChoice, nullable, sdfType, contentFormat
+    # TODO: Unmapped fields: sdfChoice, nullable, sdfType
 
     data_qualities = resolve_sdf_ref(sdf_model, data_qualities, None, [])
 
@@ -129,6 +129,8 @@ def map_data_qualities(sdf_model: Dict, data_qualities: Dict, data_schema: Dict,
                        "multipleOf", "required", "format", "uniqueItems", "pattern",
                        "exclusiveMinimum", "exclusiveMaximum"]:
         map_field(data_qualities, data_schema, field_name, field_name)
+
+    map_field(data_qualities, data_schema, "contentFormat", "contentMediaType")
 
     if is_property:
         map_field(data_qualities, data_schema, "observable", "observable")
