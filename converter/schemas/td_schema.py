@@ -207,12 +207,14 @@ td_schema = {
                     "minimum": 0
                 },
                 "multipleOf": {
-                    "oneOf": [
+                    "anyOf": [
                         {
-                            "type": "integer"
+                            "type": "integer",
+                            "exclusiveMinimum": 0
                         },
                         {
-                            "type": "number"
+                            "type": "number",
+                            "exclusiveMinimum": 0
                         }
                     ]
                 },
@@ -229,7 +231,7 @@ td_schema = {
                 }
             }
         },
-        "additionalResponsesDefinition": {
+        "additionalResponsesDefinition":{
             "type": "array",
             "items": {
                 "type": "object",
@@ -240,8 +242,8 @@ td_schema = {
                     "schema": {
                         "type": "string"
                     },
-                    "success": {
-                        "type": "boolean"
+                    "success":{
+                        "type":"boolean"
                     }
                 }
             }
@@ -301,7 +303,7 @@ td_schema = {
                     }
                 },
                 "additionalResponses": {
-                    "$ref": "#/definitions/additionalResponsesDefinition"
+                    "$ref":"#/definitions/additionalResponsesDefinition"
                 }
             },
             "required": [
@@ -358,7 +360,7 @@ td_schema = {
                     }
                 },
                 "additionalResponses": {
-                    "$ref": "#/definitions/additionalResponsesDefinition"
+                    "$ref":"#/definitions/additionalResponsesDefinition"
                 }
             },
             "required": [
@@ -417,7 +419,7 @@ td_schema = {
                     }
                 },
                 "additionalResponses": {
-                    "$ref": "#/definitions/additionalResponsesDefinition"
+                    "$ref":"#/definitions/additionalResponsesDefinition"
                 }
             },
             "required": [
@@ -488,7 +490,7 @@ td_schema = {
                     }
                 },
                 "additionalResponses": {
-                    "$ref": "#/definitions/additionalResponsesDefinition"
+                    "$ref":"#/definitions/additionalResponsesDefinition"
                 }
             },
             "required": [
@@ -602,12 +604,14 @@ td_schema = {
                     "minimum": 0
                 },
                 "multipleOf": {
-                    "oneOf": [
+                    "anyOf": [
                         {
-                            "type": "integer"
+                            "type": "integer",
+                            "exclusiveMinimum": 0
                         },
                         {
-                            "type": "number"
+                            "type": "number",
+                            "exclusiveMinimum": 0
                         }
                     ]
                 },

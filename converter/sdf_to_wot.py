@@ -155,17 +155,17 @@ def map_action_qualities(sdf_model: Dict, thing_model: Dict, sdf_action: Dict, a
         "sdf:jsonPointer": json_pointer
     }
     collect_sdf_required(thing_model, sdf_action)
+    sdf_action = resolve_sdf_ref(sdf_model, sdf_action, None, [])
 
     map_common_qualities(sdf_action, wot_action)
 
-    data_map_pairs = [("sdfInputData", "inputData"),
-                      ("sdfOutputData", "outputData")]
+    data_map_pairs = [("sdfInputData", "input"),
+                      ("sdfOutputData", "output")]
 
     for sdf_field, wot_field in data_map_pairs:
-        for data_quality in sdf_action.get(sdf_field, []):
-            initialize_list_field(wot_action, wot_field)
-            data_schema = map_data_qualities(sdf_model, data_quality, {})
-            wot_action[wot_field].append(data_schema)
+        if sdf_field in sdf_action:
+            wot_action[wot_field] = {}
+            map_data_qualities(sdf_model, sdf_action[sdf_field], wot_action[wot_field])
 
     thing_model["actions"][affordance_key] = wot_action
 
@@ -224,12 +224,13 @@ def map_sdf_property(sdf_model: Dict, sdf_definition: Dict, thing_model: Dict, p
 
 
 def map_event_qualities(sdf_model: Dict, thing_model: Dict, sdf_event: Dict, affordance_key: str, json_pointer: str):
-    initialize_object_field(thing_model, "actions")
+    initialize_object_field(thing_model, "events")
 
     wot_event: Dict[str, Any] = {
         "sdf:jsonPointer": json_pointer
     }
     collect_sdf_required(thing_model, sdf_event)
+    sdf_event = resolve_sdf_ref(sdf_model, sdf_event, None, [])
 
     map_common_qualities(sdf_event, wot_event)
 
@@ -248,7 +249,7 @@ def collect_sdf_required(thing_model: Dict, sdf_definition: Dict):
 def map_sdf_event(sdf_model: Dict, sdf_definition: Dict, thing_model: Dict, prefix_list: List[str], json_pointer_prefix: str):
     for key, sdf_event in sdf_definition.get("sdfEvent", {}).items():
         affordance_key = "_".join(prefix_list + [key])
-        map_property_qualities(sdf_model, thing_model, sdf_event,
+        map_event_qualities(sdf_model, thing_model, sdf_event,
                                affordance_key, f"{json_pointer_prefix}/sdfEvent/{key}")
 
 
