@@ -131,7 +131,7 @@ def map_common_qualities(sdf_definition: Dict, wot_definition: Dict):
 
 
 def map_data_qualities(sdf_model: Dict, data_qualities: Dict, data_schema: Dict, is_property=False):
-    # TODO: Unmapped fields: sdfChoice, nullable, sdfType
+    # TODO: Unmapped fields: sdfChoice
 
     data_qualities = resolve_sdf_ref(sdf_model, data_qualities, None, [])
 
