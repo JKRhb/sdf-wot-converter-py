@@ -480,3 +480,56 @@ def test_sdf_tm_succeeding_URL_sdf_ref():
     }
 
     perform_conversion_test(input, expected_result, sdf_tm_helper)
+
+
+def test_sdf_tm_sdf_choice():
+    input = {
+        "sdfProperty": {
+            "foobar": {
+                "sdfChoice": {
+                    "blah": {
+                        "type": "string"
+                    }
+                }
+            },
+            "foobaz": {
+                "enum": ["blargh"],
+                "sdfChoice": {
+                    "blah": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    }
+
+    expected_result = {
+        "@context": [
+            "http://www.w3.org/ns/td",
+            {"sdf": "https://example.com/sdf"}
+        ],
+        "@type": "tm:ThingModel",
+        "properties": {
+            "foobar": {
+                "enum": [
+                    {
+                        "sdf:choiceName": "blah",
+                        "type": "string"
+                    }
+                ],
+                "sdf:jsonPointer": "#/sdfProperty/foobar"
+            },
+            "foobaz": {
+                "enum": [
+                    "blargh",
+                    {
+                        "sdf:choiceName": "blah",
+                        "type": "string"
+                    }
+                ],
+                "sdf:jsonPointer": "#/sdfProperty/foobaz"
+            }
+        }
+    }
+
+    perform_conversion_test(input, expected_result, sdf_tm_helper)
