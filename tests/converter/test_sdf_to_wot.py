@@ -66,6 +66,7 @@ def test_sdf_tm_type_conversion():
     input = {
         "sdfProperty": {
             "foo": {
+                "$comment": "This is a comment!",
                 "type": "integer",
                 "readable": True,
                 "minimum": 0,
@@ -119,6 +120,7 @@ def test_sdf_tm_type_conversion():
         "@type": "tm:ThingModel",
         "properties": {
             "foo": {
+                "sdf:$comment": "This is a comment!",
                 "writeOnly": False,
                 "type": "integer",
                 "minimum": 0,
