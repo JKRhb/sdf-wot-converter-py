@@ -10,6 +10,11 @@ class SdfRefLoopError(Exception):
     pass
 
 
+class InvalidSdfRefError(Exception):
+    """Raised when an unparsable sdfRef has been included in an SDF Model"""
+    pass
+
+
 def resolve_namespace(sdf_model: dict, namespace: Optional[str]):
     if not namespace:
         namespace = sdf_model.get("defaultNamespace", "#")
@@ -45,7 +50,8 @@ def resolve_sdf_ref(sdf_model: Dict, sdf_definition: Dict, namespace: Optional[s
             except (AttributeError, HTTPError, URLError):
                 return sdf_definition
         else:
-            return sdf_definition
+            raise InvalidSdfRefError(
+                f"sdfRef {resolved_sdf_ref} could not be resolved")
 
         return json_merge_patch.merge(original, sdf_definition)
     return sdf_definition
