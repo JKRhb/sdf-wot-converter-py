@@ -149,6 +149,10 @@ def map_data_qualities(sdf_model: Dict, data_qualities: Dict, data_schema: Dict,
 
     map_field(data_qualities, data_schema, "contentFormat", "contentMediaType")
 
+    # TODO: Revisit the mapping of these two fields
+    map_field(data_qualities, data_schema, "nullable", "sdf:nullable")
+    map_field(data_qualities, data_schema, "sdfType", "sdf:sdfType")
+
     if is_property:
         map_field(data_qualities, data_schema, "observable", "observable")
     else:
