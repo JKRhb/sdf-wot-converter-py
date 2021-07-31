@@ -93,7 +93,10 @@ def test_sdf_tm_type_conversion():
             "foobar": {
                 "type": "array",
                 "minItems": 2,
-                "maxItems": 5
+                "maxItems": 5,
+                "items": {
+                    "type": "string"
+                }
             },
             "barfoo": {
                 "type": "object",
@@ -142,6 +145,9 @@ def test_sdf_tm_type_conversion():
                 "type": "array",
                 "minItems": 2,
                 "maxItems": 5,
+                "items": {
+                    "type": "string"
+                },
                 'sdf:jsonPointer': '#/sdfProperty/foobar',
             },
             "barfoo": {
