@@ -133,9 +133,21 @@ def map_field(sdf_definition: Dict, wot_definition: Dict, sdf_key: str, wot_key:
 
 
 def map_common_qualities(sdf_definition: Dict, wot_definition: Dict):
-    map_field(sdf_definition, wot_definition, "label", "title")
-    map_field(sdf_definition, wot_definition, "description", "description")
+    map_label(sdf_definition, wot_definition)
+    map_description(sdf_definition, wot_definition)
+    map_comment(sdf_definition, wot_definition)
+
+
+def map_comment(sdf_definition, wot_definition):
     map_field(sdf_definition, wot_definition, "$comment", "sdf:$comment")
+
+
+def map_description(sdf_definition, wot_definition):
+    map_field(sdf_definition, wot_definition, "description", "description")
+
+
+def map_label(sdf_definition: Dict, wot_definition: Dict):
+    map_field(sdf_definition, wot_definition, "label", "title")
 
 
 def map_sdf_choice(sdf_model: Dict, data_qualities: Dict, data_schema: Dict):
