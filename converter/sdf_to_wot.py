@@ -2,7 +2,10 @@ from typing import Any, Dict, List, Optional
 from jsonpointer import resolve_pointer
 import json_merge_patch
 import urllib.request
-from urllib.error import HTTPError, URLError
+from .utility import(
+    initialize_list_field,
+    initialize_object_field,
+)
 import json
 
 
@@ -63,16 +66,6 @@ def resolve_sdf_ref(sdf_model: Dict, sdf_definition: Dict, namespace: Optional[s
 
         return json_merge_patch.merge(original, sdf_definition)
     return sdf_definition
-
-
-def initialize_object_field(model: Dict, field_name: str):
-    if field_name not in model:
-        model[field_name] = {}
-
-
-def initialize_list_field(model: Dict, field_name: str):
-    if field_name not in model:
-        model[field_name] = []
 
 
 def map_namespace(sdf_model: Dict, thing_model: Dict):
