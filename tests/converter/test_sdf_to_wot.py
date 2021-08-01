@@ -22,11 +22,8 @@ def test_empty_sdf_tm_conversion():
     input = {}
 
     expected_result = {
-        "@context": [
-            "http://www.w3.org/ns/td",
-            {"sdf": "https://example.com/sdf"}
-        ],
-        "@type": "tm:ThingModel"
+        "@context": ["http://www.w3.org/ns/td", {"sdf": "https://example.com/sdf"}],
+        "@type": "tm:ThingModel",
     }
 
     perform_conversion_test(input, expected_result, sdf_tm_helper)
@@ -38,25 +35,19 @@ def test__sdf_tm_infoblock_conversion():
             "title": "Test",
             "version": "2021-07-31",
             "copyright": "Copyright (c) 2021 Example Corp",
-            "license": "https://example.com/LICENSE"
+            "license": "https://example.com/LICENSE",
         }
     }
 
     expected_result = {
-        "@context": [
-            "http://www.w3.org/ns/td",
-            {"sdf": "https://example.com/sdf"}
-        ],
+        "@context": ["http://www.w3.org/ns/td", {"sdf": "https://example.com/sdf"}],
         "@type": "tm:ThingModel",
         "title": "Test",
         "description": "Copyright (c) 2021 Example Corp",
         "version": {
             "instance": "2021-07-31",
         },
-        "links": [{
-            "href": "https://example.com/LICENSE",
-            "rel": "license"
-        }]
+        "links": [{"href": "https://example.com/LICENSE", "rel": "license"}],
     }
 
     perform_conversion_test(input, expected_result, sdf_tm_helper)
@@ -75,7 +66,7 @@ def test_sdf_tm_type_conversion():
                 "maximum": 9002,
                 "exclusiveMinimum": 0,
                 "exclusiveMaximum": 9000,
-                "multipleOf": 2
+                "multipleOf": 2,
             },
             "bar": {
                 "type": "number",
@@ -86,7 +77,7 @@ def test_sdf_tm_type_conversion():
                 "maximum": 9002.0,
                 "exclusiveMinimum": 0.0,
                 "exclusiveMaximum": 9000.0,
-                "multipleOf": 2.0
+                "multipleOf": 2.0,
             },
             "baz": {
                 "type": "string",
@@ -95,33 +86,24 @@ def test_sdf_tm_type_conversion():
                 "enum": ["hi", "hey"],
                 "pattern": "email",
                 "format": "uri-reference",
-                "contentFormat": "audio/mpeg"
+                "contentFormat": "audio/mpeg",
             },
             "foobar": {
                 "type": "array",
                 "minItems": 2,
                 "maxItems": 5,
-                "items": {
-                    "type": "string"
-                }
+                "items": {"type": "string"},
             },
             "barfoo": {
                 "type": "object",
-                "properties": {
-                    "foo": {
-                        "type": "string"
-                    }
-                },
-                "required": ["foo"]
-            }
+                "properties": {"foo": {"type": "string"}},
+                "required": ["foo"],
+            },
         }
     }
 
     expected_result = {
-        "@context": [
-            "http://www.w3.org/ns/td",
-            {"sdf": "https://example.com/sdf"}
-        ],
+        "@context": ["http://www.w3.org/ns/td", {"sdf": "https://example.com/sdf"}],
         "@type": "tm:ThingModel",
         "properties": {
             "foo": {
@@ -135,7 +117,7 @@ def test_sdf_tm_type_conversion():
                 "exclusiveMinimum": 0,
                 "exclusiveMaximum": 9000,
                 "multipleOf": 2,
-                'sdf:jsonPointer': '#/sdfProperty/foo',
+                "sdf:jsonPointer": "#/sdfProperty/foo",
             },
             "bar": {
                 "readOnly": False,
@@ -147,7 +129,7 @@ def test_sdf_tm_type_conversion():
                 "exclusiveMinimum": 0.0,
                 "exclusiveMaximum": 9000.0,
                 "multipleOf": 2.0,
-                'sdf:jsonPointer': '#/sdfProperty/bar',
+                "sdf:jsonPointer": "#/sdfProperty/bar",
             },
             "baz": {
                 "type": "string",
@@ -157,28 +139,22 @@ def test_sdf_tm_type_conversion():
                 "pattern": "email",
                 "format": "uri-reference",
                 "contentMediaType": "audio/mpeg",
-                'sdf:jsonPointer': '#/sdfProperty/baz',
+                "sdf:jsonPointer": "#/sdfProperty/baz",
             },
             "foobar": {
                 "type": "array",
                 "minItems": 2,
                 "maxItems": 5,
-                "items": {
-                    "type": "string"
-                },
-                'sdf:jsonPointer': '#/sdfProperty/foobar',
+                "items": {"type": "string"},
+                "sdf:jsonPointer": "#/sdfProperty/foobar",
             },
             "barfoo": {
                 "type": "object",
-                "properties": {
-                    "foo": {
-                        "type": "string"
-                    }
-                },
+                "properties": {"foo": {"type": "string"}},
                 "required": ["foo"],
-                'sdf:jsonPointer': '#/sdfProperty/barfoo',
-            }
-        }
+                "sdf:jsonPointer": "#/sdfProperty/barfoo",
+            },
+        },
     }
 
     perform_conversion_test(input, expected_result, sdf_tm_helper)
@@ -188,62 +164,38 @@ def test_sdf_tm_action_conversion():
     input = {
         "sdfAction": {
             "foobar": {
-                "sdfInputData": {
-                    "type": "string"
-                },
-                "sdfOutputData": {
-                    "type": "string"
-                }
+                "sdfInputData": {"type": "string"},
+                "sdfOutputData": {"type": "string"},
             }
         }
     }
     expected_result = {
-        "@context": [
-            "http://www.w3.org/ns/td",
-            {"sdf": "https://example.com/sdf"}
-        ],
+        "@context": ["http://www.w3.org/ns/td", {"sdf": "https://example.com/sdf"}],
         "@type": "tm:ThingModel",
         "actions": {
             "foobar": {
-                'sdf:jsonPointer': '#/sdfAction/foobar',
-                "input": {
-                    "type": "string"
-                },
-                "output": {
-                    "type": "string"
-                }
+                "sdf:jsonPointer": "#/sdfAction/foobar",
+                "input": {"type": "string"},
+                "output": {"type": "string"},
             }
-        }
+        },
     }
 
     perform_conversion_test(input, expected_result, sdf_tm_helper)
 
 
 def test_sdf_tm_event_conversion():
-    input = {
-        "sdfEvent": {
-            "foobar": {
-                "sdfOutputData": {
-                    "type": "string"
-                }
-            }
-        }
-    }
+    input = {"sdfEvent": {"foobar": {"sdfOutputData": {"type": "string"}}}}
 
     expected_result = {
-        "@context": [
-            "http://www.w3.org/ns/td",
-            {"sdf": "https://example.com/sdf"}
-        ],
+        "@context": ["http://www.w3.org/ns/td", {"sdf": "https://example.com/sdf"}],
         "@type": "tm:ThingModel",
         "events": {
             "foobar": {
-                "data": {
-                    "type": "string"
-                },
-                "sdf:jsonPointer": "#/sdfEvent/foobar"
+                "data": {"type": "string"},
+                "sdf:jsonPointer": "#/sdfEvent/foobar",
             }
-        }
+        },
     }
 
     perform_conversion_test(input, expected_result, sdf_tm_helper)
@@ -252,67 +204,34 @@ def test_sdf_tm_event_conversion():
 def test_sdf_tm_sdf_ref_conversion():
     input = {
         "sdfAction": {
-            "foobar": {
-                "label": "hi"
-            },
-            "foobaz": {
-                "sdfRef": "#/sdfAction/foobar"
-            }
+            "foobar": {"label": "hi"},
+            "foobaz": {"sdfRef": "#/sdfAction/foobar"},
         },
         "sdfEvent": {
-            "foobar": {
-                "label": "hi"
-            },
-            "foobaz": {
-                "sdfRef": "#/sdfEvent/foobar"
-            }
+            "foobar": {"label": "hi"},
+            "foobaz": {"sdfRef": "#/sdfEvent/foobar"},
         },
         "sdfProperty": {
-            "foobar": {
-                "label": "hi"
-            },
-            "foobaz": {
-                "sdfRef": "#/sdfProperty/foobar"
-            }
-        }
+            "foobar": {"label": "hi"},
+            "foobaz": {"sdfRef": "#/sdfProperty/foobar"},
+        },
     }
 
     expected_result = {
-        "@context": [
-            "http://www.w3.org/ns/td",
-            {"sdf": "https://example.com/sdf"}
-        ],
+        "@context": ["http://www.w3.org/ns/td", {"sdf": "https://example.com/sdf"}],
         "@type": "tm:ThingModel",
         "actions": {
-            "foobar": {
-                "sdf:jsonPointer": "#/sdfAction/foobar",
-                "title": "hi"
-            },
-            "foobaz": {
-                "sdf:jsonPointer": "#/sdfAction/foobaz",
-                "title": "hi"
-            }
+            "foobar": {"sdf:jsonPointer": "#/sdfAction/foobar", "title": "hi"},
+            "foobaz": {"sdf:jsonPointer": "#/sdfAction/foobaz", "title": "hi"},
         },
         "properties": {
-            "foobar": {
-                "sdf:jsonPointer": "#/sdfProperty/foobar",
-                "title": "hi"
-            },
-            "foobaz": {
-                "sdf:jsonPointer": "#/sdfProperty/foobaz",
-                "title": "hi"
-            }
+            "foobar": {"sdf:jsonPointer": "#/sdfProperty/foobar", "title": "hi"},
+            "foobaz": {"sdf:jsonPointer": "#/sdfProperty/foobaz", "title": "hi"},
         },
         "events": {
-            "foobar": {
-                "sdf:jsonPointer": "#/sdfEvent/foobar",
-                "title": "hi"
-            },
-            "foobaz": {
-                "sdf:jsonPointer": "#/sdfEvent/foobaz",
-                "title": "hi"
-            }
-        }
+            "foobar": {"sdf:jsonPointer": "#/sdfEvent/foobar", "title": "hi"},
+            "foobaz": {"sdf:jsonPointer": "#/sdfEvent/foobaz", "title": "hi"},
+        },
     }
 
     perform_conversion_test(input, expected_result, sdf_tm_helper)
@@ -332,57 +251,48 @@ def test_sdf_tm_nested_model():
                         "sdfObject": {
                             "baz": {
                                 "sdfProperty": {
-                                    "foobar": {
-                                        "label": "hi"
-                                    },
+                                    "foobar": {"label": "hi"},
                                 },
                                 "sdfAction": {
-                                    "foobar": {
-                                        "label": "hi"
-                                    },
+                                    "foobar": {"label": "hi"},
                                 },
                                 "sdfEvent": {
-                                    "foobar": {
-                                        "label": "hi"
-                                    },
-                                }
+                                    "foobar": {"label": "hi"},
+                                },
                             }
                         }
                     }
-                }
+                },
             }
         }
     }
 
     expected_result = {
-        "@context": [
-            "http://www.w3.org/ns/td",
-            {"sdf": "https://example.com/sdf"}
-        ],
+        "@context": ["http://www.w3.org/ns/td", {"sdf": "https://example.com/sdf"}],
         "@type": "tm:ThingModel",
         "actions": {
             "foo_bar_baz_foobar": {
                 "sdf:jsonPointer": "#/sdfThing/foo/sdfThing/bar/sdfObject/baz/sdfAction/foobar",
-                "title": "hi"
+                "title": "hi",
             },
         },
         "properties": {
             "foo_bar_baz_foobar": {
                 "sdf:jsonPointer": "#/sdfThing/foo/sdfThing/bar/sdfObject/baz/sdfProperty/foobar",
-                "title": "hi"
+                "title": "hi",
             },
         },
         "events": {
             "foo_bar_baz_foobar": {
                 "sdf:jsonPointer": "#/sdfThing/foo/sdfThing/bar/sdfObject/baz/sdfEvent/foobar",
-                "title": "hi"
+                "title": "hi",
             },
         },
         "tm:required": [
             "#/actions/foo_bar_baz_foobar",
             "#/properties/foo_bar_baz_foobar",
             "#/events/foo_bar_baz_foobar",
-        ]
+        ],
     }
 
     perform_conversion_test(input, expected_result, sdf_tm_helper)
@@ -391,12 +301,8 @@ def test_sdf_tm_nested_model():
 def test_sdf_tm_looping_sdf_ref():
     input = {
         "sdfProperty": {
-            "foo": {
-                "sdfRef": "#/sdfProperty/bar"
-            },
-            "bar": {
-                "sdfRef": "#/sdfProperty/foo"
-            },
+            "foo": {"sdfRef": "#/sdfProperty/bar"},
+            "bar": {"sdfRef": "#/sdfProperty/foo"},
         },
     }
 
@@ -411,9 +317,7 @@ def test_sdf_tm_looping_sdf_ref():
 def test_sdf_tm_unparsabable_sdf_ref():
     input = {
         "sdfProperty": {
-            "foo": {
-                "sdfRef": "bla/sdfProperty/bar"
-            },
+            "foo": {"sdfRef": "bla/sdfProperty/bar"},
         },
     }
 
@@ -427,13 +331,9 @@ def test_sdf_tm_unparsabable_sdf_ref():
 
 def test_sdf_tm_failing_URL_sdf_ref():
     input = {
-        "namespace": {
-            "bla": "https://example.org"
-        },
+        "namespace": {"bla": "https://example.org"},
         "sdfProperty": {
-            "foo": {
-                "sdfRef": "bla:/sdfProperty/bar"
-            },
+            "foo": {"sdfRef": "bla:/sdfProperty/bar"},
         },
     }
 
@@ -453,9 +353,7 @@ def test_sdf_tm_succeeding_URL_sdf_ref():
             "test": "https://raw.githubusercontent.com/one-data-model/playground/master/sdfObject/sdfobject-accelerometer.sdf.json"
         },
         "sdfProperty": {
-            "foo": {
-                "sdfRef": "test:/sdfObject/Accelerometer/sdfProperty/X_Value"
-            },
+            "foo": {"sdfRef": "test:/sdfObject/Accelerometer/sdfProperty/X_Value"},
         },
     }
 
@@ -464,8 +362,8 @@ def test_sdf_tm_succeeding_URL_sdf_ref():
             "http://www.w3.org/ns/td",
             {
                 "sdf": "https://example.com/sdf",
-                "test": "https://raw.githubusercontent.com/one-data-model/playground/master/sdfObject/sdfobject-accelerometer.sdf.json"
-            }
+                "test": "https://raw.githubusercontent.com/one-data-model/playground/master/sdfObject/sdfobject-accelerometer.sdf.json",
+            },
         ],
         "@type": "tm:ThingModel",
         "properties": {
@@ -474,7 +372,7 @@ def test_sdf_tm_succeeding_URL_sdf_ref():
                 "description": "The measured value along the X axis.",
                 "readOnly": True,
                 "type": "number",
-                "sdf:jsonPointer": "#/sdfProperty/foo"
+                "sdf:jsonPointer": "#/sdfProperty/foo",
             },
         },
     }
@@ -485,51 +383,24 @@ def test_sdf_tm_succeeding_URL_sdf_ref():
 def test_sdf_tm_sdf_choice():
     input = {
         "sdfProperty": {
-            "foobar": {
-                "sdfChoice": {
-                    "blah": {
-                        "type": "string"
-                    }
-                }
-            },
-            "foobaz": {
-                "enum": ["blargh"],
-                "sdfChoice": {
-                    "blah": {
-                        "type": "string"
-                    }
-                }
-            }
+            "foobar": {"sdfChoice": {"blah": {"type": "string"}}},
+            "foobaz": {"enum": ["blargh"], "sdfChoice": {"blah": {"type": "string"}}},
         }
     }
 
     expected_result = {
-        "@context": [
-            "http://www.w3.org/ns/td",
-            {"sdf": "https://example.com/sdf"}
-        ],
+        "@context": ["http://www.w3.org/ns/td", {"sdf": "https://example.com/sdf"}],
         "@type": "tm:ThingModel",
         "properties": {
             "foobar": {
-                "enum": [
-                    {
-                        "sdf:choiceName": "blah",
-                        "type": "string"
-                    }
-                ],
-                "sdf:jsonPointer": "#/sdfProperty/foobar"
+                "enum": [{"sdf:choiceName": "blah", "type": "string"}],
+                "sdf:jsonPointer": "#/sdfProperty/foobar",
             },
             "foobaz": {
-                "enum": [
-                    "blargh",
-                    {
-                        "sdf:choiceName": "blah",
-                        "type": "string"
-                    }
-                ],
-                "sdf:jsonPointer": "#/sdfProperty/foobaz"
-            }
-        }
+                "enum": ["blargh", {"sdf:choiceName": "blah", "type": "string"}],
+                "sdf:jsonPointer": "#/sdfProperty/foobaz",
+            },
+        },
     }
 
     perform_conversion_test(input, expected_result, sdf_tm_helper)

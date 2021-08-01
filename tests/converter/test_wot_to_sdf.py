@@ -20,11 +20,8 @@ def tm_sdf_helper(input):
 def test_empty_sdf_tm_conversion():
 
     input = {
-        "@context": [
-            "http://www.w3.org/ns/td",
-            {"sdf": "https://example.com/sdf"}
-        ],
-        "@type": "tm:ThingModel"
+        "@context": ["http://www.w3.org/ns/td", {"sdf": "https://example.com/sdf"}],
+        "@type": "tm:ThingModel",
     }
 
     expected_result = {}
