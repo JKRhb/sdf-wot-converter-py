@@ -313,9 +313,7 @@ def map_jsonschema_type(data_qualities, data_schema):
 def map_action_qualities(sdf_model: Dict, thing_model: Dict, sdf_action: Dict, affordance_key: str, json_pointer: str):
     initialize_object_field(thing_model, "actions")
 
-    wot_action: Dict[str, Any] = {
-        "sdf:jsonPointer": json_pointer
-    }
+    wot_action = create_wot_affordance(json_pointer)
     collect_sdf_required(thing_model, sdf_action)
     sdf_action = resolve_sdf_ref(sdf_model, sdf_action, None, [])
 
@@ -333,12 +331,18 @@ def map_action_qualities(sdf_model: Dict, thing_model: Dict, sdf_action: Dict, a
     thing_model["actions"][affordance_key] = wot_action
 
 
+def create_wot_affordance(json_pointer):
+    wot_action: Dict[str, Any] = {
+        "sdf:jsonPointer": json_pointer
+    }
+
+    return wot_action
+
+
 def map_property_qualities(sdf_model: Dict, thing_model: Dict, sdf_property: Dict, affordance_key: str, json_pointer: str):
     initialize_object_field(thing_model, "properties")
 
-    wot_property: Dict[str, Any] = {
-        "sdf:jsonPointer": json_pointer
-    }
+    wot_property = create_wot_affordance(json_pointer)
     collect_sdf_required(thing_model, sdf_property)
 
     map_data_qualities(sdf_model, sdf_property, wot_property, is_property=True)
@@ -389,9 +393,7 @@ def map_sdf_property(sdf_model: Dict, sdf_definition: Dict, thing_model: Dict, p
 def map_event_qualities(sdf_model: Dict, thing_model: Dict, sdf_event: Dict, affordance_key: str, json_pointer: str):
     initialize_object_field(thing_model, "events")
 
-    wot_event: Dict[str, Any] = {
-        "sdf:jsonPointer": json_pointer
-    }
+    wot_event = create_wot_affordance(json_pointer)
     collect_sdf_required(thing_model, sdf_event)
     sdf_event = resolve_sdf_ref(sdf_model, sdf_event, None, [])
 
