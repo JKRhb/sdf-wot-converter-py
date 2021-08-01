@@ -113,10 +113,18 @@ def map_version(infoblock: Dict, thing_model: Dict):
 def map_infoblock(sdf_model: Dict, thing_model: Dict):
     infoblock = sdf_model.get("info")
     if infoblock:
-        map_field(infoblock, thing_model, "title", "title")
-        map_field(infoblock, thing_model, "copyright", "description")
+        map_title(thing_model, infoblock)
+        map_copyright(thing_model, infoblock)
         map_license(infoblock, thing_model)
         map_version(infoblock, thing_model)
+
+
+def map_copyright(thing_model, infoblock):
+    map_field(infoblock, thing_model, "copyright", "description")
+
+
+def map_title(thing_model, infoblock):
+    map_field(infoblock, thing_model, "title", "title")
 
 
 def map_field(sdf_definition: Dict, wot_definition: Dict, sdf_key: str, wot_key: str):
@@ -125,9 +133,21 @@ def map_field(sdf_definition: Dict, wot_definition: Dict, sdf_key: str, wot_key:
 
 
 def map_common_qualities(sdf_definition: Dict, wot_definition: Dict):
-    map_field(sdf_definition, wot_definition, "label", "title")
-    map_field(sdf_definition, wot_definition, "description", "description")
+    map_label(sdf_definition, wot_definition)
+    map_description(sdf_definition, wot_definition)
+    map_comment(sdf_definition, wot_definition)
+
+
+def map_comment(sdf_definition, wot_definition):
     map_field(sdf_definition, wot_definition, "$comment", "sdf:$comment")
+
+
+def map_description(sdf_definition, wot_definition):
+    map_field(sdf_definition, wot_definition, "description", "description")
+
+
+def map_label(sdf_definition: Dict, wot_definition: Dict):
+    map_field(sdf_definition, wot_definition, "label", "title")
 
 
 def map_sdf_choice(sdf_model: Dict, data_qualities: Dict, data_schema: Dict):
@@ -148,25 +168,47 @@ def map_data_qualities(sdf_model: Dict, data_qualities: Dict, data_schema: Dict,
         if sdf_field in data_qualities:
             data_schema[wot_field] = not data_qualities[sdf_field]
 
-    for field_name in ["type", "unit", "enum", "const", "default", "multipleOf", "minLength",
-                       "maxLength", "minItems", "maxItems", "minimum", "maximum",
-                       "multipleOf", "required", "format", "uniqueItems", "pattern",
-                       "exclusiveMinimum", "exclusiveMaximum"]:
-        map_field(data_qualities, data_schema, field_name, field_name)
-
-    map_field(data_qualities, data_schema, "contentFormat", "contentMediaType")
+    map_jsonschema_type(data_qualities, data_schema)
+    map_unit(data_qualities, data_schema)
+    map_enum(data_qualities, data_schema)
+    map_const(data_qualities, data_schema)
+    map_default(data_qualities, data_schema)
+    map_multiple_of(data_qualities, data_schema)
+    map_min_length(data_qualities, data_schema)
+    map_max_length(data_qualities, data_schema)
+    map_min_items(data_qualities, data_schema)
+    map_max_items(data_qualities, data_schema)
+    map_minimum(data_qualities, data_schema)
+    map_maximum(data_qualities, data_schema)
+    map_required(data_qualities, data_schema)
+    map_format(data_qualities, data_schema)
+    map_unique_items(data_qualities, data_schema)
+    map_pattern(data_qualities, data_schema)
+    map_exclusive_minimum(data_qualities, data_schema)
+    map_exclusive_maximum(data_qualities, data_schema)
+    map_content_format(data_qualities, data_schema)
 
     # TODO: Revisit the mapping of these two fields
-    map_field(data_qualities, data_schema, "nullable", "sdf:nullable")
-    map_field(data_qualities, data_schema, "sdfType", "sdf:sdfType")
+    map_nullable(data_qualities, data_schema)
+    map_sdf_type(data_qualities, data_schema)
 
     map_sdf_choice(sdf_model, data_qualities, data_schema)
 
-    if is_property:
-        map_field(data_qualities, data_schema, "observable", "observable")
-    else:
-        map_field(data_qualities, data_schema, "observable", "sdf:observable")
+    map_observable(data_qualities, data_schema, is_property)
 
+    map_items(sdf_model, data_qualities, data_schema)
+
+    map_properties(sdf_model, data_qualities, data_schema)
+
+
+def map_properties(sdf_model, data_qualities, data_schema):
+    for key, property in data_qualities.get("properties", {}).items():
+        initialize_object_field(data_schema, "properties")
+        data_schema["properties"][key] = {}
+        map_data_qualities(sdf_model, property, data_schema["properties"][key])
+
+
+def map_items(sdf_model, data_qualities, data_schema):
     if "items" in data_qualities:
         data_schema["items"] = {}
         map_data_qualities(sdf_model,
@@ -174,18 +216,104 @@ def map_data_qualities(sdf_model: Dict, data_qualities: Dict, data_schema: Dict,
                            data_schema["items"]
                            )
 
-    for key, property in data_qualities.get("properties", {}).items():
-        initialize_object_field(data_schema, "properties")
-        data_schema["properties"][key] = {}
-        map_data_qualities(sdf_model, property, data_schema["properties"][key])
+
+def map_observable(data_qualities, data_schema, is_property):
+    if is_property:
+        map_field(data_qualities, data_schema, "observable", "observable")
+    else:
+        map_field(data_qualities, data_schema, "observable", "sdf:observable")
+
+
+def map_sdf_type(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "sdfType", "sdf:sdfType")
+
+
+def map_nullable(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "nullable", "sdf:nullable")
+
+
+def map_content_format(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "contentFormat", "contentMediaType")
+
+
+def map_exclusive_maximum(data_qualities, data_schema):
+    map_field(data_qualities, data_schema,
+              "exclusiveMaximum", "exclusiveMaximum")
+
+
+def map_exclusive_minimum(data_qualities, data_schema):
+    map_field(data_qualities, data_schema,
+              "exclusiveMinimum", "exclusiveMinimum")
+
+
+def map_pattern(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "pattern", "pattern")
+
+
+def map_unique_items(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "uniqueItems", "uniqueItems")
+
+
+def map_format(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "format", "format")
+
+
+def map_required(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "required", "required")
+
+
+def map_maximum(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "maximum", "maximum")
+
+
+def map_minimum(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "minimum", "minimum")
+
+
+def map_max_items(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "maxItems", "maxItems")
+
+
+def map_min_items(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "minItems", "minItems")
+
+
+def map_max_length(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "maxLength", "maxLength")
+
+
+def map_min_length(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "minLength", "minLength")
+
+
+def map_multiple_of(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "multipleOf", "multipleOf")
+
+
+def map_default(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "default", "default")
+
+
+def map_const(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "const", "const")
+
+
+def map_enum(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "enum", "enum")
+
+
+def map_unit(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "unit", "unit")
+
+
+def map_jsonschema_type(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "type", "type")
 
 
 def map_action_qualities(sdf_model: Dict, thing_model: Dict, sdf_action: Dict, affordance_key: str, json_pointer: str):
     initialize_object_field(thing_model, "actions")
 
-    wot_action: Dict[str, Any] = {
-        "sdf:jsonPointer": json_pointer
-    }
+    wot_action = create_wot_affordance(json_pointer)
     collect_sdf_required(thing_model, sdf_action)
     sdf_action = resolve_sdf_ref(sdf_model, sdf_action, None, [])
 
@@ -203,12 +331,18 @@ def map_action_qualities(sdf_model: Dict, thing_model: Dict, sdf_action: Dict, a
     thing_model["actions"][affordance_key] = wot_action
 
 
+def create_wot_affordance(json_pointer):
+    wot_action: Dict[str, Any] = {
+        "sdf:jsonPointer": json_pointer
+    }
+
+    return wot_action
+
+
 def map_property_qualities(sdf_model: Dict, thing_model: Dict, sdf_property: Dict, affordance_key: str, json_pointer: str):
     initialize_object_field(thing_model, "properties")
 
-    wot_property: Dict[str, Any] = {
-        "sdf:jsonPointer": json_pointer
-    }
+    wot_property = create_wot_affordance(json_pointer)
     collect_sdf_required(thing_model, sdf_property)
 
     map_data_qualities(sdf_model, sdf_property, wot_property, is_property=True)
@@ -219,49 +353,54 @@ def map_property_qualities(sdf_model: Dict, thing_model: Dict, sdf_property: Dic
 def map_sdf_action(sdf_model: Dict, sdf_definition: Dict, thing_model: Dict, prefix_list: List[str], json_pointer_prefix: str):
     for key, sdf_action in sdf_definition.get("sdfAction", {}).items():
         affordance_key = "_".join(prefix_list + [key])
-        map_action_qualities(sdf_model, thing_model, sdf_action,
-                             affordance_key, f"{json_pointer_prefix}/sdfAction/{key}")
+        json_pointer = get_json_pointer(
+            json_pointer_prefix, "sdfAction", key)
+        map_action_qualities(sdf_model, thing_model,
+                             sdf_action, affordance_key, json_pointer)
 
 
 def map_object_qualities(sdf_model: Dict, sdf_definition: Dict, thing_model: Dict, prefix_list: List[str], json_pointer_prefix: str):
     for key, sdf_object in sdf_definition.get("sdfObject", {}).items():
-        # TODO: Check if this actually works
         collect_sdf_required(thing_model, sdf_object)
         sdf_object = resolve_sdf_ref(sdf_model, sdf_object, None, [])
-        appended_prefix = f"{json_pointer_prefix}/sdfObject/{key}"
+        json_pointer = get_json_pointer(json_pointer_prefix, "sdfObject", key)
         map_sdf_action(sdf_model, sdf_object, thing_model,
-                       prefix_list + [key], appended_prefix)
+                       prefix_list + [key], json_pointer)
         map_sdf_property(sdf_model, sdf_object, thing_model,
-                         prefix_list + [key], appended_prefix)
+                         prefix_list + [key], json_pointer)
         map_sdf_event(sdf_model, sdf_object, thing_model,
-                      prefix_list + [key], appended_prefix)
+                      prefix_list + [key], json_pointer)
 
 
 def map_thing_qualities(sdf_model: Dict, sdf_definition: Dict, thing_model: Dict, prefix_list: List[str], json_pointer_prefix: str):
     for key, sdf_thing in sdf_definition.get("sdfThing", {}).items():
-        # TODO: Check if this actually works
         collect_sdf_required(thing_model, sdf_thing)
         sdf_thing = resolve_sdf_ref(sdf_model, sdf_thing, None, [])
-        pointer_prefix = f"{json_pointer_prefix}/sdfThing/{key}"
+        json_pointer = get_json_pointer(json_pointer_prefix, "sdfThing", key)
         map_thing_qualities(sdf_model, sdf_thing, thing_model,
-                            prefix_list + [key], pointer_prefix)
+                            prefix_list + [key], json_pointer)
         map_object_qualities(sdf_model, sdf_thing, thing_model,
-                             prefix_list + [key], pointer_prefix)
+                             prefix_list + [key], json_pointer)
+
+
+def get_json_pointer(json_pointer_prefix: str, infix: str, key: str):
+    pointer_prefix = f"{json_pointer_prefix}/{infix}/{key}"
+    return pointer_prefix
 
 
 def map_sdf_property(sdf_model: Dict, sdf_definition: Dict, thing_model: Dict, prefix_list: List[str], json_pointer_prefix: str):
     for key, sdf_property in sdf_definition.get("sdfProperty", {}).items():
         affordance_key = "_".join(prefix_list + [key])
+        json_pointer = get_json_pointer(
+            json_pointer_prefix, "sdfProperty", key)
         map_property_qualities(sdf_model, thing_model, sdf_property,
-                               affordance_key, f"{json_pointer_prefix}/sdfProperty/{key}")
+                               affordance_key, json_pointer)
 
 
 def map_event_qualities(sdf_model: Dict, thing_model: Dict, sdf_event: Dict, affordance_key: str, json_pointer: str):
     initialize_object_field(thing_model, "events")
 
-    wot_event: Dict[str, Any] = {
-        "sdf:jsonPointer": json_pointer
-    }
+    wot_event = create_wot_affordance(json_pointer)
     collect_sdf_required(thing_model, sdf_event)
     sdf_event = resolve_sdf_ref(sdf_model, sdf_event, None, [])
 
@@ -282,8 +421,9 @@ def collect_sdf_required(thing_model: Dict, sdf_definition: Dict):
 def map_sdf_event(sdf_model: Dict, sdf_definition: Dict, thing_model: Dict, prefix_list: List[str], json_pointer_prefix: str):
     for key, sdf_event in sdf_definition.get("sdfEvent", {}).items():
         affordance_key = "_".join(prefix_list + [key])
-        map_event_qualities(sdf_model, thing_model, sdf_event,
-                            affordance_key, f"{json_pointer_prefix}/sdfEvent/{key}")
+        json_pointer = get_json_pointer(json_pointer_prefix, "sdfEvent", key)
+        map_event_qualities(sdf_model, thing_model,
+                            sdf_event, affordance_key, json_pointer)
 
 
 def map_sdf_required(thing_model: Dict):
