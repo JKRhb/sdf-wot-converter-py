@@ -168,25 +168,47 @@ def map_data_qualities(sdf_model: Dict, data_qualities: Dict, data_schema: Dict,
         if sdf_field in data_qualities:
             data_schema[wot_field] = not data_qualities[sdf_field]
 
-    for field_name in ["type", "unit", "enum", "const", "default", "multipleOf", "minLength",
-                       "maxLength", "minItems", "maxItems", "minimum", "maximum",
-                       "multipleOf", "required", "format", "uniqueItems", "pattern",
-                       "exclusiveMinimum", "exclusiveMaximum"]:
-        map_field(data_qualities, data_schema, field_name, field_name)
-
-    map_field(data_qualities, data_schema, "contentFormat", "contentMediaType")
+    map_jsonschema_type(data_qualities, data_schema)
+    map_unit(data_qualities, data_schema)
+    map_enum(data_qualities, data_schema)
+    map_const(data_qualities, data_schema)
+    map_default(data_qualities, data_schema)
+    map_multiple_of(data_qualities, data_schema)
+    map_min_length(data_qualities, data_schema)
+    map_max_length(data_qualities, data_schema)
+    map_min_items(data_qualities, data_schema)
+    map_max_items(data_qualities, data_schema)
+    map_minimum(data_qualities, data_schema)
+    map_maximum(data_qualities, data_schema)
+    map_required(data_qualities, data_schema)
+    map_format(data_qualities, data_schema)
+    map_unique_items(data_qualities, data_schema)
+    map_pattern(data_qualities, data_schema)
+    map_exclusive_minimum(data_qualities, data_schema)
+    map_exclusive_maximum(data_qualities, data_schema)
+    map_content_format(data_qualities, data_schema)
 
     # TODO: Revisit the mapping of these two fields
-    map_field(data_qualities, data_schema, "nullable", "sdf:nullable")
-    map_field(data_qualities, data_schema, "sdfType", "sdf:sdfType")
+    map_nullable(data_qualities, data_schema)
+    map_sdf_type(data_qualities, data_schema)
 
     map_sdf_choice(sdf_model, data_qualities, data_schema)
 
-    if is_property:
-        map_field(data_qualities, data_schema, "observable", "observable")
-    else:
-        map_field(data_qualities, data_schema, "observable", "sdf:observable")
+    map_observable(data_qualities, data_schema, is_property)
 
+    map_items(sdf_model, data_qualities, data_schema)
+
+    map_properties(sdf_model, data_qualities, data_schema)
+
+
+def map_properties(sdf_model, data_qualities, data_schema):
+    for key, property in data_qualities.get("properties", {}).items():
+        initialize_object_field(data_schema, "properties")
+        data_schema["properties"][key] = {}
+        map_data_qualities(sdf_model, property, data_schema["properties"][key])
+
+
+def map_items(sdf_model, data_qualities, data_schema):
     if "items" in data_qualities:
         data_schema["items"] = {}
         map_data_qualities(sdf_model,
@@ -194,10 +216,98 @@ def map_data_qualities(sdf_model: Dict, data_qualities: Dict, data_schema: Dict,
                            data_schema["items"]
                            )
 
-    for key, property in data_qualities.get("properties", {}).items():
-        initialize_object_field(data_schema, "properties")
-        data_schema["properties"][key] = {}
-        map_data_qualities(sdf_model, property, data_schema["properties"][key])
+
+def map_observable(data_qualities, data_schema, is_property):
+    if is_property:
+        map_field(data_qualities, data_schema, "observable", "observable")
+    else:
+        map_field(data_qualities, data_schema, "observable", "sdf:observable")
+
+
+def map_sdf_type(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "sdfType", "sdf:sdfType")
+
+
+def map_nullable(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "nullable", "sdf:nullable")
+
+
+def map_content_format(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "contentFormat", "contentMediaType")
+
+
+def map_exclusive_maximum(data_qualities, data_schema):
+    map_field(data_qualities, data_schema,
+              "exclusiveMaximum", "exclusiveMaximum")
+
+
+def map_exclusive_minimum(data_qualities, data_schema):
+    map_field(data_qualities, data_schema,
+              "exclusiveMinimum", "exclusiveMinimum")
+
+
+def map_pattern(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "pattern", "pattern")
+
+
+def map_unique_items(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "uniqueItems", "uniqueItems")
+
+
+def map_format(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "format", "format")
+
+
+def map_required(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "required", "required")
+
+
+def map_maximum(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "maximum", "maximum")
+
+
+def map_minimum(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "minimum", "minimum")
+
+
+def map_max_items(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "maxItems", "maxItems")
+
+
+def map_min_items(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "minItems", "minItems")
+
+
+def map_max_length(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "maxLength", "maxLength")
+
+
+def map_min_length(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "minLength", "minLength")
+
+
+def map_multiple_of(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "multipleOf", "multipleOf")
+
+
+def map_default(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "default", "default")
+
+
+def map_const(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "const", "const")
+
+
+def map_enum(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "enum", "enum")
+
+
+def map_unit(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "unit", "unit")
+
+
+def map_jsonschema_type(data_qualities, data_schema):
+    map_field(data_qualities, data_schema, "type", "type")
 
 
 def map_action_qualities(sdf_model: Dict, thing_model: Dict, sdf_action: Dict, affordance_key: str, json_pointer: str):
