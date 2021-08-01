@@ -359,7 +359,6 @@ def map_sdf_action(sdf_model: Dict, sdf_definition: Dict, thing_model: Dict, pre
 
 def map_object_qualities(sdf_model: Dict, sdf_definition: Dict, thing_model: Dict, prefix_list: List[str], json_pointer_prefix: str):
     for key, sdf_object in sdf_definition.get("sdfObject", {}).items():
-        # TODO: Check if this actually works
         collect_sdf_required(thing_model, sdf_object)
         sdf_object = resolve_sdf_ref(sdf_model, sdf_object, None, [])
         appended_prefix = f"{json_pointer_prefix}/sdfObject/{key}"
@@ -373,7 +372,6 @@ def map_object_qualities(sdf_model: Dict, sdf_definition: Dict, thing_model: Dic
 
 def map_thing_qualities(sdf_model: Dict, sdf_definition: Dict, thing_model: Dict, prefix_list: List[str], json_pointer_prefix: str):
     for key, sdf_thing in sdf_definition.get("sdfThing", {}).items():
-        # TODO: Check if this actually works
         collect_sdf_required(thing_model, sdf_thing)
         sdf_thing = resolve_sdf_ref(sdf_model, sdf_thing, None, [])
         pointer_prefix = f"{json_pointer_prefix}/sdfThing/{key}"
