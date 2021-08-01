@@ -353,39 +353,48 @@ def map_property_qualities(sdf_model: Dict, thing_model: Dict, sdf_property: Dic
 def map_sdf_action(sdf_model: Dict, sdf_definition: Dict, thing_model: Dict, prefix_list: List[str], json_pointer_prefix: str):
     for key, sdf_action in sdf_definition.get("sdfAction", {}).items():
         affordance_key = "_".join(prefix_list + [key])
-        map_action_qualities(sdf_model, thing_model, sdf_action,
-                             affordance_key, f"{json_pointer_prefix}/sdfAction/{key}")
+        json_pointer = get_json_pointer(
+            json_pointer_prefix, "sdfAction", key)
+        map_action_qualities(sdf_model, thing_model,
+                             sdf_action, affordance_key, json_pointer)
 
 
 def map_object_qualities(sdf_model: Dict, sdf_definition: Dict, thing_model: Dict, prefix_list: List[str], json_pointer_prefix: str):
     for key, sdf_object in sdf_definition.get("sdfObject", {}).items():
         collect_sdf_required(thing_model, sdf_object)
         sdf_object = resolve_sdf_ref(sdf_model, sdf_object, None, [])
-        appended_prefix = f"{json_pointer_prefix}/sdfObject/{key}"
+        json_pointer = get_json_pointer(json_pointer_prefix, "sdfObject", key)
         map_sdf_action(sdf_model, sdf_object, thing_model,
-                       prefix_list + [key], appended_prefix)
+                       prefix_list + [key], json_pointer)
         map_sdf_property(sdf_model, sdf_object, thing_model,
-                         prefix_list + [key], appended_prefix)
+                         prefix_list + [key], json_pointer)
         map_sdf_event(sdf_model, sdf_object, thing_model,
-                      prefix_list + [key], appended_prefix)
+                      prefix_list + [key], json_pointer)
 
 
 def map_thing_qualities(sdf_model: Dict, sdf_definition: Dict, thing_model: Dict, prefix_list: List[str], json_pointer_prefix: str):
     for key, sdf_thing in sdf_definition.get("sdfThing", {}).items():
         collect_sdf_required(thing_model, sdf_thing)
         sdf_thing = resolve_sdf_ref(sdf_model, sdf_thing, None, [])
-        pointer_prefix = f"{json_pointer_prefix}/sdfThing/{key}"
+        json_pointer = get_json_pointer(json_pointer_prefix, "sdfThing", key)
         map_thing_qualities(sdf_model, sdf_thing, thing_model,
-                            prefix_list + [key], pointer_prefix)
+                            prefix_list + [key], json_pointer)
         map_object_qualities(sdf_model, sdf_thing, thing_model,
-                             prefix_list + [key], pointer_prefix)
+                             prefix_list + [key], json_pointer)
+
+
+def get_json_pointer(json_pointer_prefix: str, infix: str, key: str):
+    pointer_prefix = f"{json_pointer_prefix}/{infix}/{key}"
+    return pointer_prefix
 
 
 def map_sdf_property(sdf_model: Dict, sdf_definition: Dict, thing_model: Dict, prefix_list: List[str], json_pointer_prefix: str):
     for key, sdf_property in sdf_definition.get("sdfProperty", {}).items():
         affordance_key = "_".join(prefix_list + [key])
+        json_pointer = get_json_pointer(
+            json_pointer_prefix, "sdfProperty", key)
         map_property_qualities(sdf_model, thing_model, sdf_property,
-                               affordance_key, f"{json_pointer_prefix}/sdfProperty/{key}")
+                               affordance_key, json_pointer)
 
 
 def map_event_qualities(sdf_model: Dict, thing_model: Dict, sdf_event: Dict, affordance_key: str, json_pointer: str):
@@ -412,8 +421,9 @@ def collect_sdf_required(thing_model: Dict, sdf_definition: Dict):
 def map_sdf_event(sdf_model: Dict, sdf_definition: Dict, thing_model: Dict, prefix_list: List[str], json_pointer_prefix: str):
     for key, sdf_event in sdf_definition.get("sdfEvent", {}).items():
         affordance_key = "_".join(prefix_list + [key])
-        map_event_qualities(sdf_model, thing_model, sdf_event,
-                            affordance_key, f"{json_pointer_prefix}/sdfEvent/{key}")
+        json_pointer = get_json_pointer(json_pointer_prefix, "sdfEvent", key)
+        map_event_qualities(sdf_model, thing_model,
+                            sdf_event, affordance_key, json_pointer)
 
 
 def map_sdf_required(thing_model: Dict):
