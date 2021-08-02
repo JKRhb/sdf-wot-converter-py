@@ -222,15 +222,24 @@ def test_sdf_tm_sdf_ref_conversion():
         "@type": "tm:ThingModel",
         "actions": {
             "foobar": {"sdf:jsonPointer": "#/sdfAction/foobar", "title": "hi"},
-            "foobaz": {"sdf:jsonPointer": "#/sdfAction/foobaz", "title": "hi"},
+            "foobaz": {
+                "sdf:jsonPointer": "#/sdfAction/foobaz",
+                "tm:ref": "#/actions/foobar",
+            },
         },
         "properties": {
             "foobar": {"sdf:jsonPointer": "#/sdfProperty/foobar", "title": "hi"},
-            "foobaz": {"sdf:jsonPointer": "#/sdfProperty/foobaz", "title": "hi"},
+            "foobaz": {
+                "sdf:jsonPointer": "#/sdfProperty/foobaz",
+                "tm:ref": "#/properties/foobar",
+            },
         },
         "events": {
             "foobar": {"sdf:jsonPointer": "#/sdfEvent/foobar", "title": "hi"},
-            "foobaz": {"sdf:jsonPointer": "#/sdfEvent/foobaz", "title": "hi"},
+            "foobaz": {
+                "sdf:jsonPointer": "#/sdfEvent/foobaz",
+                "tm:ref": "#/events/foobar",
+            },
         },
     }
 
@@ -399,6 +408,81 @@ def test_sdf_tm_sdf_choice():
             "foobaz": {
                 "enum": ["blargh", {"sdf:choiceName": "blah", "type": "string"}],
                 "sdf:jsonPointer": "#/sdfProperty/foobaz",
+            },
+        },
+    }
+
+    perform_conversion_test(input, expected_result, sdf_tm_helper)
+
+
+def test_sdf_tm_sdf_data_conversion():
+    input = {
+        "sdfData": {
+            "fizz": {"type": "string"},
+        },
+        "sdfAction": {
+            "foobar": {
+                "label": "hi",
+                "sdfInputData": {"sdfRef": "#/sdfData/fizz"},
+            },
+            "foobaz": {
+                "label": "hi",
+                "sdfInputData": {"sdfRef": "#/sdfAction/foobaz/sdfData/barfoo"},
+                "sdfData": {"barfoo": {"sdfRef": "#/sdfData/fizz"}},
+            },
+        },
+        "sdfEvent": {
+            "foobar": {
+                "label": "hi",
+                "sdfOutputData": {"sdfRef": "#/sdfData/fizz"},
+            },
+            "foobaz": {
+                "label": "hi",
+                "sdfOutputData": {"sdfRef": "#/sdfEvent/foobaz/sdfData/barfoo"},
+                "sdfData": {"barfoo": {"sdfRef": "#/sdfData/fizz"}},
+            },
+        },
+    }
+
+    expected_result = {
+        "@context": ["http://www.w3.org/ns/td", {"sdf": "https://example.com/sdf"}],
+        "@type": "tm:ThingModel",
+        "schemaDefinitions": {
+            "fizz": {
+                "type": "string",
+                "sdf:jsonPointer": "#/sdfData/fizz",
+            },
+            "foobaz_barfoo_action": {
+                "sdf:jsonPointer": "#/sdfAction/foobaz/sdfData/barfoo",
+                "tm:ref": "#/schemaDefinitions/fizz",
+            },
+            "foobaz_barfoo_event": {
+                "sdf:jsonPointer": "#/sdfEvent/foobaz/sdfData/barfoo",
+                "tm:ref": "#/schemaDefinitions/fizz",
+            },
+        },
+        "actions": {
+            "foobar": {
+                "sdf:jsonPointer": "#/sdfAction/foobar",
+                "input": {"tm:ref": "#/schemaDefinitions/fizz"},
+                "title": "hi",
+            },
+            "foobaz": {
+                "title": "hi",
+                "input": {"tm:ref": "#/schemaDefinitions/foobaz_barfoo_action"},
+                "sdf:jsonPointer": "#/sdfAction/foobaz",
+            },
+        },
+        "events": {
+            "foobar": {
+                "sdf:jsonPointer": "#/sdfEvent/foobar",
+                "data": {"tm:ref": "#/schemaDefinitions/fizz"},
+                "title": "hi",
+            },
+            "foobaz": {
+                "title": "hi",
+                "data": {"tm:ref": "#/schemaDefinitions/foobaz_barfoo_event"},
+                "sdf:jsonPointer": "#/sdfEvent/foobaz",
             },
         },
     }
