@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  convert:
+  publish:
 
     runs-on: ubuntu-latest
 
