@@ -52,12 +52,13 @@ def convert_model_from_json(
     from_schema: Dict,
     to_schema: Dict,
     converter_function: Callable,
+    indent=4,
 ):  # pragma: no cover
     from_model = json.loads(from_model_json)
     to_model = convert_and_validate(
         from_model, from_schema, to_schema, converter_function
     )
-    return json.dumps(to_model)
+    return json.dumps(to_model, indent=indent)
 
 
 def convert_sdf_to_wot_tm(input: Dict):
