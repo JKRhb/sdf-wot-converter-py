@@ -1,21 +1,11 @@
 from converter import convert_sdf_to_wot_tm
-from jsonschema import validate
-from converter.schemas.tm_schema import tm_schema
-from converter.schemas.sdf_validation_schema import sdf_validation_schema
 import pytest
 
 
-def perform_conversion_test(input, expected_result, conversion_function):
-    actual_result = conversion_function(input)
+def perform_conversion_test(input, expected_result):
+    actual_result = convert_sdf_to_wot_tm(input)
 
     assert actual_result == expected_result
-
-
-def sdf_tm_helper(input):
-    validate(input, sdf_validation_schema)
-    output = convert_sdf_to_wot_tm(input)
-    validate(output, tm_schema)
-    return output
 
 
 def test_empty_sdf_tm_conversion():
@@ -26,7 +16,7 @@ def test_empty_sdf_tm_conversion():
         "@type": "tm:ThingModel",
     }
 
-    perform_conversion_test(input, expected_result, sdf_tm_helper)
+    perform_conversion_test(input, expected_result)
 
 
 def test__sdf_tm_infoblock_conversion():
@@ -50,7 +40,7 @@ def test__sdf_tm_infoblock_conversion():
         "links": [{"href": "https://example.com/LICENSE", "rel": "license"}],
     }
 
-    perform_conversion_test(input, expected_result, sdf_tm_helper)
+    perform_conversion_test(input, expected_result)
 
 
 def test_sdf_tm_type_conversion():
@@ -157,7 +147,7 @@ def test_sdf_tm_type_conversion():
         },
     }
 
-    perform_conversion_test(input, expected_result, sdf_tm_helper)
+    perform_conversion_test(input, expected_result)
 
 
 def test_sdf_tm_action_conversion():
@@ -181,7 +171,7 @@ def test_sdf_tm_action_conversion():
         },
     }
 
-    perform_conversion_test(input, expected_result, sdf_tm_helper)
+    perform_conversion_test(input, expected_result)
 
 
 def test_sdf_tm_event_conversion():
@@ -198,7 +188,7 @@ def test_sdf_tm_event_conversion():
         },
     }
 
-    perform_conversion_test(input, expected_result, sdf_tm_helper)
+    perform_conversion_test(input, expected_result)
 
 
 def test_sdf_tm_sdf_ref_conversion():
@@ -243,7 +233,7 @@ def test_sdf_tm_sdf_ref_conversion():
         },
     }
 
-    perform_conversion_test(input, expected_result, sdf_tm_helper)
+    perform_conversion_test(input, expected_result)
 
 
 def test_sdf_tm_nested_model():
@@ -304,7 +294,7 @@ def test_sdf_tm_nested_model():
         ],
     }
 
-    perform_conversion_test(input, expected_result, sdf_tm_helper)
+    perform_conversion_test(input, expected_result)
 
 
 def test_sdf_tm_looping_sdf_ref():
@@ -318,7 +308,7 @@ def test_sdf_tm_looping_sdf_ref():
     expected_result = None
 
     with pytest.raises(Exception) as e_info:
-        perform_conversion_test(input, expected_result, sdf_tm_helper)
+        perform_conversion_test(input, expected_result)
 
     assert str(e_info.value) == "Encountered a looping sdfRef: #/sdfProperty/bar"
 
@@ -333,7 +323,7 @@ def test_sdf_tm_unparsabable_sdf_ref():
     expected_result = None
 
     with pytest.raises(Exception) as e_info:
-        perform_conversion_test(input, expected_result, sdf_tm_helper)
+        perform_conversion_test(input, expected_result)
 
     assert str(e_info.value) == "sdfRef bla/sdfProperty/bar could not be resolved"
 
@@ -349,7 +339,7 @@ def test_sdf_tm_failing_URL_sdf_ref():
     expected_result = None
 
     with pytest.raises(Exception) as e_info:
-        perform_conversion_test(input, expected_result, sdf_tm_helper)
+        perform_conversion_test(input, expected_result)
 
     error_message = "No valid SDF model could be retrieved from https://example.org"
 
@@ -386,7 +376,7 @@ def test_sdf_tm_succeeding_URL_sdf_ref():
         },
     }
 
-    perform_conversion_test(input, expected_result, sdf_tm_helper)
+    perform_conversion_test(input, expected_result)
 
 
 def test_sdf_tm_sdf_choice():
@@ -412,7 +402,7 @@ def test_sdf_tm_sdf_choice():
         },
     }
 
-    perform_conversion_test(input, expected_result, sdf_tm_helper)
+    perform_conversion_test(input, expected_result)
 
 
 def test_sdf_tm_sdf_data_conversion():
@@ -487,4 +477,4 @@ def test_sdf_tm_sdf_data_conversion():
         },
     }
 
-    perform_conversion_test(input, expected_result, sdf_tm_helper)
+    perform_conversion_test(input, expected_result)
