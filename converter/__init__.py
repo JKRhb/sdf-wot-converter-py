@@ -47,18 +47,6 @@ def convert_model_from_path(
     save_model(to_path, to_model)
 
 
-def convert_model_from_dict(
-    from_model: Dict,
-    from_schema: Dict,
-    to_schema: Dict,
-    converter_function: Callable,
-):  # pragma: no cover
-    to_model = convert_and_validate(
-        from_model, from_schema, to_schema, converter_function
-    )
-    return json.dumps(to_model)
-
-
 def convert_model_from_json(
     from_model_json: str,
     from_schema: Dict,
