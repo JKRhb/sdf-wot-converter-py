@@ -238,30 +238,34 @@ def test_sdf_tm_sdf_ref_conversion():
 
 def test_sdf_tm_nested_model():
     input = {
-        "sdfThing": {
-            "foo": {
-                "sdfRequired": [
-                    "#/sdfThing/foo/sdfThing/bar/sdfObject/baz/sdfProperty/foobar",
-                    "#/sdfThing/foo/sdfThing/bar/sdfObject/baz/sdfAction/foobar",
-                    "#/sdfThing/foo/sdfThing/bar/sdfObject/baz/sdfEvent/foobar",
-                ],
+        "sdfProduct": {
+            "blah": {
                 "sdfThing": {
-                    "bar": {
-                        "sdfObject": {
-                            "baz": {
-                                "sdfProperty": {
-                                    "foobar": {"label": "hi"},
-                                },
-                                "sdfAction": {
-                                    "foobar": {"label": "hi"},
-                                },
-                                "sdfEvent": {
-                                    "foobar": {"label": "hi"},
-                                },
+                    "foo": {
+                        "sdfRequired": [
+                            "#/sdfProduct/blah/sdfThing/foo/sdfThing/bar/sdfObject/baz/sdfProperty/foobar",
+                            "#/sdfProduct/blah/sdfThing/foo/sdfThing/bar/sdfObject/baz/sdfAction/foobar",
+                            "#/sdfProduct/blah/sdfThing/foo/sdfThing/bar/sdfObject/baz/sdfEvent/foobar",
+                        ],
+                        "sdfThing": {
+                            "bar": {
+                                "sdfObject": {
+                                    "baz": {
+                                        "sdfProperty": {
+                                            "foobar": {"label": "hi"},
+                                        },
+                                        "sdfAction": {
+                                            "foobar": {"label": "hi"},
+                                        },
+                                        "sdfEvent": {
+                                            "foobar": {"label": "hi"},
+                                        },
+                                    }
+                                }
                             }
-                        }
+                        },
                     }
-                },
+                }
             }
         }
     }
@@ -270,27 +274,27 @@ def test_sdf_tm_nested_model():
         "@context": ["http://www.w3.org/ns/td", {"sdf": "https://example.com/sdf"}],
         "@type": "tm:ThingModel",
         "actions": {
-            "foo_bar_baz_foobar": {
-                "sdf:jsonPointer": "#/sdfThing/foo/sdfThing/bar/sdfObject/baz/sdfAction/foobar",
+            "blah_foo_bar_baz_foobar": {
+                "sdf:jsonPointer": "#/sdfProduct/blah/sdfThing/foo/sdfThing/bar/sdfObject/baz/sdfAction/foobar",
                 "title": "hi",
             },
         },
         "properties": {
-            "foo_bar_baz_foobar": {
-                "sdf:jsonPointer": "#/sdfThing/foo/sdfThing/bar/sdfObject/baz/sdfProperty/foobar",
+            "blah_foo_bar_baz_foobar": {
+                "sdf:jsonPointer": "#/sdfProduct/blah/sdfThing/foo/sdfThing/bar/sdfObject/baz/sdfProperty/foobar",
                 "title": "hi",
             },
         },
         "events": {
-            "foo_bar_baz_foobar": {
-                "sdf:jsonPointer": "#/sdfThing/foo/sdfThing/bar/sdfObject/baz/sdfEvent/foobar",
+            "blah_foo_bar_baz_foobar": {
+                "sdf:jsonPointer": "#/sdfProduct/blah/sdfThing/foo/sdfThing/bar/sdfObject/baz/sdfEvent/foobar",
                 "title": "hi",
             },
         },
         "tm:required": [
-            "#/actions/foo_bar_baz_foobar",
-            "#/properties/foo_bar_baz_foobar",
-            "#/events/foo_bar_baz_foobar",
+            "#/actions/blah_foo_bar_baz_foobar",
+            "#/properties/blah_foo_bar_baz_foobar",
+            "#/events/blah_foo_bar_baz_foobar",
         ],
     }
 
