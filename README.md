@@ -13,15 +13,13 @@ The CI pipeline is set up to automatically convert all (valid) models from the [
 
 ## Installation
 
-After cloning the repository run the following commands in the repo's directory:
+You can install the converter using pip:
 
 ```sh
-pip install -q build
-python -m build
-pip install --find-links dist/ sdf-wot-converter
+pip install sdf-wot-converter
 ```
 
-You need at least Python 3.6 and pip installed.
+Afterwards, it can be used both as a command line tool and a library.
 
 ## Using the command line tool
 
