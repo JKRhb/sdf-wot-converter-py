@@ -474,11 +474,15 @@ def map_thing_qualities(
     thing_model: Dict,
     prefix_list: List[str],
     json_pointer_prefix: str,
+    sdf_product=False,
 ):
-    for key, sdf_thing in sdf_definition.get("sdfThing", {}).items():
+    quality_name = "sdfThing"
+    if sdf_product:
+        quality_name = "sdfProduct"
+    for key, sdf_thing in sdf_definition.get(quality_name, {}).items():
         collect_sdf_required(thing_model, sdf_thing)
         sdf_thing = resolve_sdf_ref(sdf_model, sdf_thing, None, [])
-        json_pointer = get_json_pointer(json_pointer_prefix, "sdfThing", key)
+        json_pointer = get_json_pointer(json_pointer_prefix, quality_name, key)
         map_thing_qualities(
             sdf_model, sdf_thing, thing_model, prefix_list + [key], json_pointer
         )
@@ -591,6 +595,7 @@ def convert_sdf_to_wot_tm(sdf_model: Dict) -> Dict:
     map_infoblock(sdf_model, thing_model)
     map_namespace(sdf_model, thing_model)
 
+    map_thing_qualities(sdf_model, sdf_model, thing_model, [], "#", sdf_product=True)
     map_thing_qualities(sdf_model, sdf_model, thing_model, [], "#")
     map_object_qualities(sdf_model, sdf_model, thing_model, [], "#")
 
