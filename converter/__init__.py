@@ -17,6 +17,7 @@ def load_model(input_path: str) -> Dict:  # pragma: no cover
 
 
 def save_model(output_path: str, model: Dict, indent=4):  # pragma: no cover
+    print(output_path)
     file = open(output_path, "w")
     json.dump(model, file, indent=indent)
 
@@ -132,9 +133,9 @@ def parse_arguments(args):
 
 def use_converter_cli(args):  # pragma: no cover
     if args.from_sdf and args.to_tm:
-        convert_sdf_to_wot_tm_from_path(args.from_sdf, args.to_sdf)
+        convert_sdf_to_wot_tm_from_path(args.from_sdf, args.to_tm)
     elif args.from_tm and args.to_sdf:
-        convert_wot_tm_to_sdf_from_path(args.from_sdf, args.to_sdf)
+        convert_wot_tm_to_sdf_from_path(args.from_tm, args.to_sdf)
 
 
 def main():  # pragma: no cover
