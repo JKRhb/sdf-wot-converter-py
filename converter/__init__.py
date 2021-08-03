@@ -17,7 +17,6 @@ def load_model(input_path: str) -> Dict:  # pragma: no cover
 
 
 def save_model(output_path: str, model: Dict, indent=4):  # pragma: no cover
-    print(output_path)
     file = open(output_path, "w")
     json.dump(model, file, indent=indent)
 
