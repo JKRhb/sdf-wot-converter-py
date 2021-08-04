@@ -540,7 +540,8 @@ def map_event_qualities(
 
 
 def collect_sdf_required(thing_model: Dict, sdf_definition: Dict):
-    thing_model["sdfRequired"].extend(sdf_definition.get("sdfRequired", []))
+    initialize_list_field(thing_model, "tm:required")
+    thing_model["tm:required"].extend(sdf_definition.get("sdfRequired", []))
 
 
 def collect_mapping(thing_model, json_pointer, definition_type, definition_key):
@@ -562,13 +563,11 @@ def map_sdf_event(
 
 
 def map_sdf_required(thing_model: Dict):
-    initialize_list_field(thing_model, "tm:required")
-    for affordance_type in ["actions", "properties", "events"]:
-        for key, value in thing_model.get(affordance_type, {}).items():
-            if "sdf:jsonPointer" in value:
-                json_pointer = value["sdf:jsonPointer"]
-                if json_pointer in thing_model.get("sdfRequired", []):
-                    thing_model["tm:required"].append(f"#/{affordance_type}/{key}")
+    required_affordances = []
+    for pointer in thing_model.get("tm:required", []):
+        if pointer in thing_model["mappings"]:
+            required_affordances.append(thing_model["mappings"][pointer])
+    thing_model["tm:required"] = required_affordances
     if not thing_model["tm:required"]:
         del thing_model["tm:required"]
 
@@ -588,7 +587,6 @@ def convert_sdf_to_wot_tm(sdf_model: Dict) -> Dict:
     thing_model: Dict = {
         "@context": ["http://www.w3.org/ns/td"],
         "@type": "tm:ThingModel",
-        "sdfRequired": [],
         "mappings": {},
     }
 
@@ -606,7 +604,6 @@ def convert_sdf_to_wot_tm(sdf_model: Dict) -> Dict:
 
     map_sdf_required(thing_model)
     map_sdf_ref(thing_model, thing_model)
-    del thing_model["sdfRequired"]
     del thing_model["mappings"]
 
     return thing_model
