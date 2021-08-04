@@ -1,4 +1,4 @@
-from converter import convert_sdf_to_wot_tm
+from sdf_wot_converter import convert_sdf_to_wot_tm
 import pytest
 
 
