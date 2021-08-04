@@ -1,9 +1,9 @@
 import json
-from converter import parse_arguments
-from converter import convert_sdf_to_wot_tm_from_path
-from converter import convert_wot_tm_to_sdf_from_path
-from converter import convert_sdf_to_wot_tm_from_json
-from converter import convert_wot_tm_to_sdf_from_json
+from sdf_wot_converter import parse_arguments
+from sdf_wot_converter import convert_sdf_to_wot_tm_from_path
+from sdf_wot_converter import convert_wot_tm_to_sdf_from_path
+from sdf_wot_converter import convert_sdf_to_wot_tm_from_json
+from sdf_wot_converter import convert_wot_tm_to_sdf_from_json
 import os
 
 
