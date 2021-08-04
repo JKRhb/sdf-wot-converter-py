@@ -292,8 +292,8 @@ def test_sdf_tm_nested_model():
             },
         },
         "tm:required": [
-            "#/actions/blah_foo_bar_baz_foobar",
             "#/properties/blah_foo_bar_baz_foobar",
+            "#/actions/blah_foo_bar_baz_foobar",
             "#/events/blah_foo_bar_baz_foobar",
         ],
     }
