@@ -83,6 +83,10 @@ def map_namespace(sdf_model: Dict, thing_model: Dict):
     thing_model["@context"].append(namespaces)
 
 
+def map_default_namespace(sdf_model: Dict, thing_model: Dict):
+    map_field(sdf_model, thing_model, "defaultNamespace", "sdf:defaultNamespace")
+
+
 def create_link(
     href: str,
     type: Optional[str],
@@ -592,6 +596,7 @@ def convert_sdf_to_wot_tm(sdf_model: Dict) -> Dict:
 
     map_infoblock(sdf_model, thing_model)
     map_namespace(sdf_model, thing_model)
+    map_default_namespace(sdf_model, thing_model)
 
     map_thing_qualities(sdf_model, sdf_model, thing_model, [], "#", sdf_product=True)
     map_thing_qualities(sdf_model, sdf_model, thing_model, [], "#")
