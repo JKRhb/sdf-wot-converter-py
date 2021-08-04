@@ -482,3 +482,24 @@ def test_sdf_tm_sdf_data_conversion():
     }
 
     perform_conversion_test(input, expected_result)
+
+
+def test_empty_namespace_conversion():
+    input = {
+        "namespace": {"cap": "https://example.com/capability/cap"},
+        "defaultNamespace": "cap",
+    }
+
+    expected_result = {
+        "@context": [
+            "http://www.w3.org/ns/td",
+            {
+                "sdf": "https://example.com/sdf",
+                "cap": "https://example.com/capability/cap",
+            },
+        ],
+        "sdf:defaultNamespace": "cap",
+        "@type": "tm:ThingModel",
+    }
+
+    perform_conversion_test(input, expected_result)
