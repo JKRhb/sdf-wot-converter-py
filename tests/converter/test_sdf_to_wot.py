@@ -1,5 +1,13 @@
 from sdf_wot_converter import convert_sdf_to_wot_tm
+from sdf_wot_converter import convert_wot_tm_to_sdf
 import pytest
+
+
+def perform_sdf_roundtrip_test(input):
+    converted_model = convert_sdf_to_wot_tm(input)
+    result = convert_wot_tm_to_sdf(converted_model)
+
+    assert input == result
 
 
 def perform_conversion_test(input, expected_result):
@@ -17,6 +25,7 @@ def test_empty_sdf_tm_conversion():
     }
 
     perform_conversion_test(input, expected_result)
+    perform_sdf_roundtrip_test(input)
 
 
 def test__sdf_tm_infoblock_conversion():
@@ -41,12 +50,14 @@ def test__sdf_tm_infoblock_conversion():
     }
 
     perform_conversion_test(input, expected_result)
+    perform_sdf_roundtrip_test(input)
 
 
 def test_sdf_tm_type_conversion():
     input = {
         "sdfProperty": {
             "foo": {
+                "label": "This is a label.",
                 "$comment": "This is a comment!",
                 "type": "integer",
                 "readable": True,
@@ -61,7 +72,9 @@ def test_sdf_tm_type_conversion():
             "bar": {
                 "type": "number",
                 "writable": True,
+                "observable": True,
                 "const": 5,
+                "unit": "C",
                 "default": 5,
                 "minimum": 0.0,
                 "maximum": 9002.0,
@@ -82,11 +95,12 @@ def test_sdf_tm_type_conversion():
                 "type": "array",
                 "minItems": 2,
                 "maxItems": 5,
+                "uniqueItems": True,
                 "items": {"type": "string"},
             },
             "barfoo": {
                 "type": "object",
-                "properties": {"foo": {"type": "string"}},
+                "properties": {"foo": {"type": "string", "observable": True}},
                 "required": ["foo"],
             },
         }
@@ -97,6 +111,7 @@ def test_sdf_tm_type_conversion():
         "@type": "tm:ThingModel",
         "properties": {
             "foo": {
+                "title": "This is a label.",
                 "sdf:$comment": "This is a comment!",
                 "writeOnly": False,
                 "type": "integer",
@@ -111,8 +126,10 @@ def test_sdf_tm_type_conversion():
             },
             "bar": {
                 "readOnly": False,
+                "observable": True,
                 "type": "number",
                 "const": 5,
+                "unit": "C",
                 "default": 5,
                 "minimum": 0.0,
                 "maximum": 9002.0,
@@ -136,11 +153,12 @@ def test_sdf_tm_type_conversion():
                 "minItems": 2,
                 "maxItems": 5,
                 "items": {"type": "string"},
+                "uniqueItems": True,
                 "sdf:jsonPointer": "#/sdfProperty/foobar",
             },
             "barfoo": {
                 "type": "object",
-                "properties": {"foo": {"type": "string"}},
+                "properties": {"foo": {"type": "string", "sdf:observable": True}},
                 "required": ["foo"],
                 "sdf:jsonPointer": "#/sdfProperty/barfoo",
             },
@@ -148,6 +166,7 @@ def test_sdf_tm_type_conversion():
     }
 
     perform_conversion_test(input, expected_result)
+    perform_sdf_roundtrip_test(input)
 
 
 def test_sdf_tm_action_conversion():
@@ -172,6 +191,7 @@ def test_sdf_tm_action_conversion():
     }
 
     perform_conversion_test(input, expected_result)
+    perform_sdf_roundtrip_test(input)
 
 
 def test_sdf_tm_event_conversion():
@@ -189,6 +209,7 @@ def test_sdf_tm_event_conversion():
     }
 
     perform_conversion_test(input, expected_result)
+    perform_sdf_roundtrip_test(input)
 
 
 def test_sdf_tm_sdf_ref_conversion():
@@ -503,3 +524,4 @@ def test_empty_namespace_conversion():
     }
 
     perform_conversion_test(input, expected_result)
+    perform_sdf_roundtrip_test(input)
