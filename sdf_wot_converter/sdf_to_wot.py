@@ -131,7 +131,7 @@ def map_license(infoblock: Dict, thing_model: Dict):
 def map_version(infoblock: Dict, thing_model: Dict):
     version = infoblock.get("version")
     if version:
-        thing_model["version"] = {"instance": version}
+        thing_model["version"] = {"model": version}
 
 
 def map_infoblock(sdf_model: Dict, thing_model: Dict):

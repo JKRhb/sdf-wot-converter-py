@@ -44,7 +44,7 @@ def test__sdf_tm_infoblock_conversion():
         "title": "Test",
         "description": "Copyright (c) 2021 Example Corp",
         "version": {
-            "instance": "2021-07-31",
+            "model": "2021-07-31",
         },
         "links": [{"href": "https://example.com/LICENSE", "rel": "license"}],
     }

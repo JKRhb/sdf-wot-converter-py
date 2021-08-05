@@ -293,11 +293,10 @@ def map_links(wot_definition: Dict, sdf_definition: Dict):
 
 
 def map_version(wot_definition: Dict, sdf_definition: Dict):
-    # TODO: Deal with model field
     version_info = wot_definition.get("version", {})
-    if "instance" in version_info:
+    if "model" in version_info:
         initialize_info_block(sdf_definition)
-        sdf_definition["info"]["version"] = version_info["instance"]
+        sdf_definition["info"]["version"] = version_info["model"]
 
 
 def map_context(wot_definition: Dict, sdf_definition: Dict):
