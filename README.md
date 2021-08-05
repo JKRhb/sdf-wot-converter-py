@@ -23,13 +23,16 @@ Afterwards, it can be used both as a command line tool and a library.
 
 ## Using the command line tool
 
-After installing the libary you should be able to call the converter in your terminal using `sdf-wot-converter`. You can display available parameters by typing  `sdf-wot-converter --help`. So far, you can only convert from SDF to WoT Thing models but the other direction will be added soon.
+After installing the libary you should be able to call the converter in your terminal using `sdf-wot-converter`. You can display available parameters by typing `sdf-wot-converter --help`. So far, you can convert from SDF to WoT Thing Models and vice versa. Thing Descriptions are supposed to be added soon.
 
 ### Example
 
 ```bash
 # Convert an SDF model to a WoT Thing Model
 sdf-wot-converter --from-sdf examples/sdf/example.sdf.json --to-tm converted-example.tm.json
+
+# Convert a WoT Thing Model to an SDF model
+sdf-wot-converter --from-tm examples/wot/example.tm.json --to-sdf converted-example.sdf.json
 ```
 
 ## License
