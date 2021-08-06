@@ -123,6 +123,7 @@ def test_tm_sdf_property_conversion():
             },
             "foobar": {"type": "array", "minItems": 2, "maxItems": 5},
             "barfoo": {"type": "object", "required": ["foo"]},
+            "fizzbuzz": {},
         },
     }
 
@@ -175,6 +176,7 @@ def test_tm_sdf_property_conversion():
             },
             "foobar": {"type": "array", "minItems": 2, "maxItems": 5},
             "barfoo": {"type": "object", "required": ["foo"]},
+            "fizzbuzz": {},
         },
     }
 
