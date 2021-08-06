@@ -123,15 +123,13 @@ def add_link(
 
 
 def map_license(infoblock: Dict, thing_model: Dict):
-    license_href = infoblock.get("license")
-    if license_href:
-        add_link(thing_model, license_href, None, "license", None, None)
+    license_href = infoblock["license"]
+    add_link(thing_model, license_href, None, "license", None, None)
 
 
 def map_version(infoblock: Dict, thing_model: Dict):
-    version = infoblock.get("version")
-    if version:
-        thing_model["version"] = {"model": version}
+    version = infoblock["version"]
+    thing_model["version"] = {"model": version}
 
 
 def map_infoblock(sdf_model: Dict, thing_model: Dict):
