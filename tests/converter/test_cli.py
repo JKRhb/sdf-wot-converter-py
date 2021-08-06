@@ -1,5 +1,5 @@
 import json
-from sdf_wot_converter import parse_arguments
+from sdf_wot_converter import _parse_arguments
 from sdf_wot_converter import convert_sdf_to_wot_tm_from_path
 from sdf_wot_converter import convert_wot_tm_to_sdf_from_path
 from sdf_wot_converter import convert_sdf_to_wot_tm_from_json
@@ -9,11 +9,11 @@ import os
 
 def test_parse_arguments():
     args1 = ["--from-sdf", "foo", "--to-tm", "bar"]
-    parsed_args1 = parse_arguments(args1)
+    parsed_args1 = _parse_arguments(args1)
     assert parsed_args1.from_sdf == "foo" and parsed_args1.to_tm == "bar"
 
     args2 = ["--from-tm", "foo", "--to-sdf", "bar"]
-    parsed_args2 = parse_arguments(args2)
+    parsed_args2 = _parse_arguments(args2)
     assert parsed_args2.from_tm == "foo" and parsed_args2.to_sdf == "bar"
 
 

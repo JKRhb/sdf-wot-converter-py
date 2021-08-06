@@ -11,17 +11,17 @@ from .schemas.td_schema import td_schema
 from .schemas.tm_schema import tm_schema
 
 
-def load_model(input_path: str) -> Dict:  # pragma: no cover
+def _load_model(input_path: str) -> Dict:  # pragma: no cover
     file = open(input_path)
     return json.load(file)
 
 
-def save_model(output_path: str, model: Dict, indent=4):  # pragma: no cover
+def _save_model(output_path: str, model: Dict, indent=4):  # pragma: no cover
     file = open(output_path, "w")
     json.dump(model, file, indent=indent)
 
 
-def convert_and_validate(
+def _convert_and_validate(
     from_model: Dict,
     from_schema: Dict,
     to_schema: Dict,
@@ -33,21 +33,21 @@ def convert_and_validate(
     return to_model
 
 
-def convert_model_from_path(
+def _convert_model_from_path(
     from_path: str,
     to_path: str,
     from_schema: Dict,
     to_schema: Dict,
     converter_function: Callable,
 ):  # pragma: no cover
-    from_model = load_model(from_path)
-    to_model = convert_and_validate(
+    from_model = _load_model(from_path)
+    to_model = _convert_and_validate(
         from_model, from_schema, to_schema, converter_function
     )
-    save_model(to_path, to_model)
+    _save_model(to_path, to_model)
 
 
-def convert_model_from_json(
+def _convert_model_from_json(
     from_model_json: str,
     from_schema: Dict,
     to_schema: Dict,
@@ -55,26 +55,26 @@ def convert_model_from_json(
     indent=4,
 ):  # pragma: no cover
     from_model = json.loads(from_model_json)
-    to_model = convert_and_validate(
+    to_model = _convert_and_validate(
         from_model, from_schema, to_schema, converter_function
     )
     return json.dumps(to_model, indent=indent)
 
 
 def convert_sdf_to_wot_tm(input: Dict):
-    return convert_and_validate(
+    return _convert_and_validate(
         input, sdf_validation_schema, tm_schema, sdf_to_wot.convert_sdf_to_wot_tm
     )
 
 
 def convert_wot_tm_to_sdf(input: Dict):
-    return convert_and_validate(
+    return _convert_and_validate(
         input, tm_schema, sdf_validation_schema, wot_to_sdf.convert_wot_tm_to_sdf
     )
 
 
 def convert_sdf_to_wot_tm_from_path(from_path: str, to_path: str):
-    return convert_model_from_path(
+    return _convert_model_from_path(
         from_path,
         to_path,
         sdf_validation_schema,
@@ -84,7 +84,7 @@ def convert_sdf_to_wot_tm_from_path(from_path: str, to_path: str):
 
 
 def convert_wot_tm_to_sdf_from_path(from_path: str, to_path: str):
-    return convert_model_from_path(
+    return _convert_model_from_path(
         from_path,
         to_path,
         tm_schema,
@@ -94,19 +94,19 @@ def convert_wot_tm_to_sdf_from_path(from_path: str, to_path: str):
 
 
 def convert_sdf_to_wot_tm_from_json(input: str):
-    return convert_model_from_json(
+    return _convert_model_from_json(
         input, sdf_validation_schema, tm_schema, sdf_to_wot.convert_sdf_to_wot_tm
     )
 
 
 def convert_wot_tm_to_sdf_from_json(input: str):
 
-    return convert_model_from_json(
+    return _convert_model_from_json(
         input, tm_schema, sdf_validation_schema, wot_to_sdf.convert_wot_tm_to_sdf
     )
 
 
-def parse_arguments(args):
+def _parse_arguments(args):
     parser = argparse.ArgumentParser(
         description="Convert from SDF to WoT and vice versa."
     )
@@ -130,7 +130,7 @@ def parse_arguments(args):
     return parser.parse_args(args)
 
 
-def use_converter_cli(args):  # pragma: no cover
+def _use_converter_cli(args):  # pragma: no cover
     if args.from_sdf and args.to_tm:
         convert_sdf_to_wot_tm_from_path(args.from_sdf, args.to_tm)
     elif args.from_tm and args.to_sdf:
@@ -138,5 +138,5 @@ def use_converter_cli(args):  # pragma: no cover
 
 
 def main():  # pragma: no cover
-    args = parse_arguments(sys.argv[1:])
-    use_converter_cli(args)
+    args = _parse_arguments(sys.argv[1:])
+    _use_converter_cli(args)
