@@ -195,3 +195,19 @@ def test_tm_sdf_link_conversion():
     expected_result = {}
 
     perform_conversion_test(input, expected_result)
+
+
+def test_tm_sdf_schema_definition_conversion():
+    # TODO: Check how links should be mapped
+
+    input = {
+        "@context": ["http://www.w3.org/ns/td", {"sdf": "https://example.com/sdf"}],
+        "@type": "tm:ThingModel",
+        "schemaDefinitions": {"foobar": {"type": "string"}},
+    }
+
+    expected_result = {
+        "sdfData": {"foobar": {"type": "string"}},
+    }
+
+    perform_conversion_test(input, expected_result)
