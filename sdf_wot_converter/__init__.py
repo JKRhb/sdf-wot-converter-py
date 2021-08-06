@@ -93,16 +93,16 @@ def convert_wot_tm_to_sdf_from_path(from_path: str, to_path: str):
     )
 
 
-def convert_sdf_to_wot_tm_from_json(input: str):
+def convert_sdf_to_wot_tm_from_json(input: str, indent=4):
     return _convert_model_from_json(
-        input, sdf_validation_schema, tm_schema, sdf_to_wot.convert_sdf_to_wot_tm
+        input, sdf_validation_schema, tm_schema, sdf_to_wot.convert_sdf_to_wot_tm, indent=indent
     )
 
 
-def convert_wot_tm_to_sdf_from_json(input: str):
+def convert_wot_tm_to_sdf_from_json(input: str, indent=4):
 
     return _convert_model_from_json(
-        input, tm_schema, sdf_validation_schema, wot_to_sdf.convert_wot_tm_to_sdf
+        input, tm_schema, sdf_validation_schema, wot_to_sdf.convert_wot_tm_to_sdf, indent=indent
     )
 
 
