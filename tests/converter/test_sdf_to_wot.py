@@ -28,6 +28,80 @@ def test_empty_sdf_tm_conversion():
     perform_sdf_roundtrip_test(input)
 
 
+def test_sdf_tm_example_conversion():
+    input = {
+        "info": {
+            "title": "Example file for OneDM Semantic Definition Format",
+            "version": "2019-04-24",
+            "copyright": "Copyright 2019 Example Corp. All rights reserved.",
+            "license": "https://example.com/license",
+        },
+        "namespace": {"cap": "https://example.com/capability/cap"},
+        "defaultNamespace": "cap",
+        "sdfObject": {
+            "Switch": {
+                "sdfProperty": {
+                    "value": {
+                        "description": "The state of the switch; false for off and true for on.",
+                        "type": "boolean",
+                    }
+                },
+                "sdfAction": {
+                    "on": {
+                        "description": "Turn the switch on; equivalent to setting value to true."
+                    },
+                    "off": {
+                        "description": "Turn the switch off; equivalent to setting value to false."
+                    },
+                    "toggle": {
+                        "description": "Toggle the switch; equivalent to setting value to its complement."
+                    },
+                },
+            }
+        },
+    }
+
+    expected_result = {
+        "@context": [
+            "http://www.w3.org/ns/td",
+            {
+                "cap": "https://example.com/capability/cap",
+                "sdf": "https://example.com/sdf",
+            },
+        ],
+        "@type": "tm:ThingModel",
+        "title": "Example file for OneDM Semantic Definition Format",
+        "description": "Copyright 2019 Example Corp. All rights reserved.",
+        "links": [{"href": "https://example.com/license", "rel": "license"}],
+        "version": {"model": "2019-04-24"},
+        "sdf:defaultNamespace": "cap",
+        "actions": {
+            "Switch_on": {
+                "sdf:jsonPointer": "#/sdfObject/Switch/sdfAction/on",
+                "description": "Turn the switch on; equivalent to setting value to true.",
+            },
+            "Switch_off": {
+                "sdf:jsonPointer": "#/sdfObject/Switch/sdfAction/off",
+                "description": "Turn the switch off; equivalent to setting value to false.",
+            },
+            "Switch_toggle": {
+                "sdf:jsonPointer": "#/sdfObject/Switch/sdfAction/toggle",
+                "description": "Toggle the switch; equivalent to setting value to its complement.",
+            },
+        },
+        "properties": {
+            "Switch_value": {
+                "sdf:jsonPointer": "#/sdfObject/Switch/sdfProperty/value",
+                "description": "The state of the switch; false for off and true for on.",
+                "type": "boolean",
+            }
+        },
+    }
+
+    perform_conversion_test(input, expected_result)
+    perform_sdf_roundtrip_test(input)
+
+
 def test__sdf_tm_infoblock_conversion():
     input = {
         "info": {
