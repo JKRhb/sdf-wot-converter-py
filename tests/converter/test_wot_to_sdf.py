@@ -7,7 +7,7 @@ def perform_conversion_test(input, expected_result):
     assert actual_result == expected_result
 
 
-def test_empty_sdf_tm_conversion():
+def test_empty_tm_sdf_conversion():
 
     input = {
         "@context": ["http://www.w3.org/ns/td", {"sdf": "https://example.com/sdf"}],
@@ -123,6 +123,7 @@ def test_tm_sdf_property_conversion():
             },
             "foobar": {"type": "array", "minItems": 2, "maxItems": 5},
             "barfoo": {"type": "object", "required": ["foo"]},
+            "fizzbuzz": {},
         },
     }
 
@@ -175,7 +176,22 @@ def test_tm_sdf_property_conversion():
             },
             "foobar": {"type": "array", "minItems": 2, "maxItems": 5},
             "barfoo": {"type": "object", "required": ["foo"]},
+            "fizzbuzz": {},
         },
     }
+
+    perform_conversion_test(input, expected_result)
+
+
+def test_tm_sdf_link_conversion():
+    # TODO: Check how links should be mapped
+
+    input = {
+        "@context": ["http://www.w3.org/ns/td", {"sdf": "https://example.com/sdf"}],
+        "@type": "tm:ThingModel",
+        "links": [{"href": "https://example.org"}],
+    }
+
+    expected_result = {}
 
     perform_conversion_test(input, expected_result)
