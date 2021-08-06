@@ -585,6 +585,8 @@ def test_sdf_tm_sdf_data_conversion():
     }
 
     perform_conversion_test(input, expected_result)
+    # TODO: Implement roundtripping of sdf_ref
+    # perform_sdf_roundtrip_test(input)
 
 
 def test_empty_namespace_conversion():
