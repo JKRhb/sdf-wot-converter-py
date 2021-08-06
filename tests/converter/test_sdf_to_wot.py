@@ -195,7 +195,9 @@ def test_sdf_tm_action_conversion():
 
 
 def test_sdf_tm_event_conversion():
-    input = {"sdfEvent": {"foobar": {"sdfOutputData": {"type": "string"}}}}
+    input = {
+        "sdfEvent": {"foobar": {"sdfOutputData": {"type": "string"}}, "foobaz": {}}
+    }
 
     expected_result = {
         "@context": ["http://www.w3.org/ns/td", {"sdf": "https://example.com/sdf"}],
@@ -204,7 +206,10 @@ def test_sdf_tm_event_conversion():
             "foobar": {
                 "data": {"type": "string"},
                 "sdf:jsonPointer": "#/sdfEvent/foobar",
-            }
+            },
+            "foobaz": {
+                "sdf:jsonPointer": "#/sdfEvent/foobaz",
+            },
         },
     }
 
