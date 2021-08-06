@@ -32,21 +32,16 @@ def map_properties(thing_model: Dict, sdf_model: Dict):
         map_interaction_affordance_fields(wot_property, sdf_property)
         map_data_schema_fields(wot_property, sdf_property)
 
-        map_items(thing_model, wot_property, sdf_property)
-        map_dataschema_properties(thing_model, wot_property, sdf_property)
-
         set_pointer(sdf_model, json_pointer, sdf_property)
 
 
-def map_items(thing_model: Dict, wot_definition: Dict, sdf_definition: Dict):
+def map_items(wot_definition: Dict, sdf_definition: Dict):
     if "items" in wot_definition:
         sdf_definition["items"] = {}
         map_data_schema_fields(wot_definition["items"], sdf_definition["items"])
 
 
-def map_dataschema_properties(
-    thing_model: Dict, wot_definition: Dict, sdf_definition: Dict
-):
+def map_dataschema_properties(wot_definition: Dict, sdf_definition: Dict):
     for key, property in wot_definition.get("properties", {}).items():
         initialize_object_field(sdf_definition, "properties")
         sdf_definition["properties"][key] = {}
@@ -123,6 +118,9 @@ def map_data_schema_fields(wot_definition: Dict, sdf_definition: Dict):
     map_exclusive_minimum(wot_definition, sdf_definition)
     map_exclusive_maximum(wot_definition, sdf_definition)
     map_content_format(wot_definition, sdf_definition)
+
+    map_items(wot_definition, sdf_definition)
+    map_dataschema_properties(wot_definition, sdf_definition)
 
 
 def map_const(wot_definition: Dict, sdf_definition: Dict):
