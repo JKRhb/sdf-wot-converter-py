@@ -7,7 +7,7 @@ def perform_conversion_test(input, expected_result):
     assert actual_result == expected_result
 
 
-def test_empty_sdf_tm_conversion():
+def test_empty_tm_sdf_conversion():
 
     input = {
         "@context": ["http://www.w3.org/ns/td", {"sdf": "https://example.com/sdf"}],
