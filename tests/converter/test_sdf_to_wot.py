@@ -266,6 +266,9 @@ def test_sdf_tm_nested_model():
     input = {
         "sdfProduct": {
             "blah": {
+                "sdfRequired": [
+                    "#/sdfProduct/blah/sdfThing/foo",  # TODO: Check if such requirements can be kept
+                ],
                 "sdfThing": {
                     "foo": {
                         "sdfRequired": [
@@ -291,7 +294,7 @@ def test_sdf_tm_nested_model():
                             }
                         },
                     }
-                }
+                },
             }
         }
     }
