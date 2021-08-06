@@ -254,7 +254,14 @@ def map_description(wot_definition: Dict, sdf_definition: Dict):
 
 
 def map_schema_definitions(thing_model: Dict, sdf_model: Dict):
-    pass
+    for key, wot_schema_definitions in thing_model.get("schemaDefinitions", {}).items():
+        json_pointer = determine_json_pointer(
+            sdf_model, "sdfData", key, wot_schema_definitions
+        )
+        sdf_data: Dict[str, Any] = {}
+        map_sdf_comment(wot_schema_definitions, sdf_data)
+        map_data_schema_fields(wot_schema_definitions, sdf_data)
+        set_pointer(sdf_model, json_pointer, sdf_data)
 
 
 def initialize_empty_string_field(sdf_definition: Dict, field_name: str):
