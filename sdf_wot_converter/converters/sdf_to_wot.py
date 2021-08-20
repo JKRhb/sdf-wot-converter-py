@@ -1,4 +1,9 @@
-from typing import Any, Dict, List, Optional
+from typing import (
+    Any,
+    Dict,
+    List,
+    Optional,
+)
 from jsonpointer import resolve_pointer
 import json_merge_patch
 import urllib.request

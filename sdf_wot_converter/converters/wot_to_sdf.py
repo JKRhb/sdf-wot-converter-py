@@ -1,4 +1,7 @@
-from typing import Any, Dict
+from typing import (
+    Any,
+    Dict,
+)
 from .utility import (
     initialize_list_field,
     initialize_object_field,

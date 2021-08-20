@@ -1,5 +1,7 @@
-from sdf_wot_converter import convert_sdf_to_wot_tm
-from sdf_wot_converter import convert_wot_tm_to_sdf
+from sdf_wot_converter import (
+    convert_sdf_to_wot_tm,
+    convert_wot_tm_to_sdf,
+)
 import pytest
 
 

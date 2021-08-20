@@ -1,9 +1,11 @@
 import json
-from sdf_wot_converter import _parse_arguments
-from sdf_wot_converter import convert_sdf_to_wot_tm_from_path
-from sdf_wot_converter import convert_wot_tm_to_sdf_from_path
-from sdf_wot_converter import convert_sdf_to_wot_tm_from_json
-from sdf_wot_converter import convert_wot_tm_to_sdf_from_json
+from sdf_wot_converter import (
+    _parse_arguments,
+    convert_sdf_to_wot_tm_from_path,
+    convert_wot_tm_to_sdf_from_path,
+    convert_sdf_to_wot_tm_from_json,
+    convert_wot_tm_to_sdf_from_json,
+)
 import os
 
 

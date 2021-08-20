@@ -3,8 +3,10 @@ import argparse
 import sys
 from jsonschema import validate
 from typing import Dict, Callable
-from .converters import sdf_to_wot
-from .converters import wot_to_sdf
+from .converters import (
+    sdf_to_wot,
+    wot_to_sdf,
+)
 
 from .schemas.sdf_validation_schema import sdf_validation_schema
 from .schemas.td_schema import td_schema
