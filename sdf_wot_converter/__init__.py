@@ -149,6 +149,16 @@ def convert_wot_tm_to_sdf_from_json(input: str, indent=4):
     )
 
 
+def convert_wot_tm_to_wot_td_from_json(input: str, indent=4):
+    return _convert_model_from_json(
+        input,
+        tm_schema,
+        td_schema,
+        tm_to_td.convert_tm_to_td,
+        indent=indent,
+    )
+
+
 def _parse_arguments(args):
     parser = argparse.ArgumentParser(
         description="Convert from SDF to WoT and vice versa."
