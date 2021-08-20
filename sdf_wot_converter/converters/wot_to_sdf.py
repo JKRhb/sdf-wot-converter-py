@@ -337,11 +337,11 @@ def convert_wot_tm_to_sdf(thing_model: Dict) -> Dict:
     #       securityDefinitions, profile, schemaDefinitions
     sdf_model: Dict = {}
 
-    map_context(thing_model, sdf_model)
     map_thing_title(thing_model, sdf_model)
     map_thing_description(thing_model, sdf_model)
     map_links(thing_model, sdf_model)
     map_version(thing_model, sdf_model)
+    map_context(thing_model, sdf_model)
 
     map_properties(thing_model, sdf_model)
     map_actions(thing_model, sdf_model)
