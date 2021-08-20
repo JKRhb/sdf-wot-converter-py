@@ -42,6 +42,7 @@ def _convert_model_from_path(
     from_schema: Dict,
     to_schema: Dict,
     converter_function: Callable,
+    **kwargs,
 ):  # pragma: no cover
     from_model = _load_model(from_path)
     to_model = _convert_and_validate(
@@ -144,7 +145,16 @@ def _parse_arguments(args):
         "--to-tm", metavar="TM", dest="to_tm", help="WoT TM output file"
     )
     to_group.add_argument(
+        "--to-td", metavar="TD", dest="to_td", help="WoT TD output file"
+    )
+    to_group.add_argument(
         "--to-sdf", metavar="SDF", dest="to_sdf", help="SDF output file"
+    )
+
+    parser.add_argument(
+        "--placeholder",
+        dest="placeholder_map",
+        help="Optional placeholder map for TM-to-TD conversion",
     )
 
     return parser.parse_args(args)
@@ -153,8 +163,13 @@ def _parse_arguments(args):
 def _use_converter_cli(args):  # pragma: no cover
     if args.from_sdf and args.to_tm:
         convert_sdf_to_wot_tm_from_path(args.from_sdf, args.to_tm)
-    elif args.from_tm and args.to_sdf:
-        convert_wot_tm_to_sdf_from_path(args.from_tm, args.to_sdf)
+    elif args.from_tm:
+        if args.to_sdf:
+            convert_wot_tm_to_sdf_from_path(args.from_tm, args.to_sdf)
+        elif args.to_td:
+            convert_wot_tm_to_wot_td_from_path(
+                args.from_tm, args.to_td, placeholder_map=args.placeholder_map
+            )
 
 
 def main():  # pragma: no cover
