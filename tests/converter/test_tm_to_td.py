@@ -27,3 +27,52 @@ def test_empty_tm_td_conversion():
 
     perform_conversion_test(input, expected_result)
 
+
+def test_tm_td_with_placeholder_conversion():
+    # TODO: Handle case of TMs without forms
+    input = {
+        "@context": ["http://www.w3.org/ns/td"],
+        "@type": "tm:ThingModel",
+        "title": "Thing Title",
+        "security": ["nosec_sc"],
+        "securityDefinitions": {"nosec_sc": {"scheme": "nosec"}},
+        "properties": {
+            "temperature": {
+                "description": "Shows the current temperature value",
+                "type": "number",
+                "minimum": -20,
+                "maximum": "{{THERMOSTATE_TEMPERATURE_MAXIMUM}}",
+                "observable": "{{THERMOSTATE_TEMPERATURE_OBSERVABLE}}",
+                "readOnly": "{{THERMOSTATE_TEMPERATURE_READ_ONLY}}",
+                "forms": [{"href": "coap://example.org"}],
+            }
+        },
+    }
+
+    placeholder_map = {
+        "THERMOSTATE_NUMBER": 4,
+        "THERMOSTATE_TEMPERATURE_MAXIMUM": 47.7,
+        "THERMOSTATE_TEMPERATURE_OBSERVABLE": False,
+        "THERMOSTATE_TEMPERATURE_READ_ONLY": True,
+    }
+
+    expected_result = {
+        "@context": ["http://www.w3.org/ns/td"],
+        "@type": "Thing",
+        "title": "Thing Title",
+        "security": ["nosec_sc"],
+        "securityDefinitions": {"nosec_sc": {"scheme": "nosec"}},
+        "properties": {
+            "temperature": {
+                "description": "Shows the current temperature value",
+                "type": "number",
+                "minimum": -20,
+                "maximum": 47.7,
+                "observable": False,
+                "readOnly": True,
+                "forms": [{"href": "coap://example.org"}],
+            }
+        },
+    }
+
+    perform_conversion_test(input, expected_result, placeholder_map=placeholder_map)
