@@ -6,6 +6,7 @@ from typing import Dict, Callable
 from .converters import (
     sdf_to_wot,
     wot_to_sdf,
+    tm_to_td,
 )
 
 from .schemas.sdf_validation_schema import sdf_validation_schema
@@ -72,6 +73,15 @@ def convert_sdf_to_wot_tm(input: Dict):
 def convert_wot_tm_to_sdf(input: Dict):
     return _convert_and_validate(
         input, tm_schema, sdf_validation_schema, wot_to_sdf.convert_wot_tm_to_sdf
+    )
+
+
+def convert_wot_tm_to_td(input: Dict, placeholder_map=None):
+    return _convert_and_validate(
+        input,
+        tm_schema,
+        td_schema,
+        tm_to_td.convert_tm_to_td,
     )
 
 
