@@ -91,7 +91,7 @@ def replace_placeholders(thing_model, placeholders):
 
 
 def convert_tm_to_td(thing_model: Dict, placeholder_map=None) -> Dict:
-    partial_td: Dict = thing_model.copy()
+    partial_td: Dict = copy.deepcopy(thing_model)
 
     partial_td = resolve_extension(partial_td)
 
