@@ -130,6 +130,30 @@ def test_tm_td_extension():
     perform_conversion_test(input, expected_result)
 
 
+def test_tm_td_link_preservation():
+    input = {
+        "@context": ["http://www.w3.org/ns/td"],
+        "@type": "tm:ThingModel",
+        "title": "Thing Title",
+        "security": ["nosec_sc"],
+        "securityDefinitions": {"nosec_sc": {"scheme": "nosec"}},
+        "links": [{"href": "https://example.org"}],
+    }
+
+    expected_result = {
+        "@context": ["http://www.w3.org/ns/td"],
+        "title": "Thing Title",
+        "@type": "Thing",
+        "securityDefinitions": {
+            "nosec_sc": {"scheme": "nosec"},
+        },
+        "security": ["nosec_sc"],
+        "links": [{"href": "https://example.org"}],
+    }
+
+    perform_conversion_test(input, expected_result)
+
+
 def test_tm_td_tm_ref():
     # TODO: Handle case of TMs without forms
     input = {
