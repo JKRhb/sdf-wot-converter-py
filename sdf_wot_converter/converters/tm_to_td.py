@@ -2,6 +2,11 @@ from typing import (
     Dict,
 )
 import json
+import copy
+import urllib.request
+import json_merge_patch
+import jsonschema
+from ..schemas import tm_schema
 
 
 def replace_type(thing_description: Dict):
@@ -11,6 +16,43 @@ def replace_type(thing_description: Dict):
     else:
         json_ld_type = ["Thing" if x == "tm:ThingModel" else x for x in json_ld_type]
     thing_description["@type"] = json_ld_type
+
+
+def _retrieve_thing_model(tm_url: str):
+    with urllib.request.urlopen(tm_url) as url:
+        retrieved_thing_model = json.loads(url.read().decode())
+        jsonschema.validate(retrieved_thing_model, tm_schema.tm_schema)
+        return retrieved_thing_model
+
+
+def perform_extension(partial_td, extension_href):
+    retrieved_thing_model = _retrieve_thing_model(extension_href)
+    merged_partial_td = json_merge_patch.merge(retrieved_thing_model, partial_td)
+    return resolve_extension(merged_partial_td)
+
+
+def resolve_extension(partial_td: Dict):
+    if "links" not in partial_td:
+        return partial_td
+
+    extension_href = None
+    new_links = []
+
+    for link in partial_td.get("links", []):
+        if "tm:extends" == link.get("rel"):
+            extension_href = link["href"]
+        else:
+            new_links.append(link)
+
+    if new_links:
+        partial_td["links"] = new_links
+    else:
+        del partial_td["links"]
+
+    if extension_href:
+        partial_td = perform_extension(partial_td, extension_href)
+
+    return partial_td
 
 
 def _stringify_boolean(boolean: bool) -> str:
@@ -50,6 +92,8 @@ def replace_placeholders(thing_model, placeholders):
 
 def convert_tm_to_td(thing_model: Dict, placeholder_map=None) -> Dict:
     partial_td: Dict = thing_model.copy()
+
+    partial_td = resolve_extension(partial_td)
 
     replace_type(partial_td)
 

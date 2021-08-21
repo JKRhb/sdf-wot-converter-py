@@ -76,3 +76,55 @@ def test_tm_td_with_placeholder_conversion():
     }
 
     perform_conversion_test(input, expected_result, placeholder_map=placeholder_map)
+
+
+def test_tm_td_extension():
+    # TODO: Handle case of TMs without forms
+    input = {
+        "@context": ["http://www.w3.org/ns/td"],
+        "@type": "tm:ThingModel",
+        "title": "Thing Title",
+        "security": ["nosec_sc"],
+        "securityDefinitions": {"nosec_sc": {"scheme": "nosec"}},
+        "links": [
+            {
+                "href": "https://raw.githubusercontent.com/JKRhb/sdf-wot-converter-py/main/examples/wot/example-with-bindings.tm.json",
+                "rel": "tm:extends",
+            }
+        ],
+    }
+
+    expected_result = {
+        "@context": ["http://www.w3.org/ns/td"],
+        "id": "urn:dev:ops:32473-WoTLamp-1234",
+        "title": "Thing Title",
+        "@type": "Thing",
+        "securityDefinitions": {
+            "basic_sc": {"scheme": "basic", "in": "header"},
+            "nosec_sc": {"scheme": "nosec"},
+        },
+        "security": ["nosec_sc"],
+        "properties": {
+            "status": {
+                "@type": "saref:OnOffState",
+                "type": "string",
+                "forms": [{"href": "https://mylamp.example.com/status"}],
+            }
+        },
+        "actions": {
+            "toggle": {
+                "@type": "saref:ToggleCommand",
+                "forms": [{"href": "https://mylamp.example.com/toggle"}],
+            }
+        },
+        "events": {
+            "overheating": {
+                "data": {"type": "string"},
+                "forms": [
+                    {"href": "https://mylamp.example.com/oh", "subprotocol": "longpoll"}
+                ],
+            }
+        },
+    }
+
+    perform_conversion_test(input, expected_result)
