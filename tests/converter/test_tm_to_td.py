@@ -128,3 +128,40 @@ def test_tm_td_extension():
     }
 
     perform_conversion_test(input, expected_result)
+
+
+def test_tm_td_tm_ref():
+    # TODO: Handle case of TMs without forms
+    input = {
+        "@context": ["http://www.w3.org/ns/td"],
+        "@type": "tm:ThingModel",
+        "title": "Thing Title",
+        "security": ["nosec_sc"],
+        "securityDefinitions": {"nosec_sc": {"scheme": "nosec"}},
+        "properties": {
+            "status": {
+                "tm:ref": "https://raw.githubusercontent.com/JKRhb/sdf-wot-converter-py/main/examples/wot/example-with-tm-ref.tm.json#/properties/status",
+                "readOnly": True,
+            }
+        },
+    }
+
+    expected_result = {
+        "@context": ["http://www.w3.org/ns/td"],
+        "title": "Thing Title",
+        "@type": "Thing",
+        "securityDefinitions": {
+            "nosec_sc": {"scheme": "nosec"},
+        },
+        "security": ["nosec_sc"],
+        "properties": {
+            "status": {
+                "@type": "saref:OnOffState",
+                "type": "boolean",
+                "readOnly": True,
+                "forms": [{"href": "https://mylamp.example.com/status"}],
+            }
+        },
+    }
+
+    perform_conversion_test(input, expected_result)

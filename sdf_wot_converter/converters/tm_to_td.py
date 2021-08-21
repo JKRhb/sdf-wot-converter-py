@@ -7,6 +7,7 @@ import urllib.request
 import json_merge_patch
 import jsonschema
 from ..schemas import tm_schema
+from jsonpointer import resolve_pointer
 
 
 def replace_type(thing_description: Dict):
@@ -32,6 +33,8 @@ def perform_extension(partial_td, extension_href):
 
 
 def resolve_extension(partial_td: Dict):
+    partial_td = _resolve_tm_ref(partial_td)
+
     if "links" not in partial_td:
         return partial_td
 
@@ -88,6 +91,28 @@ def replace_placeholders(thing_model, placeholders):
     assert "{{" not in thing_model_as_string, "Not all placeholders have been replaced!"
 
     return json.loads(thing_model_as_string)
+
+
+def _resolve_tm_ref(current_definition):
+    # TODO: Deal with cirular references
+
+    result = copy.deepcopy(current_definition)
+
+    if "tm:ref" in result:
+        tm_ref = result["tm:ref"]
+        del result["tm:ref"]
+        root, pointer = tuple(tm_ref.split("#", 1))
+        retrieved_thing_model = _retrieve_thing_model(root)
+        original = resolve_pointer(retrieved_thing_model, pointer)
+        result = json_merge_patch.merge(original, result)
+        if "tm:ref" in result:
+            result = _resolve_tm_ref(result)
+
+    for key, value in result.items():
+        if isinstance(value, dict):
+            result[key] = _resolve_tm_ref(value)
+
+    return result
 
 
 def convert_tm_to_td(thing_model: Dict, placeholder_map=None) -> Dict:
