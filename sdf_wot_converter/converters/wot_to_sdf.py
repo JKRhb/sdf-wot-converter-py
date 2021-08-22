@@ -335,13 +335,15 @@ def map_sdf_comment(wot_definition: Dict, sdf_definition: Dict):
         sdf_definition["$comment"] = wot_definition["sdf:$comment"]
 
 
-def convert_wot_tm_to_sdf(thing_model: Dict) -> Dict:
+def convert_wot_tm_to_sdf(thing_model: Dict, placeholder_map=None) -> Dict:
     # TODO: Unmapped fields: @type, id, titles, descriptions, created,
     #       modified, support, base, forms, security,
     #       securityDefinitions, profile, schemaDefinitions
     sdf_model: Dict = {}
 
     thing_model = wot_common.resolve_extension(thing_model)
+    thing_model = wot_common.replace_placeholders(thing_model, placeholder_map)
+
     map_thing_title(thing_model, sdf_model)
     map_thing_description(thing_model, sdf_model)
     map_links(thing_model, sdf_model)
