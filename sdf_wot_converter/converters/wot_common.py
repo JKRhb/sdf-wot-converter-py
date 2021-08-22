@@ -1,5 +1,6 @@
 from typing import (
     Dict,
+    List,
 )
 import urllib.request
 import json_merge_patch
@@ -17,17 +18,20 @@ def _retrieve_thing_model(tm_url: str):
         return retrieved_thing_model
 
 
-def perform_extension(partial_td, extension_href):
+def perform_extension(partial_td: Dict, extension_href: str, extension_link_list: List[str]):
     retrieved_thing_model = _retrieve_thing_model(extension_href)
     merged_partial_td = json_merge_patch.merge(retrieved_thing_model, partial_td)
-    return resolve_extension(merged_partial_td)
+    return resolve_extension(merged_partial_td, extension_link_list=extension_link_list)
 
 
-def resolve_extension(partial_td: Dict):
+def resolve_extension(partial_td: Dict, extension_link_list=None):
     partial_td = _resolve_tm_ref(partial_td)
 
     if "links" not in partial_td:
         return partial_td
+
+    if extension_link_list is None:
+        extension_link_list = []
 
     extension_href = None
     new_links = []
@@ -44,7 +48,9 @@ def resolve_extension(partial_td: Dict):
         del partial_td["links"]
 
     if extension_href:
-        partial_td = perform_extension(partial_td, extension_href)
+        assert extension_href not in extension_link_list
+        extension_link_list.append(extension_href)
+        partial_td = perform_extension(partial_td, extension_href, extension_link_list)
 
     return partial_td
 
@@ -86,20 +92,25 @@ def replace_placeholders(thing_model, placeholders):
     return json.loads(thing_model_as_string)
 
 
-def _resolve_tm_ref(current_definition):
+def _resolve_tm_ref(current_definition, pointer_list=None):
     # TODO: Deal with cirular references
 
     result = copy.deepcopy(current_definition)
 
+    if pointer_list is None:
+        pointer_list = []
+
     if "tm:ref" in result:
         tm_ref = result["tm:ref"]
+        assert tm_ref not in pointer_list
+        pointer_list.append(tm_ref)
         del result["tm:ref"]
         root, pointer = tuple(tm_ref.split("#", 1))
         retrieved_thing_model = _retrieve_thing_model(root)
         original = resolve_pointer(retrieved_thing_model, pointer)
         result = json_merge_patch.merge(original, result)
         if "tm:ref" in result:
-            result = _resolve_tm_ref(result)
+            result = _resolve_tm_ref(result, pointer_list=pointer_list)
 
     for key, value in result.items():
         if isinstance(value, dict):
