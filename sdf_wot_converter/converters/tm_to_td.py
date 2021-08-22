@@ -115,6 +115,18 @@ def _resolve_tm_ref(current_definition):
     return result
 
 
+def assert_tm_required(partial_td):
+    if "tm:required" not in partial_td:
+        return
+
+    for required_affordance_pointer in partial_td["tm:required"]:
+        root, pointer = tuple(required_affordance_pointer.split("#", 1))
+        assert root == ""
+        assert resolve_pointer(partial_td, pointer, None) is not None
+
+    del partial_td["tm:required"]
+
+
 def convert_tm_to_td(thing_model: Dict, placeholder_map=None) -> Dict:
     partial_td: Dict = copy.deepcopy(thing_model)
 
@@ -123,5 +135,7 @@ def convert_tm_to_td(thing_model: Dict, placeholder_map=None) -> Dict:
     replace_type(partial_td)
 
     partial_td = replace_placeholders(partial_td, placeholder_map)
+
+    assert_tm_required(partial_td)
 
     return partial_td

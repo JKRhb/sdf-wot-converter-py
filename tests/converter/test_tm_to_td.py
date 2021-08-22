@@ -189,3 +189,38 @@ def test_tm_td_tm_ref():
     }
 
     perform_conversion_test(input, expected_result)
+
+
+def test_tm_td_tm_required():
+    input = {
+        "@context": ["http://www.w3.org/ns/td"],
+        "@type": "tm:ThingModel",
+        "title": "Thing Title",
+        "security": ["nosec_sc"],
+        "securityDefinitions": {"nosec_sc": {"scheme": "nosec"}},
+        "properties": {
+            "status": {
+                "type": "string",
+                "forms": [{"href": "https://mylamp.example.com/status"}],
+            }
+        },
+        "tm:required": ["#/properties/status"],
+    }
+
+    expected_result = {
+        "@context": ["http://www.w3.org/ns/td"],
+        "title": "Thing Title",
+        "@type": "Thing",
+        "securityDefinitions": {
+            "nosec_sc": {"scheme": "nosec"},
+        },
+        "security": ["nosec_sc"],
+        "properties": {
+            "status": {
+                "type": "string",
+                "forms": [{"href": "https://mylamp.example.com/status"}],
+            }
+        },
+    }
+
+    perform_conversion_test(input, expected_result)
