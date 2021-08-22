@@ -108,3 +108,32 @@ def test_wot_tm_td_json_conversion():
     result = json.loads(convert_wot_tm_to_wot_td_from_json(json.dumps(input)))
 
     assert result == expected_result
+
+
+def test_wot_tm_td_json_conversion_with_meta_data():
+    input = {
+        "@context": ["http://www.w3.org/ns/td"],
+        "@type": "tm:ThingModel",
+    }
+
+    meta_data = {
+        "title": "Thing Title",
+        "security": ["nosec_sc"],
+        "securityDefinitions": {"nosec_sc": {"scheme": "nosec"}},
+    }
+
+    expected_result = {
+        "@context": ["http://www.w3.org/ns/td"],
+        "@type": "Thing",
+        "title": "Thing Title",
+        "security": ["nosec_sc"],
+        "securityDefinitions": {"nosec_sc": {"scheme": "nosec"}},
+    }
+
+    result = json.loads(
+        convert_wot_tm_to_wot_td_from_json(
+            json.dumps(input), meta_data_json=json.dumps(meta_data)
+        )
+    )
+
+    assert result == expected_result
