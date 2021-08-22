@@ -1,0 +1,10 @@
+{
+    "@context": "https://www.w3.org/2019/wot/td/v1",
+    "@type": "tm:ThingModel",
+    "properties": {
+        "status": {
+            "tm:ref": "https://raw.githubusercontent.com/JKRhb/sdf-wot-converter-py/main/examples/wot/example-with-bindings.tm.json#/properties/status",
+            "type": "boolean"
+        }
+    }
+}
