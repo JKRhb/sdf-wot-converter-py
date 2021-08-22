@@ -94,13 +94,17 @@ def convert_wot_tm_to_sdf(input: Dict, placeholder_map=None):
     )
 
 
-def convert_wot_tm_to_td(input: Dict, placeholder_map=None):
+def convert_wot_tm_to_td(
+    input: Dict, placeholder_map=None, meta_data=None, bindings=None
+):
     return _convert_and_validate(
         input,
         tm_schema,
         td_schema,
         tm_to_td.convert_tm_to_td,
         placeholder_map=placeholder_map,
+        meta_data=meta_data,
+        bindings=bindings,
     )
 
 
