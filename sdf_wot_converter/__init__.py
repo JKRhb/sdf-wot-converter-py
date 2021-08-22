@@ -6,6 +6,7 @@ from typing import Dict, Callable
 from .converters import (
     sdf_to_wot,
     wot_to_sdf,
+    tm_to_td,
 )
 
 from .schemas.sdf_validation_schema import sdf_validation_schema
@@ -28,9 +29,10 @@ def _convert_and_validate(
     from_schema: Dict,
     to_schema: Dict,
     converter_function: Callable,
+    **kwargs,
 ):
     validate(from_model, from_schema)
-    to_model = converter_function(from_model)
+    to_model = converter_function(from_model, **kwargs)
     validate(to_model, to_schema)
     return to_model
 
@@ -41,10 +43,15 @@ def _convert_model_from_path(
     from_schema: Dict,
     to_schema: Dict,
     converter_function: Callable,
+    **kwargs,
 ):  # pragma: no cover
     from_model = _load_model(from_path)
     to_model = _convert_and_validate(
-        from_model, from_schema, to_schema, converter_function
+        from_model,
+        from_schema,
+        to_schema,
+        converter_function,
+        **kwargs,
     )
     _save_model(to_path, to_model)
 
@@ -75,6 +82,16 @@ def convert_wot_tm_to_sdf(input: Dict):
     )
 
 
+def convert_wot_tm_to_td(input: Dict, placeholder_map=None):
+    return _convert_and_validate(
+        input,
+        tm_schema,
+        td_schema,
+        tm_to_td.convert_tm_to_td,
+        placeholder_map=placeholder_map,
+    )
+
+
 def convert_sdf_to_wot_tm_from_path(from_path: str, to_path: str):
     return _convert_model_from_path(
         from_path,
@@ -92,6 +109,22 @@ def convert_wot_tm_to_sdf_from_path(from_path: str, to_path: str):
         tm_schema,
         sdf_validation_schema,
         wot_to_sdf.convert_wot_tm_to_sdf,
+    )
+
+
+def convert_wot_tm_to_wot_td_from_path(
+    from_path: str, to_path: str, placeholder_map_path=None
+):
+    placeholder_map = None
+    if placeholder_map_path:
+        placeholder_map = _load_model(placeholder_map_path)
+    return _convert_model_from_path(
+        from_path,
+        to_path,
+        tm_schema,
+        td_schema,
+        tm_to_td.convert_tm_to_td,
+        placeholder_map=placeholder_map,
     )
 
 
@@ -116,6 +149,16 @@ def convert_wot_tm_to_sdf_from_json(input: str, indent=4):
     )
 
 
+def convert_wot_tm_to_wot_td_from_json(input: str, indent=4):
+    return _convert_model_from_json(
+        input,
+        tm_schema,
+        td_schema,
+        tm_to_td.convert_tm_to_td,
+        indent=indent,
+    )
+
+
 def _parse_arguments(args):
     parser = argparse.ArgumentParser(
         description="Convert from SDF to WoT and vice versa."
@@ -134,7 +177,16 @@ def _parse_arguments(args):
         "--to-tm", metavar="TM", dest="to_tm", help="WoT TM output file"
     )
     to_group.add_argument(
+        "--to-td", metavar="TD", dest="to_td", help="WoT TD output file"
+    )
+    to_group.add_argument(
         "--to-sdf", metavar="SDF", dest="to_sdf", help="SDF output file"
+    )
+
+    parser.add_argument(
+        "--placeholder",
+        dest="placeholder_map",
+        help="Optional placeholder map for TM-to-TD conversion",
     )
 
     return parser.parse_args(args)
@@ -143,8 +195,13 @@ def _parse_arguments(args):
 def _use_converter_cli(args):  # pragma: no cover
     if args.from_sdf and args.to_tm:
         convert_sdf_to_wot_tm_from_path(args.from_sdf, args.to_tm)
-    elif args.from_tm and args.to_sdf:
-        convert_wot_tm_to_sdf_from_path(args.from_tm, args.to_sdf)
+    elif args.from_tm:
+        if args.to_sdf:
+            convert_wot_tm_to_sdf_from_path(args.from_tm, args.to_sdf)
+        elif args.to_td:
+            convert_wot_tm_to_wot_td_from_path(
+                args.from_tm, args.to_td, placeholder_map=args.placeholder_map
+            )
 
 
 def main():  # pragma: no cover
