@@ -32,6 +32,12 @@ def _load_optional_json_file(path: Optional[str]) -> Optional[Dict]:
     return json_data
 
 
+def _load_optional_json(json_string: Optional[str]) -> Optional[Dict]:
+    json_data = None
+    if json_string:
+        json_data = json.loads(json_string)
+
+    return json_data
 
 
 def _convert_and_validate(
@@ -72,10 +78,15 @@ def _convert_model_from_json(
     to_schema: Dict,
     converter_function: Callable,
     indent=4,
+    **kwargs,
 ):  # pragma: no cover
     from_model = json.loads(from_model_json)
     to_model = _convert_and_validate(
-        from_model, from_schema, to_schema, converter_function
+        from_model,
+        from_schema,
+        to_schema,
+        converter_function,
+        **kwargs,
     )
     return json.dumps(to_model, indent=indent)
 
@@ -177,13 +188,25 @@ def convert_wot_tm_to_sdf_from_json(input: str, indent=4):
     )
 
 
-def convert_wot_tm_to_wot_td_from_json(input: str, indent=4):
+def convert_wot_tm_to_wot_td_from_json(
+    input: str,
+    indent=4,
+    placeholder_map_json=None,
+    meta_data_json=None,
+    bindings_json=None,
+):
+    placeholder_map = _load_optional_json(placeholder_map_json)
+    meta_data = _load_optional_json(meta_data_json)
+    bindings = _load_optional_json(bindings_json)
     return _convert_model_from_json(
         input,
         tm_schema,
         td_schema,
         tm_to_td.convert_tm_to_td,
         indent=indent,
+        placeholder_map=placeholder_map,
+        meta_data=meta_data,
+        bindings=bindings,
     )
 
 
