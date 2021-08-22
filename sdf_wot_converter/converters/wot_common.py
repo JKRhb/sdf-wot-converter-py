@@ -73,6 +73,8 @@ def replace_placeholders(thing_model, placeholders):
 
         if isinstance(value, bool):
             value = _stringify_boolean(value)
+        elif isinstance(value, str):
+            value = f'"{value}"'
 
         thing_model_as_string = thing_model_as_string.replace(
             '"{{' + placeholder + '}}"', str(value)

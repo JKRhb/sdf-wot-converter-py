@@ -211,10 +211,12 @@ def _use_converter_cli(args):  # pragma: no cover
         convert_sdf_to_wot_tm_from_path(args.from_sdf, args.to_tm)
     elif args.from_tm:
         if args.to_sdf:
-            convert_wot_tm_to_sdf_from_path(args.from_tm, args.to_sdf, placeholder_map_path=args.placeholder_map)
+            convert_wot_tm_to_sdf_from_path(
+                args.from_tm, args.to_sdf, placeholder_map_path=args.placeholder_map
+            )
         elif args.to_td:
             convert_wot_tm_to_wot_td_from_path(
-                args.from_tm, args.to_td, placeholder_map=args.placeholder_map
+                args.from_tm, args.to_td, placeholder_map_path=args.placeholder_map
             )
 
 
