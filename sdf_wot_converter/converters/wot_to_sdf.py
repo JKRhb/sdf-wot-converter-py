@@ -7,6 +7,7 @@ from .utility import (
     initialize_object_field,
 )
 from jsonpointer import set_pointer
+from . import wot_common
 
 
 def initialize_object_from_json_pointer(sdf_model: Dict, json_pointer: str):
@@ -340,6 +341,7 @@ def convert_wot_tm_to_sdf(thing_model: Dict) -> Dict:
     #       securityDefinitions, profile, schemaDefinitions
     sdf_model: Dict = {}
 
+    thing_model = wot_common.resolve_extension(thing_model)
     map_thing_title(thing_model, sdf_model)
     map_thing_description(thing_model, sdf_model)
     map_links(thing_model, sdf_model)
