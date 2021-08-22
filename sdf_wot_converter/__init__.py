@@ -2,7 +2,7 @@ import json
 import argparse
 import sys
 from jsonschema import validate
-from typing import Dict, Callable
+from typing import Dict, Callable, Optional
 from .converters import (
     sdf_to_wot,
     wot_to_sdf,
@@ -22,6 +22,14 @@ def _load_model(input_path: str) -> Dict:  # pragma: no cover
 def _save_model(output_path: str, model: Dict, indent=4):  # pragma: no cover
     file = open(output_path, "w")
     json.dump(model, file, indent=indent)
+
+
+def _load_placeholder_map(placeholder_map_path: str) -> Optional[Dict]:
+    placeholder_map = None
+    if placeholder_map_path:
+        placeholder_map = _load_model(placeholder_map_path)
+
+    return placeholder_map
 
 
 def _convert_and_validate(
@@ -76,9 +84,13 @@ def convert_sdf_to_wot_tm(input: Dict):
     )
 
 
-def convert_wot_tm_to_sdf(input: Dict):
+def convert_wot_tm_to_sdf(input: Dict, placeholder_map=None):
     return _convert_and_validate(
-        input, tm_schema, sdf_validation_schema, wot_to_sdf.convert_wot_tm_to_sdf
+        input,
+        tm_schema,
+        sdf_validation_schema,
+        wot_to_sdf.convert_wot_tm_to_sdf,
+        placeholder_map=placeholder_map,
     )
 
 
@@ -102,22 +114,24 @@ def convert_sdf_to_wot_tm_from_path(from_path: str, to_path: str):
     )
 
 
-def convert_wot_tm_to_sdf_from_path(from_path: str, to_path: str):
+def convert_wot_tm_to_sdf_from_path(
+    from_path: str, to_path: str, placeholder_map_path=None
+):
+    placeholder_map = _load_placeholder_map(placeholder_map_path)
     return _convert_model_from_path(
         from_path,
         to_path,
         tm_schema,
         sdf_validation_schema,
         wot_to_sdf.convert_wot_tm_to_sdf,
+        placeholder_map=placeholder_map,
     )
 
 
 def convert_wot_tm_to_wot_td_from_path(
     from_path: str, to_path: str, placeholder_map_path=None
 ):
-    placeholder_map = None
-    if placeholder_map_path:
-        placeholder_map = _load_model(placeholder_map_path)
+    placeholder_map = _load_placeholder_map(placeholder_map_path)
     return _convert_model_from_path(
         from_path,
         to_path,
@@ -197,10 +211,12 @@ def _use_converter_cli(args):  # pragma: no cover
         convert_sdf_to_wot_tm_from_path(args.from_sdf, args.to_tm)
     elif args.from_tm:
         if args.to_sdf:
-            convert_wot_tm_to_sdf_from_path(args.from_tm, args.to_sdf)
+            convert_wot_tm_to_sdf_from_path(
+                args.from_tm, args.to_sdf, placeholder_map_path=args.placeholder_map
+            )
         elif args.to_td:
             convert_wot_tm_to_wot_td_from_path(
-                args.from_tm, args.to_td, placeholder_map=args.placeholder_map
+                args.from_tm, args.to_td, placeholder_map_path=args.placeholder_map
             )
 
 
