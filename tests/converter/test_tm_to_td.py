@@ -250,7 +250,8 @@ def test_tm_td_tm_ref():
             "status": {
                 "tm:ref": "https://raw.githubusercontent.com/JKRhb/sdf-wot-converter-py/main/examples/wot/example-with-tm-ref.tm.json#/properties/status",
                 "readOnly": True,
-            }
+            },
+            "anotherStatus": {"tm:ref": "#/properties/status"},
         },
     }
 
@@ -268,7 +269,13 @@ def test_tm_td_tm_ref():
                 "type": "boolean",
                 "readOnly": True,
                 "forms": [{"href": "https://mylamp.example.com/status"}],
-            }
+            },
+            "anotherStatus": {
+                "@type": "saref:OnOffState",
+                "type": "boolean",
+                "readOnly": True,
+                "forms": [{"href": "https://mylamp.example.com/status"}],
+            },
         },
     }
 
