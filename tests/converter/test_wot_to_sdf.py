@@ -211,3 +211,19 @@ def test_tm_sdf_schema_definition_conversion():
     }
 
     perform_conversion_test(input, expected_result)
+
+
+def test_tm_sdf_relative_tm_ref_conversion():
+    input = {
+        "@context": ["http://www.w3.org/ns/td", {"sdf": "https://example.com/sdf"}],
+        "@type": "tm:ThingModel",
+        "schemaDefinitions": {"foobar": {"type": "string"}},
+        "actions": {"toggle": {"input": {"tm:ref": "#/schemaDefinitions/foobar"}}},
+    }
+
+    expected_result = {
+        "sdfData": {"foobar": {"type": "string"}},
+        "sdfAction": {"toggle": {"sdfInputData": {"sdfRef": "#/sdfData/foobar"}}},
+    }
+
+    perform_conversion_test(input, expected_result)
