@@ -214,6 +214,54 @@ def test_tm_td_extension():
     perform_conversion_test(input, expected_result)
 
 
+def test_tm_td_recursive_extension():
+    # TODO: Handle case of TMs without forms
+    input = {
+        "@context": ["http://www.w3.org/ns/td"],
+        "@type": "tm:ThingModel",
+        "links": [
+            {
+                "href": "https://raw.githubusercontent.com/JKRhb/sdf-wot-converter-py/main/examples/wot/example-with-tm-extends.tm.json",
+                "rel": "tm:extends",
+            }
+        ],
+    }
+
+    expected_result = {
+        "@context": ["http://www.w3.org/ns/td"],
+        "id": "urn:dev:ops:32473-WoTLamp-1234",
+        "title": "MyLampThing",
+        "@type": "Thing",
+        "securityDefinitions": {
+            "basic_sc": {"scheme": "basic", "in": "header"},
+        },
+        "security": "basic_sc",
+        "properties": {
+            "status": {
+                "@type": "saref:OnOffState",
+                "type": "string",
+                "forms": [{"href": "https://mylamp.example.com/status"}],
+            }
+        },
+        "actions": {
+            "toggle": {
+                "@type": "saref:ToggleCommand",
+                "forms": [{"href": "https://mylamp.example.com/toggle"}],
+            }
+        },
+        "events": {
+            "overheating": {
+                "data": {"type": "string"},
+                "forms": [
+                    {"href": "https://mylamp.example.com/oh", "subprotocol": "longpoll"}
+                ],
+            }
+        },
+    }
+
+    perform_conversion_test(input, expected_result)
+
+
 def test_tm_td_link_preservation():
     input = {
         "@context": ["http://www.w3.org/ns/td"],
@@ -250,7 +298,8 @@ def test_tm_td_tm_ref():
             "status": {
                 "tm:ref": "https://raw.githubusercontent.com/JKRhb/sdf-wot-converter-py/main/examples/wot/example-with-tm-ref.tm.json#/properties/status",
                 "readOnly": True,
-            }
+            },
+            "anotherStatus": {"tm:ref": "#/properties/status"},
         },
     }
 
@@ -268,7 +317,13 @@ def test_tm_td_tm_ref():
                 "type": "boolean",
                 "readOnly": True,
                 "forms": [{"href": "https://mylamp.example.com/status"}],
-            }
+            },
+            "anotherStatus": {
+                "@type": "saref:OnOffState",
+                "type": "boolean",
+                "readOnly": True,
+                "forms": [{"href": "https://mylamp.example.com/status"}],
+            },
         },
     }
 

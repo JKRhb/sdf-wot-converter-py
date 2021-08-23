@@ -6,7 +6,7 @@ from .utility import (
     initialize_list_field,
     initialize_object_field,
 )
-from jsonpointer import set_pointer
+from jsonpointer import resolve_pointer, set_pointer
 from . import wot_common
 
 
@@ -34,22 +34,24 @@ def map_properties(thing_model: Dict, sdf_model: Dict):
         )
         sdf_property: Dict[str, Any] = {}
         map_interaction_affordance_fields(wot_property, sdf_property)
-        map_data_schema_fields(wot_property, sdf_property)
+        map_data_schema_fields(thing_model, wot_property, sdf_property)
 
         set_pointer(sdf_model, json_pointer, sdf_property)
 
 
-def map_items(wot_definition: Dict, sdf_definition: Dict):
+def map_items(thing_model, wot_definition: Dict, sdf_definition: Dict):
     if "items" in wot_definition:
         sdf_definition["items"] = {}
-        map_data_schema_fields(wot_definition["items"], sdf_definition["items"])
+        map_data_schema_fields(
+            thing_model, wot_definition["items"], sdf_definition["items"]
+        )
 
 
-def map_dataschema_properties(wot_definition: Dict, sdf_definition: Dict):
+def map_dataschema_properties(thing_model, wot_definition: Dict, sdf_definition: Dict):
     for key, property in wot_definition.get("properties", {}).items():
         initialize_object_field(sdf_definition, "properties")
         sdf_definition["properties"][key] = {}
-        map_data_schema_fields(property, sdf_definition["properties"][key])
+        map_data_schema_fields(thing_model, property, sdf_definition["properties"][key])
 
 
 def map_actions(thing_model: Dict, sdf_model: Dict):
@@ -58,19 +60,20 @@ def map_actions(thing_model: Dict, sdf_model: Dict):
         sdf_action: Dict[str, Any] = {}
         map_sdf_comment(wot_action, sdf_action)
         map_interaction_affordance_fields(wot_action, sdf_action)
-        map_action_fields(wot_action, sdf_action)
+        map_action_fields(thing_model, wot_action, sdf_action)
         set_pointer(sdf_model, json_pointer, sdf_action)
+        map_tm_ref(thing_model, wot_action, sdf_action)
 
 
-def map_action_fields(wot_action, sdf_action):
+def map_action_fields(thing_model, wot_action, sdf_action):
     # TODO: Missing fields: safe, idempotent
     if "input" in wot_action:
         sdf_input_data = {}
-        map_data_schema_fields(wot_action["input"], sdf_input_data)
+        map_data_schema_fields(thing_model, wot_action["input"], sdf_input_data)
         sdf_action["sdfInputData"] = sdf_input_data
     if "output" in wot_action:
         sdf_output_data = {}
-        map_data_schema_fields(wot_action["output"], sdf_output_data)
+        map_data_schema_fields(thing_model, wot_action["output"], sdf_output_data)
         sdf_action["sdfOutputData"] = sdf_output_data
 
 
@@ -80,19 +83,20 @@ def map_events(thing_model: Dict, sdf_model: Dict):
         sdf_event: Dict[str, Any] = {}
         map_sdf_comment(wot_event, sdf_event)
         map_interaction_affordance_fields(wot_event, sdf_event)
-        map_event_fields(wot_event, sdf_event)
+        map_event_fields(thing_model, wot_event, sdf_event)
         set_pointer(sdf_model, json_pointer, sdf_event)
+        map_tm_ref(thing_model, wot_event, sdf_event)
 
 
-def map_event_fields(wot_event, sdf_event):
+def map_event_fields(thing_model, wot_event, sdf_event):
     # TODO: Missing fields: subscription, cancellation
     if "data" in wot_event:
         sdf_input_data = {}
-        map_data_schema_fields(wot_event["data"], sdf_input_data)
+        map_data_schema_fields(thing_model, wot_event["data"], sdf_input_data)
         sdf_event["sdfOutputData"] = sdf_input_data
 
 
-def map_data_schema_fields(wot_definition: Dict, sdf_definition: Dict):
+def map_data_schema_fields(thing_model, wot_definition: Dict, sdf_definition: Dict):
     # TODO: Unmapped fields: @type, titles, descriptions, oneOf,
     # TODO: Deal with sdfType and nullable
     map_sdf_comment(wot_definition, sdf_definition)
@@ -123,8 +127,10 @@ def map_data_schema_fields(wot_definition: Dict, sdf_definition: Dict):
     map_exclusive_maximum(wot_definition, sdf_definition)
     map_content_format(wot_definition, sdf_definition)
 
-    map_items(wot_definition, sdf_definition)
-    map_dataschema_properties(wot_definition, sdf_definition)
+    map_items(thing_model, wot_definition, sdf_definition)
+    map_dataschema_properties(thing_model, wot_definition, sdf_definition)
+
+    map_tm_ref(thing_model, wot_definition, sdf_definition)
 
 
 def map_const(wot_definition: Dict, sdf_definition: Dict):
@@ -264,7 +270,9 @@ def map_schema_definitions(thing_model: Dict, sdf_model: Dict):
         )
         sdf_data: Dict[str, Any] = {}
         map_sdf_comment(wot_schema_definitions, sdf_data)
-        map_data_schema_fields(wot_schema_definitions, sdf_data)
+        map_data_schema_fields(thing_model, wot_schema_definitions, sdf_data)
+        map_tm_ref(thing_model, wot_schema_definitions, sdf_data)
+
         set_pointer(sdf_model, json_pointer, sdf_data)
 
 
@@ -335,13 +343,37 @@ def map_sdf_comment(wot_definition: Dict, sdf_definition: Dict):
         sdf_definition["$comment"] = wot_definition["sdf:$comment"]
 
 
+def convert_pointer(pointer) -> str:
+    # TODO: Maybe this can be done more elegantly
+    # TODO: Check if there are more possible mappings
+    pointer = pointer.replace("events", "sdfEvent")
+    pointer = pointer.replace("actions", "sdfAction")
+    pointer = pointer.replace("properties", "sdfProperty")
+    pointer = pointer.replace("schemaDefinitions", "sdfData")
+    pointer = pointer.replace("input", "sdfInputData")
+    pointer = pointer.replace("output", "sdfOutputData")
+    return pointer
+
+
+def map_tm_ref(wot_model: Dict, wot_definition: Dict, sdf_definition: Dict):
+    if "tm:ref" in wot_definition:
+        pointer = wot_definition["tm:ref"]
+        resolved_definition = resolve_pointer(wot_model, pointer[1:])
+        if "sdf:jsonPointer" in resolved_definition:
+            sdf_definition["sdfRef"] = resolved_definition["sdf:jsonPointer"]
+        else:
+            sdf_definition["sdfRef"] = convert_pointer(pointer)
+
+
 def convert_wot_tm_to_sdf(thing_model: Dict, placeholder_map=None) -> Dict:
     # TODO: Unmapped fields: @type, id, titles, descriptions, created,
     #       modified, support, base, forms, security,
     #       securityDefinitions, profile, schemaDefinitions
     sdf_model: Dict = {}
 
-    thing_model = wot_common.resolve_extension(thing_model)
+    thing_model = wot_common.resolve_extension(
+        thing_model, resolve_relative_pointers=False
+    )
     thing_model = wot_common.replace_placeholders(thing_model, placeholder_map)
 
     map_thing_title(thing_model, sdf_model)
