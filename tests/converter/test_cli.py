@@ -4,9 +4,11 @@ from sdf_wot_converter import (
     convert_sdf_to_wot_tm_from_path,
     convert_wot_tm_to_sdf_from_path,
     convert_wot_tm_to_wot_td_from_path,
+    convert_wot_td_to_wot_tm_from_path,
     convert_sdf_to_wot_tm_from_json,
     convert_wot_tm_to_sdf_from_json,
     convert_wot_tm_to_wot_td_from_json,
+    convert_wot_td_to_wot_tm_from_json,
 )
 import os
 
@@ -59,6 +61,14 @@ def test_wot_tm_td_placeholder_example_conversion():
         "examples/wot/example-with-placeholders.tm.json",
         "test_output/blah_placeholders.td.json",
         placeholder_map_path="examples/wot/placeholders.json",
+    )
+
+
+def test_wot_td_tm_example_conversion():
+    # TODO: Check for correct test output
+    make_test_output_dir()
+    convert_wot_td_to_wot_tm_from_path(
+        "examples/wot/example.td.json", "test_output/from_td.tm.json"
     )
 
 
@@ -135,5 +145,28 @@ def test_wot_tm_td_json_conversion_with_meta_data():
             json.dumps(input), meta_data_json=json.dumps(meta_data)
         )
     )
+
+    assert result == expected_result
+
+
+def test_wot_td_tm_json_conversion():
+
+    input = {
+        "@context": ["http://www.w3.org/ns/td"],
+        "@type": "Thing",
+        "title": "Thing Title",
+        "security": ["nosec_sc"],
+        "securityDefinitions": {"nosec_sc": {"scheme": "nosec"}},
+    }
+
+    expected_result = {
+        "@context": ["http://www.w3.org/ns/td"],
+        "@type": "tm:ThingModel",
+        "title": "Thing Title",
+        "security": ["nosec_sc"],
+        "securityDefinitions": {"nosec_sc": {"scheme": "nosec"}},
+    }
+
+    result = json.loads(convert_wot_td_to_wot_tm_from_json(json.dumps(input)))
 
     assert result == expected_result
