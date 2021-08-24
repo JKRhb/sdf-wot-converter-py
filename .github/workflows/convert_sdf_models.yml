@@ -24,15 +24,12 @@ jobs:
         python -m build
         pip install --find-links dist/ sdf-wot-converter
     - name: Convert SDF models to WoT TM
-      run: |
-        sudo chmod +x convert_playground.sh
-        ./convert_playground.sh
+      run: ./convert_playground.sh
     - name: Export conversion results
       uses: actions/upload-artifact@v2
       with:
         name: WoT Thing Models
-        path: |
-          output/tm
+        path: output/tm
     - name: Push to playground results repo
       uses: dmnemec/copy_file_to_another_repo_action@main
       env:
