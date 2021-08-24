@@ -7,6 +7,7 @@ from .converters import (
     sdf_to_wot,
     wot_to_sdf,
     tm_to_td,
+    td_to_tm,
 )
 
 from .schemas.sdf_validation_schema import sdf_validation_schema
@@ -121,6 +122,10 @@ def convert_wot_tm_to_td(
     )
 
 
+def convert_wot_td_to_tm(input: Dict):
+    return _convert_and_validate(input, td_schema, tm_schema, td_to_tm.convert_td_to_tm)
+
+
 def convert_sdf_to_wot_tm_from_path(from_path: str, to_path: str):
     return _convert_model_from_path(
         from_path,
@@ -167,6 +172,16 @@ def convert_wot_tm_to_wot_td_from_path(
     )
 
 
+def convert_wot_td_to_wot_tm_from_path(from_path: str, to_path: str):
+    return _convert_model_from_path(
+        from_path,
+        to_path,
+        td_schema,
+        tm_schema,
+        td_to_tm.convert_td_to_tm,
+    )
+
+
 def convert_sdf_to_wot_tm_from_json(input: str, indent=4):
     return _convert_model_from_json(
         input,
@@ -210,6 +225,16 @@ def convert_wot_tm_to_wot_td_from_json(
     )
 
 
+def convert_wot_td_to_wot_tm_from_json(input: str, indent=4):
+    return _convert_model_from_json(
+        input,
+        td_schema,
+        tm_schema,
+        td_to_tm.convert_td_to_tm,
+        indent=indent,
+    )
+
+
 def _parse_arguments(args):
     parser = argparse.ArgumentParser(
         description="Convert from SDF to WoT and vice versa."
@@ -221,6 +246,9 @@ def _parse_arguments(args):
     )
     from_group.add_argument(
         "--from-tm", metavar="TM", dest="from_tm", help="WoT TM input JSON file"
+    )
+    from_group.add_argument(
+        "--from-td", metavar="TD", dest="from_td", help="WoT TD input JSON file"
     )
 
     to_group = parser.add_mutually_exclusive_group(required=True)
@@ -270,6 +298,12 @@ def _use_converter_cli(args):  # pragma: no cover
                 placeholder_map_path=args.placeholder_map,
                 meta_data_path=args.meta_data,
                 bindings_path=args.bindings,
+            )
+    elif args.from_td:
+        if args.to_tm:
+            convert_wot_td_to_wot_tm_from_path(
+                args.from_tm,
+                args.to_td,
             )
 
 
