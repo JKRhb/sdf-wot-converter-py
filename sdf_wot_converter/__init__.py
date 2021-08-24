@@ -25,6 +25,15 @@ def _save_model(output_path: str, model: Dict, indent=4):  # pragma: no cover
     json.dump(model, file, indent=indent)
 
 
+def _load_and_save_model(
+    input_path: str,
+    output_path: str,
+    indent=4,
+):  # pragma: no cover
+    model = _load_model(input_path)
+    _save_model(output_path, model, indent=indent)
+
+
 def _load_optional_json_file(path: Optional[str]) -> Optional[Dict]:
     json_data = None
     if path:
@@ -284,8 +293,13 @@ def _parse_arguments(args):
 
 
 def _use_converter_cli(args):  # pragma: no cover
-    if args.from_sdf and args.to_tm:
-        convert_sdf_to_wot_tm_from_path(args.from_sdf, args.to_tm)
+    if args.from_sdf:
+        if args.to_tm:
+            convert_sdf_to_wot_tm_from_path(args.from_sdf, args.to_tm)
+        elif args.to_sdf:
+            _load_and_save_model(args.from_sdf, args.to_sdf)
+        elif args.to_td:
+            raise NotImplementedError("SDF -> TD conversion is not implemented, yet!")
     elif args.from_tm:
         if args.to_sdf:
             convert_wot_tm_to_sdf_from_path(
@@ -299,12 +313,18 @@ def _use_converter_cli(args):  # pragma: no cover
                 meta_data_path=args.meta_data,
                 bindings_path=args.bindings,
             )
+        elif args.to_tm:
+            _load_and_save_model(args.from_tm, args.to_tm)
     elif args.from_td:
         if args.to_tm:
             convert_wot_td_to_wot_tm_from_path(
                 args.from_tm,
                 args.to_td,
             )
+        elif args.to_td:
+            _load_and_save_model(args.from_td, args.to_td)
+        elif args.to_sdf:
+            raise NotImplementedError("TD -> SDF conversion is not implemented, yet!")
 
 
 def main():  # pragma: no cover
