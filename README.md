@@ -29,10 +29,10 @@ After installing the libary you should be able to call the converter in your ter
 
 ```bash
 # Convert an SDF model to a WoT Thing Model
-sdf-wot-converter --from-sdf examples/sdf/example.sdf.json --to-tm converted-example.tm.json
+sdf-wot-converter --from-sdf examples/sdf/example.sdf.json --to-tm converted-example.tm.jsonld
 
 # Convert a WoT Thing Model to an SDF model
-sdf-wot-converter --from-tm examples/wot/example.tm.json --to-sdf converted-example.sdf.json
+sdf-wot-converter --from-tm examples/wot/example.tm.jsonld --to-sdf converted-example.sdf.json
 ```
 
 ## Using the library

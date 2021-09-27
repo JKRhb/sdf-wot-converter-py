@@ -3,7 +3,7 @@
     "@type": "tm:ThingModel",
     "properties": {
         "status": {
-            "tm:ref": "https://raw.githubusercontent.com/JKRhb/sdf-wot-converter-py/main/examples/wot/example-with-bindings.tm.json#/properties/status",
+            "tm:ref": "https://raw.githubusercontent.com/JKRhb/sdf-wot-converter-py/main/examples/wot/example-with-bindings.tm.jsonld#/properties/status",
             "type": "boolean"
         }
     }

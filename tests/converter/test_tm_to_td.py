@@ -172,7 +172,7 @@ def test_tm_td_extension():
         "securityDefinitions": {"nosec_sc": {"scheme": "nosec"}},
         "links": [
             {
-                "href": "https://raw.githubusercontent.com/JKRhb/sdf-wot-converter-py/main/examples/wot/example-with-bindings.tm.json",
+                "href": "https://raw.githubusercontent.com/JKRhb/sdf-wot-converter-py/main/examples/wot/example-with-bindings.tm.jsonld",
                 "rel": "tm:extends",
             }
         ],
@@ -221,7 +221,7 @@ def test_tm_td_recursive_extension():
         "@type": "tm:ThingModel",
         "links": [
             {
-                "href": "https://raw.githubusercontent.com/JKRhb/sdf-wot-converter-py/main/examples/wot/example-with-tm-extends.tm.json",
+                "href": "https://raw.githubusercontent.com/JKRhb/sdf-wot-converter-py/main/examples/wot/example-with-tm-extends.tm.jsonld",
                 "rel": "tm:extends",
             }
         ],
@@ -296,7 +296,7 @@ def test_tm_td_tm_ref():
         "securityDefinitions": {"nosec_sc": {"scheme": "nosec"}},
         "properties": {
             "status": {
-                "tm:ref": "https://raw.githubusercontent.com/JKRhb/sdf-wot-converter-py/main/examples/wot/example-with-tm-ref.tm.json#/properties/status",
+                "tm:ref": "https://raw.githubusercontent.com/JKRhb/sdf-wot-converter-py/main/examples/wot/example-with-tm-ref.tm.jsonld#/properties/status",
                 "readOnly": True,
             },
             "anotherStatus": {"tm:ref": "#/properties/status"},
