@@ -50,7 +50,7 @@ def test_wot_tm_td_example_conversion():
     # TODO: Check for correct test output
     make_test_output_dir()
     convert_wot_tm_to_wot_td_from_path(
-        "examples/wot/example-with-bindings.tm.jsonld", "test_output/blah.td.json"
+        "examples/wot/example-with-bindings.tm.jsonld", "test_output/blah.td.jsonld"
     )
 
 
@@ -59,7 +59,7 @@ def test_wot_tm_td_placeholder_example_conversion():
     make_test_output_dir()
     convert_wot_tm_to_wot_td_from_path(
         "examples/wot/example-with-placeholders.tm.jsonld",
-        "test_output/blah_placeholders.td.json",
+        "test_output/blah_placeholders.td.jsonld",
         placeholder_map_path="examples/wot/placeholders.json",
     )
 
@@ -68,7 +68,7 @@ def test_wot_td_tm_example_conversion():
     # TODO: Check for correct test output
     make_test_output_dir()
     convert_wot_td_to_wot_tm_from_path(
-        "examples/wot/example.td.json", "test_output/from_td.tm.jsonld"
+        "examples/wot/example.td.jsonld", "test_output/from_td.tm.jsonld"
     )
 
 
