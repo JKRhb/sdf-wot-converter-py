@@ -4,7 +4,7 @@
     "links": [
         {
             "rel": "tm:extends",
-            "href": "https://raw.githubusercontent.com/JKRhb/sdf-wot-converter-py/main/examples/wot/example-with-bindings.tm.json"
+            "href": "https://raw.githubusercontent.com/JKRhb/sdf-wot-converter-py/main/examples/wot/example-with-bindings.tm.jsonld"
         }
     ]
 }
