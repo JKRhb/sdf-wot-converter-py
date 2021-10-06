@@ -1,7 +1,7 @@
 import json
 import argparse
 import sys
-from jsonschema import validate
+from jsonschema import Draft7Validator
 from typing import Dict, Callable, Optional
 from .converters import (
     sdf_to_wot,
@@ -57,9 +57,10 @@ def _convert_and_validate(
     converter_function: Callable,
     **kwargs,
 ):
-    validate(from_model, from_schema)
+
+    Draft7Validator(from_schema).validate(from_model, from_schema)
     to_model = converter_function(from_model, **kwargs)
-    validate(to_model, to_schema)
+    Draft7Validator(to_schema).validate(to_model)
     return to_model
 
 

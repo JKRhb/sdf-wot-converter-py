@@ -4,7 +4,7 @@ from typing import (
 )
 import urllib.request
 import json_merge_patch
-import jsonschema
+from jsonschema import Draft7Validator
 import json
 from ..schemas import tm_schema
 import copy
@@ -14,7 +14,7 @@ from jsonpointer import resolve_pointer
 def _retrieve_thing_model(tm_url: str):
     with urllib.request.urlopen(tm_url) as url:
         retrieved_thing_model = json.loads(url.read().decode())
-        jsonschema.validate(retrieved_thing_model, tm_schema.tm_schema)
+        Draft7Validator(tm_schema.tm_schema).validate(retrieved_thing_model)
         return retrieved_thing_model
 
 
