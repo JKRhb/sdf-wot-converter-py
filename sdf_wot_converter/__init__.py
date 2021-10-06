@@ -58,7 +58,7 @@ def _convert_and_validate(
     **kwargs,
 ):
 
-    Draft7Validator(from_schema).validate(from_model, from_schema)
+    Draft7Validator(from_schema).validate(from_model)
     to_model = converter_function(from_model, **kwargs)
     Draft7Validator(to_schema).validate(to_model)
     return to_model
