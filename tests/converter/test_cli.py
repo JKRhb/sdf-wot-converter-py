@@ -1,8 +1,11 @@
 import json
 from sdf_wot_converter import (
     _parse_arguments,
+    _resolve_tm_input,
     convert_sdf_to_wot_tm_from_path,
     convert_wot_tm_to_sdf_from_path,
+    convert_wot_tm_to_sdf_from_paths,
+    convert_wot_tm_to_td_from_paths,
     convert_wot_tm_to_wot_td_from_path,
     convert_wot_td_to_wot_tm_from_path,
     convert_sdf_to_wot_tm_from_json,
@@ -20,7 +23,7 @@ def test_parse_arguments():
 
     args2 = ["--from-tm", "foo", "--to-sdf", "bar"]
     parsed_args2 = _parse_arguments(args2)
-    assert parsed_args2.from_tm == "foo" and parsed_args2.to_sdf == "bar"
+    assert parsed_args2.from_tm == ["foo"] and parsed_args2.to_sdf == "bar"
 
 
 def make_test_output_dir():
@@ -28,6 +31,75 @@ def make_test_output_dir():
         os.mkdir("test_output")
     except FileExistsError:
         pass
+
+
+def test_resolve_tm_input():
+    expected_result = {
+        "@context": "https://www.w3.org/2019/wot/td/v1",
+        "@type": "tm:ThingModel",
+        "actions": {
+            "toggle": {
+                "@type": "saref:ToggleCommand",
+                "forms": [{"href": "https://mylamp.example.com/toggle"}],
+            }
+        },
+        "events": {
+            "overheating": {
+                "data": {"type": "string"},
+                "forms": [
+                    {"href": "https://mylamp.example.com/oh", "subprotocol": "longpoll"}
+                ],
+            }
+        },
+        "id": "urn:dev:ops:32473-WoTLamp-1234",
+        "properties": {
+            "status": {
+                "@type": "saref:OnOffState",
+                "forms": [{"href": "https://mylamp.example.com/status"}],
+                "type": "string",
+            }
+        },
+        "security": "basic_sc",
+        "securityDefinitions": {"basic_sc": {"in": "header", "scheme": "basic"}},
+        "title": "MyLampThing",
+        "base": "BASE_ADDRESS",
+    }
+
+    result = _resolve_tm_input(
+        [
+            "examples/wot/example-with-placeholders.tm.jsonld",
+            "examples/wot/example-with-tm-extends.tm.jsonld",
+        ],
+        True,
+    )
+    assert result == expected_result
+
+
+def test_resolve_tm_input_without_extends_resolution():
+    expected_result = {
+        "@context": "https://www.w3.org/2019/wot/td/v1",
+        "@type": "tm:ThingModel",
+        "id": "urn:dev:ops:32473-WoTLamp-1234",
+        "security": "basic_sc",
+        "securityDefinitions": {"basic_sc": {"in": "header", "scheme": "basic"}},
+        "links": [
+            {
+                "href": "https://raw.githubusercontent.com/JKRhb/sdf-wot-converter-py/main/examples/wot/example-with-bindings.tm.jsonld",
+                "rel": "tm:extends",
+            }
+        ],
+        "title": "MyLampThing",
+        "base": "BASE_ADDRESS",
+    }
+
+    result = _resolve_tm_input(
+        [
+            "examples/wot/example-with-placeholders.tm.jsonld",
+            "examples/wot/example-with-tm-extends.tm.jsonld",
+        ],
+        False,
+    )
+    assert result == expected_result
 
 
 def test_sdf_example_conversion():
@@ -43,6 +115,30 @@ def test_wot_example_conversion():
     make_test_output_dir()
     convert_wot_tm_to_sdf_from_path(
         "examples/wot/example.tm.jsonld", "test_output/blah.sdf.json"
+    )
+
+
+def test_multiple_tms_to_sdf_conversion():
+    # TODO: Check for correct test output
+    make_test_output_dir()
+    convert_wot_tm_to_sdf_from_paths(
+        [
+            "examples/wot/example.tm.jsonld",
+            "examples/wot/example-with-tm-extends.tm.jsonld",
+        ],
+        "test_output/multipleconvertedtms.sdf.json",
+    )
+
+
+def test_multiple_tms_to_td_conversion():
+    # TODO: Check for correct test output
+    make_test_output_dir()
+    convert_wot_tm_to_td_from_paths(
+        [
+            "examples/wot/example.tm.jsonld",
+            "examples/wot/example-with-tm-extends.tm.jsonld",
+        ],
+        "test_output/multipleconvertedtms.td.json",
     )
 
 

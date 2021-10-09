@@ -11,6 +11,17 @@ import copy
 from jsonpointer import resolve_pointer
 
 
+def flatten_thing_models(thing_models: List[dict], resolve_extensions=True):
+    for thing_model in thing_models:
+        Draft7Validator(tm_schema.tm_schema).validate(thing_model)
+    if resolve_extensions:
+        thing_models = [resolve_extension(x) for x in thing_models]
+    current_thing_model = thing_models[0]
+    for thing_model in thing_models[1:]:
+        current_thing_model = json_merge_patch.merge(current_thing_model, thing_model)
+    return current_thing_model
+
+
 def _retrieve_thing_model(tm_url: str):
     with urllib.request.urlopen(tm_url) as url:
         retrieved_thing_model = json.loads(url.read().decode())
