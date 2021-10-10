@@ -622,6 +622,5 @@ def test_add_origin_link():
 
     add_origin_link(input1, origin_url="https://example.org")
     add_origin_link(input2, origin_url="https://example.org")
-    print(input1)
     assert input1 == expected_result1
     assert input2 == expected_result1
