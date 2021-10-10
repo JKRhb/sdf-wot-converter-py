@@ -115,7 +115,11 @@ def _convert_model_from_json(
 
 def convert_sdf_to_wot_tm(input: Dict, origin_url=None):
     return _convert_and_validate(
-        input, sdf_validation_schema, tm_schema, sdf_to_wot.convert_sdf_to_wot_tm, origin_url=origin_url
+        input,
+        sdf_validation_schema,
+        tm_schema,
+        sdf_to_wot.convert_sdf_to_wot_tm,
+        origin_url=origin_url,
     )
 
 
@@ -155,7 +159,7 @@ def convert_sdf_to_wot_tm_from_path(from_path: str, to_path: str, indent=4, **kw
         tm_schema,
         sdf_to_wot.convert_sdf_to_wot_tm,
         indent=indent,
-        **kwargs
+        **kwargs,
     )
 
 

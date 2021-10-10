@@ -274,5 +274,5 @@ def test_get_origin_url():
     assert get_origin_url("http://example.com", None) == "http://example.com"
     assert get_origin_url("https://example.com", None) == "https://example.com"
     assert get_origin_url(None, "http://example.com") == "http://example.com"
-    assert get_origin_url("http://example.com", "http://example.org") == "http://example.org"
+    assert get_origin_url("http://hi.com", "http://example.com") == "http://example.com"
     assert get_origin_url("this/is/a/file/path", None) == None
