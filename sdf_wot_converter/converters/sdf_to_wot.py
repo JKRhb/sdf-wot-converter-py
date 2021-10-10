@@ -598,7 +598,7 @@ def add_origin_link(thing_model: Dict, origin_url: str):
         if "links" in thing_model:
             thing_model["links"].append(origin_link)
         else:
-            thing_model["links"] = origin_link
+            thing_model["links"] = [origin_link]
 
 
 def convert_sdf_to_wot_tm(sdf_model: Dict, origin_url=None) -> Dict:
