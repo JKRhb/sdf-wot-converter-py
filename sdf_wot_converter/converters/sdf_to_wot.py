@@ -589,7 +589,19 @@ def map_sdf_ref(thing_model: Dict, current_definition: Dict):
             map_sdf_ref(thing_model, value)
 
 
-def convert_sdf_to_wot_tm(sdf_model: Dict) -> Dict:
+def add_origin_link(thing_model: Dict, origin_url: str):
+    if origin_url:
+        origin_link = {
+            "href": origin_url,
+            "rel": "alternate",  # TODO: Which kind of link relation should be used?
+        }
+        if "links" in thing_model:
+            thing_model["links"].append(origin_link)
+        else:
+            thing_model["links"] = [origin_link]
+
+
+def convert_sdf_to_wot_tm(sdf_model: Dict, origin_url=None) -> Dict:
 
     thing_model: Dict = {
         "@context": ["http://www.w3.org/ns/td"],
@@ -613,5 +625,7 @@ def convert_sdf_to_wot_tm(sdf_model: Dict) -> Dict:
     map_sdf_required(thing_model)
     map_sdf_ref(thing_model, thing_model)
     del thing_model["mappings"]
+
+    add_origin_link(thing_model, origin_url)
 
     return thing_model
