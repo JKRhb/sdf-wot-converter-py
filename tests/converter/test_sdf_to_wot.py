@@ -4,6 +4,8 @@ from sdf_wot_converter import (
 )
 import pytest
 
+from sdf_wot_converter.converters.sdf_to_wot import add_origin_link
+
 
 def perform_sdf_roundtrip_test(input):
     converted_model = convert_sdf_to_wot_tm(input)
@@ -610,3 +612,16 @@ def test_empty_namespace_conversion():
 
     perform_conversion_test(input, expected_result)
     perform_sdf_roundtrip_test(input)
+
+
+def test_add_origin_link():
+    input1 = {}
+    input2 = {"links": []}
+
+    expected_result1 = {"links": [{"href": "https://example.org", "rel": "alternate"}]}
+
+    add_origin_link(input1, origin_url="https://example.org")
+    add_origin_link(input2, origin_url="https://example.org")
+    print(input1)
+    assert input1 == expected_result1
+    assert input2 == expected_result1

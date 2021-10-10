@@ -12,6 +12,7 @@ from sdf_wot_converter import (
     convert_wot_tm_to_sdf_from_json,
     convert_wot_tm_to_wot_td_from_json,
     convert_wot_td_to_wot_tm_from_json,
+    get_origin_url,
 )
 import os
 
@@ -266,3 +267,12 @@ def test_wot_td_tm_json_conversion():
     result = json.loads(convert_wot_td_to_wot_tm_from_json(json.dumps(input)))
 
     assert result == expected_result
+
+
+def test_get_origin_url():
+    assert get_origin_url(None, None) == None
+    assert get_origin_url("http://example.com", None) == "http://example.com"
+    assert get_origin_url("https://example.com", None) == "https://example.com"
+    assert get_origin_url(None, "http://example.com") == "http://example.com"
+    assert get_origin_url("http://hi.com", "http://example.com") == "http://example.com"
+    assert get_origin_url("this/is/a/file/path", None) == None

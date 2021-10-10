@@ -113,9 +113,13 @@ def _convert_model_from_json(
     return json.dumps(to_model, indent=indent)
 
 
-def convert_sdf_to_wot_tm(input: Dict):
+def convert_sdf_to_wot_tm(input: Dict, origin_url=None):
     return _convert_and_validate(
-        input, sdf_validation_schema, tm_schema, sdf_to_wot.convert_sdf_to_wot_tm
+        input,
+        sdf_validation_schema,
+        tm_schema,
+        sdf_to_wot.convert_sdf_to_wot_tm,
+        origin_url=origin_url,
     )
 
 
@@ -147,7 +151,7 @@ def convert_wot_td_to_tm(input: Dict):
     return _convert_and_validate(input, td_schema, tm_schema, td_to_tm.convert_td_to_tm)
 
 
-def convert_sdf_to_wot_tm_from_path(from_path: str, to_path: str, indent=4):
+def convert_sdf_to_wot_tm_from_path(from_path: str, to_path: str, indent=4, **kwargs):
     return _convert_model_from_path(
         from_path,
         to_path,
@@ -155,6 +159,7 @@ def convert_sdf_to_wot_tm_from_path(from_path: str, to_path: str, indent=4):
         tm_schema,
         sdf_to_wot.convert_sdf_to_wot_tm,
         indent=indent,
+        **kwargs,
     )
 
 
@@ -350,6 +355,10 @@ def _parse_arguments(args):
     )
 
     parser.add_argument(
+        "--origin-url", dest="origin_url", help="Explicitly set the model's origin URL."
+    )
+
+    parser.add_argument(
         "--indent",
         dest="indent",
         default=4,
@@ -360,11 +369,23 @@ def _parse_arguments(args):
     return parser.parse_args(args)
 
 
+def get_origin_url(path: str, url: str):
+    if url:
+        return url
+    elif path and (path.startswith("http://") or path.startswith("https://")):
+        return path
+    else:
+        return None
+
+
 def _use_converter_cli(args):  # pragma: no cover
     indent = args.indent
     if args.from_sdf:
+        origin_url = get_origin_url(args.from_sdf, args.origin_url)
         if args.to_tm:
-            convert_sdf_to_wot_tm_from_path(args.from_sdf, args.to_tm, indent=indent)
+            convert_sdf_to_wot_tm_from_path(
+                args.from_sdf, args.to_tm, indent=indent, origin_url=origin_url
+            )
         elif args.to_sdf:
             _load_and_save_model(args.from_sdf, args.to_sdf, indent=indent)
         elif args.to_td:
@@ -377,6 +398,7 @@ def _use_converter_cli(args):  # pragma: no cover
                     args.to_sdf,
                     placeholder_map_path=args.placeholder_map,
                     indent=indent,
+                    origin_url=args.origin_url,
                 )
             else:
                 convert_wot_tm_to_sdf_from_paths(
