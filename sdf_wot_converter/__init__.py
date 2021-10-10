@@ -70,6 +70,7 @@ def _convert_model_from_path(
     from_schema: Dict,
     to_schema: Dict,
     converter_function: Callable,
+    indent=4,
     **kwargs,
 ):  # pragma: no cover
     from_model = _load_model(from_path)
@@ -80,7 +81,7 @@ def _convert_model_from_path(
         converter_function,
         **kwargs,
     )
-    _save_model(to_path, to_model)
+    _save_model(to_path, to_model, indent=indent)
 
 
 def _convert_model_from_json(
@@ -136,18 +137,19 @@ def convert_wot_td_to_tm(input: Dict):
     return _convert_and_validate(input, td_schema, tm_schema, td_to_tm.convert_td_to_tm)
 
 
-def convert_sdf_to_wot_tm_from_path(from_path: str, to_path: str):
+def convert_sdf_to_wot_tm_from_path(from_path: str, to_path: str, indent=4):
     return _convert_model_from_path(
         from_path,
         to_path,
         sdf_validation_schema,
         tm_schema,
         sdf_to_wot.convert_sdf_to_wot_tm,
+        indent=indent,
     )
 
 
 def convert_wot_tm_to_sdf_from_path(
-    from_path: str, to_path: str, placeholder_map_path=None
+    from_path: str, to_path: str, placeholder_map_path=None, indent=4
 ):
     placeholder_map = _load_optional_json_file(placeholder_map_path)
     return _convert_model_from_path(
@@ -157,6 +159,7 @@ def convert_wot_tm_to_sdf_from_path(
         sdf_validation_schema,
         wot_to_sdf.convert_wot_tm_to_sdf,
         placeholder_map=placeholder_map,
+        indent=indent,
     )
 
 
@@ -166,6 +169,7 @@ def convert_wot_tm_to_wot_td_from_path(
     placeholder_map_path=None,
     meta_data_path=None,
     bindings_path=None,
+    indent=4,
 ):
     placeholder_map = _load_optional_json_file(placeholder_map_path)
     meta_data = _load_optional_json_file(meta_data_path)
@@ -179,16 +183,18 @@ def convert_wot_tm_to_wot_td_from_path(
         placeholder_map=placeholder_map,
         meta_data=meta_data,
         bindings=bindings,
+        indent=indent,
     )
 
 
-def convert_wot_td_to_wot_tm_from_path(from_path: str, to_path: str):
+def convert_wot_td_to_wot_tm_from_path(from_path: str, to_path: str, indent=4):
     return _convert_model_from_path(
         from_path,
         to_path,
         td_schema,
         tm_schema,
         td_to_tm.convert_td_to_tm,
+        indent=indent,
     )
 
 
@@ -290,21 +296,33 @@ def _parse_arguments(args):
         help="Additional bindings information for TM-to-TD conversion",
     )
 
+    parser.add_argument(
+        "--indent",
+        dest="indent",
+        default=4,
+        type=int,
+        help="Indentation depth for the output JSON file.",
+    )
+
     return parser.parse_args(args)
 
 
 def _use_converter_cli(args):  # pragma: no cover
+    indent = args.indent
     if args.from_sdf:
         if args.to_tm:
-            convert_sdf_to_wot_tm_from_path(args.from_sdf, args.to_tm)
+            convert_sdf_to_wot_tm_from_path(args.from_sdf, args.to_tm, indent=indent)
         elif args.to_sdf:
-            _load_and_save_model(args.from_sdf, args.to_sdf)
+            _load_and_save_model(args.from_sdf, args.to_sdf, indent=indent)
         elif args.to_td:
             raise NotImplementedError("SDF -> TD conversion is not implemented, yet!")
     elif args.from_tm:
         if args.to_sdf:
             convert_wot_tm_to_sdf_from_path(
-                args.from_tm, args.to_sdf, placeholder_map_path=args.placeholder_map
+                args.from_tm,
+                args.to_sdf,
+                placeholder_map_path=args.placeholder_map,
+                indent=indent,
             )
         elif args.to_td:
             convert_wot_tm_to_wot_td_from_path(
@@ -313,17 +331,15 @@ def _use_converter_cli(args):  # pragma: no cover
                 placeholder_map_path=args.placeholder_map,
                 meta_data_path=args.meta_data,
                 bindings_path=args.bindings,
+                indent=indent,
             )
         elif args.to_tm:
-            _load_and_save_model(args.from_tm, args.to_tm)
+            _load_and_save_model(args.from_tm, args.to_tm, indent=indent)
     elif args.from_td:
         if args.to_tm:
-            convert_wot_td_to_wot_tm_from_path(
-                args.from_tm,
-                args.to_td,
-            )
+            convert_wot_td_to_wot_tm_from_path(args.from_tm, args.to_td, indent=indent)
         elif args.to_td:
-            _load_and_save_model(args.from_td, args.to_td)
+            _load_and_save_model(args.from_td, args.to_td, indent=indent)
         elif args.to_sdf:
             raise NotImplementedError("TD -> SDF conversion is not implemented, yet!")
 
