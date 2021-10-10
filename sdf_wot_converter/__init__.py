@@ -368,7 +368,7 @@ def _parse_arguments(args):
 def get_origin_url(path: str, url: str):
     if url:
         return url
-    elif path.startswith("http://") or path.startswith("https://"):
+    elif path and (path.startswith("http://") or path.startswith("https://")):
         return path
     else:
         return None
