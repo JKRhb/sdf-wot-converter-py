@@ -2,7 +2,9 @@ import json
 import argparse
 import sys
 from jsonschema import Draft7Validator
-from typing import Dict, Callable, Optional
+from typing import Dict, Callable, Optional, List, Union
+
+from sdf_wot_converter.converters.wot_common import flatten_thing_models
 from .converters import (
     sdf_to_wot,
     wot_to_sdf,
@@ -148,9 +150,22 @@ def convert_sdf_to_wot_tm_from_path(from_path: str, to_path: str, indent=4):
     )
 
 
+def convert_wot_tm_to_sdf_from_paths(
+    from_paths: List[str],
+    to_path: str,
+    placeholder_map_path=None,
+    indent=4,
+):
+    resolved_tms = _resolve_tm_input(from_paths, True)
+    placeholder_map = _load_optional_json_file(placeholder_map_path)
+    sdf_model = convert_wot_tm_to_sdf(resolved_tms, placeholder_map=placeholder_map)
+    _save_model(to_path, sdf_model, indent=indent)
+
+
 def convert_wot_tm_to_sdf_from_path(
     from_path: str, to_path: str, placeholder_map_path=None, indent=4
 ):
+
     placeholder_map = _load_optional_json_file(placeholder_map_path)
     return _convert_model_from_path(
         from_path,
@@ -185,6 +200,16 @@ def convert_wot_tm_to_wot_td_from_path(
         bindings=bindings,
         indent=indent,
     )
+
+
+def convert_wot_tm_to_td_from_paths(
+    from_paths: List[str], to_path: str, placeholder_map_path=None, indent=4
+):
+    # TODO: Refactor
+    resolved_tms = _resolve_tm_input(from_paths, True)
+    placeholder_map = _load_optional_json_file(placeholder_map_path)
+    sdf_model = convert_wot_tm_to_sdf(resolved_tms, placeholder_map=placeholder_map)
+    _save_model(to_path, sdf_model, indent=indent)
 
 
 def convert_wot_td_to_wot_tm_from_path(from_path: str, to_path: str, indent=4):
@@ -251,7 +276,15 @@ def convert_wot_td_to_wot_tm_from_json(input: str, indent=4):
     )
 
 
+def _resolve_tm_input(thing_model_paths: List[str], resolve_extensions):
+    thing_models = [_load_model(path) for path in thing_model_paths]
+    flattened_thing_model = flatten_thing_models(thing_models, resolve_extensions)
+    return flattened_thing_model
+
+
 def _parse_arguments(args):
+    # TODO: Argument structure might have to be reworked
+
     parser = argparse.ArgumentParser(
         description="Convert from SDF to WoT and vice versa."
     )
@@ -261,7 +294,11 @@ def _parse_arguments(args):
         "--from-sdf", metavar="SDF", dest="from_sdf", help="SDF input JSON file"
     )
     from_group.add_argument(
-        "--from-tm", metavar="TM", dest="from_tm", help="WoT TM input JSON file"
+        "--from-tm",
+        metavar="TM",
+        dest="from_tm",
+        help="WoT TM input JSON file(s)",
+        nargs="+",
     )
     from_group.add_argument(
         "--from-td", metavar="TD", dest="from_td", help="WoT TD input JSON file"
@@ -297,6 +334,14 @@ def _parse_arguments(args):
     )
 
     parser.add_argument(
+        "--no-extends",  # TODO: Might need a better name for this
+        dest="no_extends",
+        help="Don't resolve tm:extends links when using multiple TMs as input.",
+        action="store_true",
+        default=False,
+    )
+
+    parser.add_argument(
         "--indent",
         dest="indent",
         default=4,
@@ -318,26 +363,51 @@ def _use_converter_cli(args):  # pragma: no cover
             raise NotImplementedError("SDF -> TD conversion is not implemented, yet!")
     elif args.from_tm:
         if args.to_sdf:
-            convert_wot_tm_to_sdf_from_path(
-                args.from_tm,
-                args.to_sdf,
-                placeholder_map_path=args.placeholder_map,
-                indent=indent,
-            )
+            if len(args.from_tm) == 1:
+                convert_wot_tm_to_sdf_from_path(
+                    args.from_tm[0],
+                    args.to_sdf,
+                    placeholder_map_path=args.placeholder_map,
+                    indent=indent,
+                )
+            else:
+                convert_wot_tm_to_sdf_from_paths(
+                    args.from_tm,
+                    args.to_sdf,
+                    placeholder_map_path=args.placeholder_map,
+                    resolve_extensions=not args.no_extends,
+                    indent=indent,
+                )
         elif args.to_td:
-            convert_wot_tm_to_wot_td_from_path(
-                args.from_tm,
-                args.to_td,
-                placeholder_map_path=args.placeholder_map,
-                meta_data_path=args.meta_data,
-                bindings_path=args.bindings,
-                indent=indent,
-            )
+            if len(args.from_tm) == 1:
+                convert_wot_tm_to_wot_td_from_path(
+                    args.from_tm[0],
+                    args.to_td,
+                    placeholder_map_path=args.placeholder_map,
+                    meta_data_path=args.meta_data,
+                    bindings_path=args.bindings,
+                    indent=indent,
+                )
+            else:
+                convert_wot_tm_to_td_from_paths(
+                    args.from_tm,
+                    args.to_sdf,
+                    placeholder_map_path=args.placeholder_map,
+                    indent=indent,
+                )
         elif args.to_tm:
-            _load_and_save_model(args.from_tm, args.to_tm, indent=indent)
+            if len(args.from_tm) == 1:
+                _load_and_save_model(args.from_tm[0], args.to_tm)
+            else:
+                thing_model = _resolve_tm_input(args.from_tm, not args.no_extends)
+                _save_model(args.to_tm, thing_model, indent=args.indent)
     elif args.from_td:
         if args.to_tm:
-            convert_wot_td_to_wot_tm_from_path(args.from_tm, args.to_td, indent=indent)
+            convert_wot_td_to_wot_tm_from_path(
+                args.from_td,
+                args.to_tm,
+                indent=indent,
+            )
         elif args.to_td:
             _load_and_save_model(args.from_td, args.to_td, indent=indent)
         elif args.to_sdf:
