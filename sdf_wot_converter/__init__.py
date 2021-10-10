@@ -1,6 +1,8 @@
 import json
 import argparse
 import sys
+import urllib.parse
+import urllib.request
 from jsonschema import Draft7Validator
 from typing import Dict, Callable, Optional, List, Union
 
@@ -18,8 +20,14 @@ from .schemas.tm_schema import tm_schema
 
 
 def _load_model(input_path: str) -> Dict:  # pragma: no cover
-    file = open(input_path)
-    return json.load(file)
+    parsed_input_path = urllib.parse.urlparse(input_path)
+    if parsed_input_path.scheme.startswith("http"):
+        with urllib.request.urlopen(input_path) as url:
+            retrieved_model = json.loads(url.read().decode())
+            return retrieved_model
+    else:
+        file = open(input_path)
+        return json.load(file)
 
 
 def _save_model(output_path: str, model: Dict, indent=4):  # pragma: no cover
