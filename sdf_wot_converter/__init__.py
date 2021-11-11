@@ -398,7 +398,6 @@ def _use_converter_cli(args):  # pragma: no cover
                     args.to_sdf,
                     placeholder_map_path=args.placeholder_map,
                     indent=indent,
-                    origin_url=args.origin_url,
                 )
             else:
                 convert_wot_tm_to_sdf_from_paths(
