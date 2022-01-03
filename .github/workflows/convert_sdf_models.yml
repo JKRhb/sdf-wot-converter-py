@@ -39,7 +39,7 @@ jobs:
         if [[ `git status --porcelain` ]]; then
           git config --global user.email "jan.romann@uni.bremen.de"
           git config --global user.name "Jan Romann"
-          git commit -am "Update from JKRhb/sdf-wot-converter-py"
+          git commit -am "Update from JKRhb/sdf-wot-converter-py@${GITHUB_SHA}"
           git remote set-url origin https://JKRhb:${{ secrets.API_TOKEN_GITHUB }}@github.com/JKRhb/onedm-playground-wot-tm.git
           git push origin main
         fi
