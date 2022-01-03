@@ -36,7 +36,7 @@ jobs:
         rm -fR onedm-playground-wot-tm/tm
         mv output/tm onedm-playground-wot-tm/tm
         cd onedm-playground-wot-tm
-        if ! git diff-index --quiet HEAD; then
+        if [[ `git status --porcelain` ]]; then
           git config --global user.email "jan.romann@uni.bremen.de"
           git config --global user.name "Jan Romann"
           git commit -am "Update from JKRhb/sdf-wot-converter-py"
