@@ -142,3 +142,7 @@ test_output
 
 # Ignore vscode settings
 .vscode
+
+# Ignore playground conversion files
+output
+playground
