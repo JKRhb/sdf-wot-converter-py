@@ -4,6 +4,8 @@ from typing import (
 import copy
 import json_merge_patch
 from jsonpointer import resolve_pointer
+
+from .utility import validate_thing_description, validate_thing_model
 from . import wot_common
 
 
@@ -45,6 +47,7 @@ def _replace_bindings(partial_td, bindings) -> Dict:
 def convert_tm_to_td(
     thing_model: Dict, placeholder_map=None, meta_data=None, bindings=None
 ) -> Dict:
+    validate_thing_model(thing_model)
     partial_td: Dict = copy.deepcopy(thing_model)
 
     partial_td = wot_common.resolve_extension(partial_td)
@@ -56,5 +59,7 @@ def convert_tm_to_td(
     partial_td = wot_common.replace_placeholders(partial_td, placeholder_map)
 
     assert_tm_required(partial_td)
+
+    validate_thing_description(partial_td)
 
     return partial_td

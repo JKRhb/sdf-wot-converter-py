@@ -1,6 +1,8 @@
 from typing import Dict
 import copy
 
+from .utility import validate_thing_description, validate_thing_model
+
 
 def _replace_type(thing_model: Dict):
 
@@ -25,8 +27,10 @@ def _replace_type(thing_model: Dict):
 
 
 def convert_td_to_tm(thing_description: Dict) -> Dict:
+    validate_thing_description(thing_description)
     thing_model: Dict = copy.deepcopy(thing_description)
 
     _replace_type(thing_model)
+    validate_thing_model(thing_model)
 
     return thing_model
