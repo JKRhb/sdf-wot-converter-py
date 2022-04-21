@@ -90,9 +90,11 @@ def convert_wot_td_to_tm(input: Dict):
     return td_to_tm.convert_td_to_tm(input)
 
 
-def convert_sdf_to_wot_tm_from_path(from_path: str, to_path: str, indent=4, **kwargs):
+def convert_sdf_to_wot_tm_from_path(
+    from_path: str, to_path: str, indent=4, origin_url=None
+):
     from_model = _load_model(from_path)
-    to_model = sdf_to_wot.convert_sdf_to_wot_tm(from_model)
+    to_model = sdf_to_wot.convert_sdf_to_wot_tm(from_model, origin_url=origin_url)
 
     _save_model(to_path, to_model, indent=indent)
 
