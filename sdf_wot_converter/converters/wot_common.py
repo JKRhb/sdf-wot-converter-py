@@ -3,6 +3,7 @@ from typing import (
     List,
 )
 import urllib.request
+import urllib.parse
 import json_merge_patch
 from jsonschema import Draft7Validator
 import json
@@ -22,11 +23,33 @@ def flatten_thing_models(thing_models: List[dict], resolve_extensions=True):
     return current_thing_model
 
 
-def _retrieve_thing_model(tm_url: str):
+def validate_thing_model(thing_model):
+    Draft7Validator(tm_schema.tm_schema).validate(thing_model)
+
+
+def retrieve_thing_model_from_url(tm_url: str):
     with urllib.request.urlopen(tm_url) as url:
         retrieved_thing_model = json.loads(url.read().decode())
-        Draft7Validator(tm_schema.tm_schema).validate(retrieved_thing_model)
+        validate_thing_model(retrieved_thing_model)
         return retrieved_thing_model
+
+
+def retrieve_thing_model_from_file_path(file_path: str):
+    with open(file_path) as json_file:
+        read_thing_model = json.load(json_file)
+        validate_thing_model(read_thing_model)
+        return read_thing_model
+
+
+def retrieve_thing_model(tm_url: str, thing_collection=None):
+    url_scheme = urllib.parse.urlparse(tm_url).scheme
+
+    if url_scheme.startswith("http"):
+        return retrieve_thing_model_from_url(tm_url)
+    elif tm_url.startswith("#/") and thing_collection is not None:
+        return resolve_pointer(thing_collection, tm_url[1:])
+    else:
+        return retrieve_thing_model_from_file_path(tm_url)
 
 
 def perform_extension(
@@ -34,8 +57,11 @@ def perform_extension(
     extension_href: str,
     extension_link_list: List[str],
     resolve_relative_pointers: bool,
+    thing_collection=None,
 ):
-    retrieved_thing_model = _retrieve_thing_model(extension_href)
+    retrieved_thing_model = retrieve_thing_model(
+        extension_href, thing_collection=thing_collection
+    )
     merged_partial_td = json_merge_patch.merge(retrieved_thing_model, partial_td)
     return resolve_extension(
         merged_partial_td,
@@ -94,13 +120,6 @@ def replace_placeholders(thing_model, placeholders):
     thing_model_as_string = json.dumps(thing_model)
 
     for placeholder, value in placeholders.items():
-        # TODO: Placeholder pattern should be validated
-
-        # assert isinstance(placeholder, str)
-        # assert re.fullmatch('[A-Z0-9_]+',
-        #                     placeholder), "Placeholders must follow the pattern \"PLACEHOLDER_IDENTIFIER\""
-        # assert isinstance(value, str)
-
         if isinstance(value, bool):
             value = _stringify_boolean(value)
         elif isinstance(value, str):
@@ -117,7 +136,11 @@ def replace_placeholders(thing_model, placeholders):
 
 
 def _resolve_tm_ref(
-    partial_td, current_definition, resolve_relative_pointers, pointer_list=None
+    partial_td,
+    current_definition,
+    resolve_relative_pointers,
+    pointer_list=None,
+    thing_collection=None,
 ):
     result = copy.deepcopy(current_definition)
 
@@ -132,7 +155,9 @@ def _resolve_tm_ref(
         root, pointer = tuple(tm_ref.split("#", 1))
         original = None
         if root:
-            retrieved_thing_model = _retrieve_thing_model(root)
+            retrieved_thing_model = retrieve_thing_model(
+                root, thing_collection=thing_collection
+            )
             original = resolve_pointer(retrieved_thing_model, pointer)
         elif resolve_relative_pointers:
             original = resolve_pointer(partial_td, pointer)

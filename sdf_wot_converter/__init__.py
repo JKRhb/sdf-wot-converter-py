@@ -3,8 +3,7 @@ import argparse
 import sys
 import urllib.parse
 import urllib.request
-from jsonschema import Draft7Validator
-from typing import Dict, Callable, Optional, List, Union
+from typing import Dict, Callable, Optional, List
 
 from sdf_wot_converter.converters.wot_common import flatten_thing_models
 from .converters import (
@@ -13,10 +12,6 @@ from .converters import (
     tm_to_td,
     td_to_tm,
 )
-
-from .schemas.sdf_validation_schema import sdf_validation_schema
-from .schemas.td_schema import td_schema
-from .schemas.tm_schema import tm_schema
 
 
 def _load_model(input_path: str) -> Dict:  # pragma: no cover
@@ -60,107 +55,46 @@ def _load_optional_json(json_string: Optional[str]) -> Optional[Dict]:
     return json_data
 
 
-def _convert_and_validate(
-    from_model: Dict,
-    from_schema: Dict,
-    to_schema: Dict,
-    converter_function: Callable,
-    **kwargs,
-):
-
-    Draft7Validator(from_schema).validate(from_model)
-    to_model = converter_function(from_model, **kwargs)
-    Draft7Validator(to_schema).validate(to_model)
-    return to_model
-
-
 def _convert_model_from_path(
     from_path: str,
     to_path: str,
-    from_schema: Dict,
-    to_schema: Dict,
     converter_function: Callable,
     indent=4,
     **kwargs,
 ):  # pragma: no cover
     from_model = _load_model(from_path)
-    to_model = _convert_and_validate(
-        from_model,
-        from_schema,
-        to_schema,
-        converter_function,
-        **kwargs,
-    )
+    to_model = converter_function(from_model, **kwargs)
     _save_model(to_path, to_model, indent=indent)
 
 
 def _convert_model_from_json(
     from_model_json: str,
-    from_schema: Dict,
-    to_schema: Dict,
     converter_function: Callable,
     indent=4,
     **kwargs,
 ):  # pragma: no cover
     from_model = json.loads(from_model_json)
-    to_model = _convert_and_validate(
-        from_model,
-        from_schema,
-        to_schema,
-        converter_function,
-        **kwargs,
-    )
+    to_model = converter_function(from_model, **kwargs)
     return json.dumps(to_model, indent=indent)
-
-
-def convert_sdf_to_wot_tm(input: Dict, origin_url=None):
-    return _convert_and_validate(
-        input,
-        sdf_validation_schema,
-        tm_schema,
-        sdf_to_wot.convert_sdf_to_wot_tm,
-        origin_url=origin_url,
-    )
-
-
-def convert_wot_tm_to_sdf(input: Dict, placeholder_map=None):
-    return _convert_and_validate(
-        input,
-        tm_schema,
-        sdf_validation_schema,
-        wot_to_sdf.convert_wot_tm_to_sdf,
-        placeholder_map=placeholder_map,
-    )
 
 
 def convert_wot_tm_to_td(
     input: Dict, placeholder_map=None, meta_data=None, bindings=None
 ):
-    return _convert_and_validate(
-        input,
-        tm_schema,
-        td_schema,
-        tm_to_td.convert_tm_to_td,
-        placeholder_map=placeholder_map,
-        meta_data=meta_data,
-        bindings=bindings,
+    return tm_to_td.convert_tm_to_td(
+        input, placeholder_map=placeholder_map, meta_data=meta_data, bindings=bindings
     )
 
 
 def convert_wot_td_to_tm(input: Dict):
-    return _convert_and_validate(input, td_schema, tm_schema, td_to_tm.convert_td_to_tm)
+    return td_to_tm.convert_td_to_tm(input)
 
 
 def convert_sdf_to_wot_tm_from_path(from_path: str, to_path: str, indent=4, **kwargs):
-    return _convert_model_from_path(
-        from_path,
-        to_path,
-        sdf_validation_schema,
-        tm_schema,
-        sdf_to_wot.convert_sdf_to_wot_tm,
-        indent=indent,
-        **kwargs,
-    )
+    from_model = _load_model(from_path)
+    to_model = sdf_to_wot.convert_sdf_to_wot_tm(from_model)
+
+    _save_model(to_path, to_model, indent=indent)
 
 
 def convert_wot_tm_to_sdf_from_paths(
@@ -171,7 +105,9 @@ def convert_wot_tm_to_sdf_from_paths(
 ):
     resolved_tms = _resolve_tm_input(from_paths, True)
     placeholder_map = _load_optional_json_file(placeholder_map_path)
-    sdf_model = convert_wot_tm_to_sdf(resolved_tms, placeholder_map=placeholder_map)
+    sdf_model = wot_to_sdf.convert_wot_tm_to_sdf(
+        resolved_tms, placeholder_map=placeholder_map
+    )
     _save_model(to_path, sdf_model, indent=indent)
 
 
@@ -183,8 +119,6 @@ def convert_wot_tm_to_sdf_from_path(
     return _convert_model_from_path(
         from_path,
         to_path,
-        tm_schema,
-        sdf_validation_schema,
         wot_to_sdf.convert_wot_tm_to_sdf,
         placeholder_map=placeholder_map,
         indent=indent,
@@ -205,8 +139,6 @@ def convert_wot_tm_to_wot_td_from_path(
     return _convert_model_from_path(
         from_path,
         to_path,
-        tm_schema,
-        td_schema,
         tm_to_td.convert_tm_to_td,
         placeholder_map=placeholder_map,
         meta_data=meta_data,
@@ -221,7 +153,9 @@ def convert_wot_tm_to_td_from_paths(
     # TODO: Refactor
     resolved_tms = _resolve_tm_input(from_paths, True)
     placeholder_map = _load_optional_json_file(placeholder_map_path)
-    sdf_model = convert_wot_tm_to_sdf(resolved_tms, placeholder_map=placeholder_map)
+    sdf_model = wot_to_sdf.convert_wot_tm_to_sdf(
+        resolved_tms, placeholder_map=placeholder_map
+    )
     _save_model(to_path, sdf_model, indent=indent)
 
 
@@ -229,8 +163,6 @@ def convert_wot_td_to_wot_tm_from_path(from_path: str, to_path: str, indent=4):
     return _convert_model_from_path(
         from_path,
         to_path,
-        td_schema,
-        tm_schema,
         td_to_tm.convert_td_to_tm,
         indent=indent,
     )
@@ -239,19 +171,14 @@ def convert_wot_td_to_wot_tm_from_path(from_path: str, to_path: str, indent=4):
 def convert_sdf_to_wot_tm_from_json(input: str, indent=4):
     return _convert_model_from_json(
         input,
-        sdf_validation_schema,
-        tm_schema,
         sdf_to_wot.convert_sdf_to_wot_tm,
         indent=indent,
     )
 
 
 def convert_wot_tm_to_sdf_from_json(input: str, indent=4):
-
     return _convert_model_from_json(
         input,
-        tm_schema,
-        sdf_validation_schema,
         wot_to_sdf.convert_wot_tm_to_sdf,
         indent=indent,
     )
@@ -269,8 +196,6 @@ def convert_wot_tm_to_wot_td_from_json(
     bindings = _load_optional_json(bindings_json)
     return _convert_model_from_json(
         input,
-        tm_schema,
-        td_schema,
         tm_to_td.convert_tm_to_td,
         indent=indent,
         placeholder_map=placeholder_map,
@@ -282,8 +207,6 @@ def convert_wot_tm_to_wot_td_from_json(
 def convert_wot_td_to_wot_tm_from_json(input: str, indent=4):
     return _convert_model_from_json(
         input,
-        td_schema,
-        tm_schema,
         td_to_tm.convert_td_to_tm,
         indent=indent,
     )

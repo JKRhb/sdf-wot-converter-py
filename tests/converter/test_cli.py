@@ -170,11 +170,12 @@ def test_wot_td_tm_example_conversion():
 
 
 def test_sdf_json_conversion():
-    input = {}
+    input = {"sdfObject": {"Test": {}}}
 
     expected_result = {
         "@context": ["http://www.w3.org/ns/td", {"sdf": "https://example.com/sdf"}],
         "@type": "tm:ThingModel",
+        "sdf:objectKey": "Test",
     }
 
     result = json.loads(convert_sdf_to_wot_tm_from_json(json.dumps(input)))
@@ -188,7 +189,7 @@ def test_wot_json_conversion():
         "@type": "tm:ThingModel",
     }
 
-    expected_result = {}
+    expected_result = {"sdfObject": {"sdfObject0": {}}}
 
     result = json.loads(convert_wot_tm_to_sdf_from_json(json.dumps(input)))
 
