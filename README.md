@@ -40,9 +40,9 @@ sdf-wot-converter --from-tm examples/wot/example.tm.jsonld --to-sdf converted-ex
 With the converter installed, you can use also use it as a library in your own projects. Below you can see examples for how to convert an SDF model to a WoT Thing Model and back again. As you can see, nested definitions from `sdfObject`s or `sdfThing`s a prefixed with the respective object or thing names. Moreover, an `sdf:jsonPointer` field is added to each affordance to enable roundtripping. More detailed mapping tables will be added to this readme soon.
 
 ```python
-from sdf_wot_converter import (
-    convert_sdf_to_wot_tm,
-    convert_wot_tm_to_sdf,
+from sdf_wot_converter.converters import (
+    sdf_to_wot,
+    wot_to_sdf,
 )
 
 sdf_model = {
@@ -77,45 +77,45 @@ sdf_model = {
     },
 }
 
-thing_model = convert_sdf_to_wot_tm(sdf_model)
+thing_model = sdf_to_wot.convert_sdf_to_wot_tm(sdf_model)
 
 expected_thing_model = {
     "@context": [
         "https://www.w3.org/2022/wot/td/v1.1",
-        {"cap": "https://example.com/capability/cap", "sdf": "https://example.com/sdf"},
+        {
+            "cap": "https://example.com/capability/cap",
+            "sdf": "https://example.com/sdf",
+        },
     ],
     "@type": "tm:ThingModel",
-    "title": "Example file for OneDM Semantic Definition Format",
-    "description": "Copyright 2019 Example Corp. All rights reserved.",
+    "sdf:title": "Example file for OneDM Semantic Definition Format",
+    "sdf:copyright": "Copyright 2019 Example Corp. All rights reserved.",
     "links": [{"href": "https://example.com/license", "rel": "license"}],
     "version": {"model": "2019-04-24"},
     "sdf:defaultNamespace": "cap",
     "actions": {
-        "Switch_on": {
-            "sdf:jsonPointer": "#/sdfObject/Switch/sdfAction/on",
+        "on": {
             "description": "Turn the switch on; equivalent to setting value to true.",
         },
-        "Switch_off": {
-            "sdf:jsonPointer": "#/sdfObject/Switch/sdfAction/off",
+        "off": {
             "description": "Turn the switch off; equivalent to setting value to false.",
         },
-        "Switch_toggle": {
-            "sdf:jsonPointer": "#/sdfObject/Switch/sdfAction/toggle",
+        "toggle": {
             "description": "Toggle the switch; equivalent to setting value to its complement.",
         },
     },
     "properties": {
-        "Switch_value": {
-            "sdf:jsonPointer": "#/sdfObject/Switch/sdfProperty/value",
+        "value": {
             "description": "The state of the switch; false for off and true for on.",
             "type": "boolean",
         }
     },
+    "sdf:objectKey": "Switch",
 }
 
 assert thing_model == expected_thing_model
 
-sdf_roundtrip_model = convert_wot_tm_to_sdf(thing_model)
+sdf_roundtrip_model = wot_to_sdf.convert_wot_tm_to_sdf(thing_model)
 
 assert sdf_model == sdf_roundtrip_model
 ```
