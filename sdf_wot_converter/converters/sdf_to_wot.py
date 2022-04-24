@@ -563,7 +563,7 @@ def add_origin_link(thing_model: Dict, origin_url: str):
 
 def create_basic_thing_model():
     return {
-        "@context": ["http://www.w3.org/ns/td"],
+        "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "@type": "tm:ThingModel",
         "mappings": {},
     }
