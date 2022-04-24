@@ -650,21 +650,42 @@ def convert_wot_tm_to_sdf(
     return sdf_model
 
 
+def _get_submodel_keys(thing_model: Dict):
+    links = thing_model.get("links", [])
+    submodel_links = [
+        link["href"] for link in links if link.get("rel") == "tm:submodel"
+    ]
+    submodel_keys = [link[2:] for link in submodel_links if link.startswith("#/")]
+    return submodel_keys
+
+
+def detect_top_level_models(thing_model_collection: Dict):
+    referenced_models = set()
+    for thing_model in thing_model_collection.values():
+        for key in _get_submodel_keys(thing_model):
+            referenced_models.add(key)
+    top_level_keys = [
+        key for key in thing_model_collection.keys() if key not in referenced_models
+    ]
+    return set(top_level_keys)
+
+
 def convert_wot_tm_collection_to_sdf(
     thing_model_collection: Dict,
     root_model_key=None,
     top_model_keys: Union[Set[str], None] = None,
 ):
-    if root_model_key is not None:
-        root_model = thing_model_collection[root_model_key]
-    else:
-        # Use the first model in the map as default
-        root_model_key, root_model = list(thing_model_collection.items())[0]
 
     if top_model_keys is None:
-        top_model_keys = set()
+        top_model_keys = detect_top_level_models(thing_model_collection)
 
-    top_model_keys.add(root_model_key)
+    if root_model_key is not None:
+        root_model = thing_model_collection[root_model_key]
+        top_model_keys.add(root_model_key)
+    else:
+        # Use the first top-level model in the map as default
+        root_model_key = list(top_model_keys)[0]
+        root_model = thing_model_collection[root_model_key]
 
     return convert_wot_tm_to_sdf(
         root_model,
