@@ -816,7 +816,8 @@ def test_sdf_tm_nested_sdf_conversion():
                 "sdfProperty": {"status": {}},
                 "sdfObject": {"bar": {"sdfAction": {"toggle": {}}}},
             }
-        }
+        },
+        "sdfObject": {"baz": {}},
     }
 
     expected_result = {
@@ -828,6 +829,14 @@ def test_sdf_tm_nested_sdf_conversion():
             "@type": "tm:ThingModel",
             "actions": {"toggle": {}},
             "sdf:objectKey": "bar",
+        },
+        "baz": {
+            "@context": [
+                "http://www.w3.org/ns/td",
+                {"sdf": "https://example.com/sdf"},
+            ],
+            "@type": "tm:ThingModel",
+            "sdf:objectKey": "baz",
         },
         "foo": {
             "@context": [
