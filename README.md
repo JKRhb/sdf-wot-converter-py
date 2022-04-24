@@ -81,7 +81,7 @@ thing_model = convert_sdf_to_wot_tm(sdf_model)
 
 expected_thing_model = {
     "@context": [
-        "http://www.w3.org/ns/td",
+        "https://www.w3.org/2022/wot/td/v1.1",
         {"cap": "https://example.com/capability/cap", "sdf": "https://example.com/sdf"},
     ],
     "@type": "tm:ThingModel",
