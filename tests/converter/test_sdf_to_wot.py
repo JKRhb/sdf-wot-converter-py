@@ -38,7 +38,10 @@ def test_empty_sdf_tm_conversion():
     input = {"sdfObject": {"Test": {}}}
 
     expected_result = {
-        "@context": ["http://www.w3.org/ns/td", {"sdf": "https://example.com/sdf"}],
+        "@context": [
+            "https://www.w3.org/2022/wot/td/v1.1",
+            {"sdf": "https://example.com/sdf"},
+        ],
         "@type": "tm:ThingModel",
         "sdf:objectKey": "Test",
     }
@@ -83,7 +86,7 @@ def test_sdf_tm_example_conversion():
 
     expected_result = {
         "@context": [
-            "http://www.w3.org/ns/td",
+            "https://www.w3.org/2022/wot/td/v1.1",
             {
                 "cap": "https://example.com/capability/cap",
                 "sdf": "https://example.com/sdf",
@@ -132,7 +135,10 @@ def test_sdf_tm_infoblock_conversion():
     }
 
     expected_result = {
-        "@context": ["http://www.w3.org/ns/td", {"sdf": "https://example.com/sdf"}],
+        "@context": [
+            "https://www.w3.org/2022/wot/td/v1.1",
+            {"sdf": "https://example.com/sdf"},
+        ],
         "@type": "tm:ThingModel",
         "sdf:title": "Test",
         "sdf:copyright": "Copyright (c) 2021 Example Corp",
@@ -161,17 +167,26 @@ def test_sdf_tm_multiple_objects_and_things():
 
     expected_result = {
         "Test1": {
-            "@context": ["http://www.w3.org/ns/td", {"sdf": "https://example.com/sdf"}],
+            "@context": [
+                "https://www.w3.org/2022/wot/td/v1.1",
+                {"sdf": "https://example.com/sdf"},
+            ],
             "@type": "tm:ThingModel",
             "sdf:objectKey": "Test1",
         },
         "Test2": {
-            "@context": ["http://www.w3.org/ns/td", {"sdf": "https://example.com/sdf"}],
+            "@context": [
+                "https://www.w3.org/2022/wot/td/v1.1",
+                {"sdf": "https://example.com/sdf"},
+            ],
             "@type": "tm:ThingModel",
             "sdf:objectKey": "Test2",
         },
         "testThing1": {
-            "@context": ["http://www.w3.org/ns/td", {"sdf": "https://example.com/sdf"}],
+            "@context": [
+                "https://www.w3.org/2022/wot/td/v1.1",
+                {"sdf": "https://example.com/sdf"},
+            ],
             "@type": "tm:ThingModel",
             "links": [
                 {"href": "#/Test1", "rel": "tm:submodel"},
@@ -180,7 +195,10 @@ def test_sdf_tm_multiple_objects_and_things():
             "sdf:thingKey": "testThing1",
         },
         "testThing2": {
-            "@context": ["http://www.w3.org/ns/td", {"sdf": "https://example.com/sdf"}],
+            "@context": [
+                "https://www.w3.org/2022/wot/td/v1.1",
+                {"sdf": "https://example.com/sdf"},
+            ],
             "@type": "tm:ThingModel",
             "sdf:thingKey": "testThing2",
         },
@@ -199,7 +217,10 @@ def test_sdf_tm_partial_infoblock_conversion():
     }
 
     expected_result = {
-        "@context": ["http://www.w3.org/ns/td", {"sdf": "https://example.com/sdf"}],
+        "@context": [
+            "https://www.w3.org/2022/wot/td/v1.1",
+            {"sdf": "https://example.com/sdf"},
+        ],
         "@type": "tm:ThingModel",
         "sdf:objectKey": "Test",
         "sdf:title": "Test",
@@ -271,7 +292,7 @@ def test_sdf_tm_type_conversion():
 
     expected_result = {
         "@context": [
-            "http://www.w3.org/ns/td",
+            "https://www.w3.org/2022/wot/td/v1.1",
             {"sdf": "https://example.com/sdf"},
         ],
         "@type": "tm:ThingModel",
@@ -349,7 +370,7 @@ def test_sdf_tm_action_conversion():
     }
     expected_result = {
         "@context": [
-            "http://www.w3.org/ns/td",
+            "https://www.w3.org/2022/wot/td/v1.1",
             {"sdf": "https://example.com/sdf"},
         ],
         "@type": "tm:ThingModel",
@@ -380,7 +401,7 @@ def test_sdf_tm_event_conversion():
 
     expected_result = {
         "@context": [
-            "http://www.w3.org/ns/td",
+            "https://www.w3.org/2022/wot/td/v1.1",
             {"sdf": "https://example.com/sdf"},
         ],
         "@type": "tm:ThingModel",
@@ -419,7 +440,7 @@ def test_sdf_tm_sdf_ref_conversion():
 
     expected_result = {
         "@context": [
-            "http://www.w3.org/ns/td",
+            "https://www.w3.org/2022/wot/td/v1.1",
             {"sdf": "https://example.com/sdf"},
         ],
         "@type": "tm:ThingModel",
@@ -490,13 +511,19 @@ def test_sdf_tm_nested_model():
 
     expected_result = {
         "bar": {
-            "@context": ["http://www.w3.org/ns/td", {"sdf": "https://example.com/sdf"}],
+            "@context": [
+                "https://www.w3.org/2022/wot/td/v1.1",
+                {"sdf": "https://example.com/sdf"},
+            ],
             "@type": "tm:ThingModel",
             "links": [{"href": "#/baz", "rel": "tm:submodel"}],
             "sdf:thingKey": "bar",
         },
         "baz": {
-            "@context": ["http://www.w3.org/ns/td", {"sdf": "https://example.com/sdf"}],
+            "@context": [
+                "https://www.w3.org/2022/wot/td/v1.1",
+                {"sdf": "https://example.com/sdf"},
+            ],
             "@type": "tm:ThingModel",
             "actions": {
                 "foobar": {
@@ -522,13 +549,19 @@ def test_sdf_tm_nested_model():
             ],
         },
         "blah": {
-            "@context": ["http://www.w3.org/ns/td", {"sdf": "https://example.com/sdf"}],
+            "@context": [
+                "https://www.w3.org/2022/wot/td/v1.1",
+                {"sdf": "https://example.com/sdf"},
+            ],
             "@type": "tm:ThingModel",
             "links": [{"href": "#/foo", "rel": "tm:submodel"}],
             "sdf:thingKey": "blah",
         },
         "foo": {
-            "@context": ["http://www.w3.org/ns/td", {"sdf": "https://example.com/sdf"}],
+            "@context": [
+                "https://www.w3.org/2022/wot/td/v1.1",
+                {"sdf": "https://example.com/sdf"},
+            ],
             "@type": "tm:ThingModel",
             "links": [{"href": "#/bar", "rel": "tm:submodel"}],
             "sdf:thingKey": "foo",
@@ -621,7 +654,7 @@ def test_sdf_tm_succeeding_URL_sdf_ref():
 
     expected_result = {
         "@context": [
-            "http://www.w3.org/ns/td",
+            "https://www.w3.org/2022/wot/td/v1.1",
             {
                 "sdf": "https://example.com/sdf",
                 "test": "https://raw.githubusercontent.com/one-data-model/playground/master/sdfObject/sdfobject-accelerometer.sdf.json",
@@ -662,7 +695,7 @@ def test_sdf_tm_sdf_choice():
 
     expected_result = {
         "@context": [
-            "http://www.w3.org/ns/td",
+            "https://www.w3.org/2022/wot/td/v1.1",
             {"sdf": "https://example.com/sdf"},
         ],
         "@type": "tm:ThingModel",
@@ -728,7 +761,7 @@ def test_sdf_tm_sdf_data_conversion():
 
     expected_result = {
         "@context": [
-            "http://www.w3.org/ns/td",
+            "https://www.w3.org/2022/wot/td/v1.1",
             {"sdf": "https://example.com/sdf"},
         ],
         "@type": "tm:ThingModel",
@@ -782,7 +815,7 @@ def test_empty_namespace_conversion():
 
     expected_result = {
         "@context": [
-            "http://www.w3.org/ns/td",
+            "https://www.w3.org/2022/wot/td/v1.1",
             {
                 "sdf": "https://example.com/sdf",
                 "cap": "https://example.com/capability/cap",
@@ -823,7 +856,7 @@ def test_sdf_tm_nested_sdf_conversion():
     expected_result = {
         "bar": {
             "@context": [
-                "http://www.w3.org/ns/td",
+                "https://www.w3.org/2022/wot/td/v1.1",
                 {"sdf": "https://example.com/sdf"},
             ],
             "@type": "tm:ThingModel",
@@ -832,7 +865,7 @@ def test_sdf_tm_nested_sdf_conversion():
         },
         "baz": {
             "@context": [
-                "http://www.w3.org/ns/td",
+                "https://www.w3.org/2022/wot/td/v1.1",
                 {"sdf": "https://example.com/sdf"},
             ],
             "@type": "tm:ThingModel",
@@ -840,7 +873,7 @@ def test_sdf_tm_nested_sdf_conversion():
         },
         "foo": {
             "@context": [
-                "http://www.w3.org/ns/td",
+                "https://www.w3.org/2022/wot/td/v1.1",
                 {"sdf": "https://example.com/sdf"},
             ],
             "@type": "tm:ThingModel",

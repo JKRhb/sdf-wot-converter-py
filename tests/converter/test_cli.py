@@ -36,7 +36,7 @@ def make_test_output_dir():
 
 def test_resolve_tm_input():
     expected_result = {
-        "@context": "https://www.w3.org/2019/wot/td/v1",
+        "@context": "https://www.w3.org/2022/wot/td/v1.1",
         "@type": "tm:ThingModel",
         "actions": {
             "toggle": {
@@ -78,7 +78,7 @@ def test_resolve_tm_input():
 
 def test_resolve_tm_input_without_extends_resolution():
     expected_result = {
-        "@context": "https://www.w3.org/2019/wot/td/v1",
+        "@context": "https://www.w3.org/2022/wot/td/v1.1",
         "@type": "tm:ThingModel",
         "id": "urn:dev:ops:32473-WoTLamp-1234",
         "security": "basic_sc",
@@ -173,7 +173,10 @@ def test_sdf_json_conversion():
     input = {"sdfObject": {"Test": {}}}
 
     expected_result = {
-        "@context": ["http://www.w3.org/ns/td", {"sdf": "https://example.com/sdf"}],
+        "@context": [
+            "https://www.w3.org/2022/wot/td/v1.1",
+            {"sdf": "https://example.com/sdf"},
+        ],
         "@type": "tm:ThingModel",
         "sdf:objectKey": "Test",
     }
@@ -185,7 +188,7 @@ def test_sdf_json_conversion():
 
 def test_wot_json_conversion():
     input = {
-        "@context": "http://www.w3.org/ns/td",
+        "@context": "https://www.w3.org/2022/wot/td/v1.1",
         "@type": "tm:ThingModel",
     }
 
@@ -198,7 +201,7 @@ def test_wot_json_conversion():
 
 def test_wot_tm_td_json_conversion():
     input = {
-        "@context": ["http://www.w3.org/ns/td"],
+        "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "@type": "tm:ThingModel",
         "title": "Thing Title",
         "security": ["nosec_sc"],
@@ -206,7 +209,7 @@ def test_wot_tm_td_json_conversion():
     }
 
     expected_result = {
-        "@context": ["http://www.w3.org/ns/td"],
+        "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "@type": "Thing",
         "title": "Thing Title",
         "security": ["nosec_sc"],
@@ -220,7 +223,7 @@ def test_wot_tm_td_json_conversion():
 
 def test_wot_tm_td_json_conversion_with_meta_data():
     input = {
-        "@context": ["http://www.w3.org/ns/td"],
+        "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "@type": "tm:ThingModel",
     }
 
@@ -231,7 +234,7 @@ def test_wot_tm_td_json_conversion_with_meta_data():
     }
 
     expected_result = {
-        "@context": ["http://www.w3.org/ns/td"],
+        "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "@type": "Thing",
         "title": "Thing Title",
         "security": ["nosec_sc"],
@@ -250,7 +253,7 @@ def test_wot_tm_td_json_conversion_with_meta_data():
 def test_wot_td_tm_json_conversion():
 
     input = {
-        "@context": ["http://www.w3.org/ns/td"],
+        "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "@type": "Thing",
         "title": "Thing Title",
         "security": ["nosec_sc"],
@@ -258,7 +261,7 @@ def test_wot_td_tm_json_conversion():
     }
 
     expected_result = {
-        "@context": ["http://www.w3.org/ns/td"],
+        "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "@type": "tm:ThingModel",
         "title": "Thing Title",
         "security": ["nosec_sc"],

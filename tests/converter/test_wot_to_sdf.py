@@ -11,7 +11,10 @@ def perform_conversion_test(input, expected_result):
 def test_empty_tm_sdf_conversion():
 
     input = {
-        "@context": ["http://www.w3.org/ns/td", {"sdf": "https://example.com/sdf"}],
+        "@context": [
+            "https://www.w3.org/2022/wot/td/v1.1",
+            {"sdf": "https://example.com/sdf"},
+        ],
         "@type": "tm:ThingModel",
     }
 
@@ -23,7 +26,7 @@ def test_empty_tm_sdf_conversion():
 def test_wot_tm_to_sdf_conversion():
 
     input = {
-        "@context": ["http://www.w3.org/ns/td"],
+        "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "@type": "tm:ThingModel",
         "title": "Lamp Thing Model",
         "properties": {
@@ -70,7 +73,7 @@ def test_wot_tm_to_sdf_conversion():
 def test_tm_sdf_namespace_conversion():
     input = {
         "@context": [
-            "https://www.w3.org/2019/wot/td/v1",
+            "https://www.w3.org/2022/wot/td/v1.1",
             {
                 "sdf": "https://example.com/sdf",
                 "foo": "https://example.com/foo",
@@ -91,7 +94,7 @@ def test_tm_sdf_namespace_conversion():
 
 def test_tm_sdf_property_conversion():
     input = {
-        "@context": ["https://www.w3.org/2019/wot/td/v1"],
+        "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "@type": "tm:ThingModel",
         "properties": {
             "boo": {"type": "boolean", "const": True, "default": True},
@@ -191,7 +194,10 @@ def test_tm_sdf_link_conversion():
     # TODO: Check how links should be mapped
 
     input = {
-        "@context": ["http://www.w3.org/ns/td", {"sdf": "https://example.com/sdf"}],
+        "@context": [
+            "https://www.w3.org/2022/wot/td/v1.1",
+            {"sdf": "https://example.com/sdf"},
+        ],
         "@type": "tm:ThingModel",
         "links": [{"href": "https://example.org"}],
     }
@@ -205,7 +211,10 @@ def test_tm_sdf_schema_definition_conversion():
     # TODO: Check how links should be mapped
 
     input = {
-        "@context": ["http://www.w3.org/ns/td", {"sdf": "https://example.com/sdf"}],
+        "@context": [
+            "https://www.w3.org/2022/wot/td/v1.1",
+            {"sdf": "https://example.com/sdf"},
+        ],
         "@type": "tm:ThingModel",
         "schemaDefinitions": {
             "foobar": {"type": "string"},
@@ -229,7 +238,10 @@ def test_tm_sdf_schema_definition_conversion():
 
 def test_tm_sdf_relative_tm_ref_conversion():
     input = {
-        "@context": ["http://www.w3.org/ns/td", {"sdf": "https://example.com/sdf"}],
+        "@context": [
+            "https://www.w3.org/2022/wot/td/v1.1",
+            {"sdf": "https://example.com/sdf"},
+        ],
         "@type": "tm:ThingModel",
         "schemaDefinitions": {"foobar": {"type": "string"}},
         "actions": {"toggle": {"input": {"tm:ref": "#/schemaDefinitions/foobar"}}},
@@ -255,7 +267,10 @@ def test_tm_sdf_relative_tm_ref_conversion():
 
 def test_tm_sdf_composited_conversion():
     input = {
-        "@context": ["http://www.w3.org/ns/td", {"sdf": "https://example.com/sdf"}],
+        "@context": [
+            "https://www.w3.org/2022/wot/td/v1.1",
+            {"sdf": "https://example.com/sdf"},
+        ],
         "@type": "tm:ThingModel",
         "links": [
             {
@@ -287,7 +302,10 @@ def test_tm_sdf_composited_conversion():
 
 def test_tm_sdf_composited_conversion_with_affordance():
     input = {
-        "@context": ["http://www.w3.org/ns/td", {"sdf": "https://example.com/sdf"}],
+        "@context": [
+            "https://www.w3.org/2022/wot/td/v1.1",
+            {"sdf": "https://example.com/sdf"},
+        ],
         "@type": "tm:ThingModel",
         "title": "Top Level Lamp Thing",
         "links": [

@@ -10,7 +10,7 @@ def perform_conversion_test(input, expected_result, **kwargs):
 def test_empty_tm_td_conversion():
     # TODO: Handle case of TMs without title or security
     input = {
-        "@context": ["http://www.w3.org/ns/td"],
+        "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "@type": ["tm:ThingModel", "test"],
         "title": "Thing Title",
         "security": ["nosec_sc"],
@@ -18,7 +18,7 @@ def test_empty_tm_td_conversion():
     }
 
     expected_result = {
-        "@context": ["http://www.w3.org/ns/td"],
+        "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "@type": ["Thing", "test"],
         "title": "Thing Title",
         "security": ["nosec_sc"],
@@ -31,7 +31,7 @@ def test_empty_tm_td_conversion():
 def test_tm_td_with_meta_data_and_bindings_conversion():
     # TODO: Handle case of TMs without title or security
     input = {
-        "@context": "http://www.w3.org/ns/td",
+        "@context": "https://www.w3.org/2022/wot/td/v1.1",
         "@type": "tm:ThingModel",
         "title": "Lamp Thing Model",
         "properties": {
@@ -76,7 +76,7 @@ def test_tm_td_with_meta_data_and_bindings_conversion():
     }
 
     expected_result = {
-        "@context": "http://www.w3.org/ns/td",
+        "@context": "https://www.w3.org/2022/wot/td/v1.1",
         "@type": "Thing",
         "id": "urn:dev:ops:32473-WoTLamp-1234",
         "title": "MyLampThing",
@@ -115,7 +115,7 @@ def test_tm_td_with_meta_data_and_bindings_conversion():
 def test_tm_td_with_placeholder_conversion():
     # TODO: Handle case of TMs without forms
     input = {
-        "@context": ["http://www.w3.org/ns/td"],
+        "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "@type": "tm:ThingModel",
         "title": "Thing Title",
         "security": ["nosec_sc"],
@@ -141,7 +141,7 @@ def test_tm_td_with_placeholder_conversion():
     }
 
     expected_result = {
-        "@context": ["http://www.w3.org/ns/td"],
+        "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "@type": "Thing",
         "title": "Thing Title",
         "security": ["nosec_sc"],
@@ -165,7 +165,7 @@ def test_tm_td_with_placeholder_conversion():
 def test_tm_td_extension():
     # TODO: Handle case of TMs without forms
     input = {
-        "@context": ["http://www.w3.org/ns/td"],
+        "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "@type": "tm:ThingModel",
         "title": "Thing Title",
         "security": ["nosec_sc"],
@@ -179,7 +179,7 @@ def test_tm_td_extension():
     }
 
     expected_result = {
-        "@context": ["http://www.w3.org/ns/td"],
+        "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "id": "urn:dev:ops:32473-WoTLamp-1234",
         "title": "Thing Title",
         "@type": "Thing",
@@ -217,7 +217,7 @@ def test_tm_td_extension():
 def test_tm_td_recursive_extension():
     # TODO: Handle case of TMs without forms
     input = {
-        "@context": ["http://www.w3.org/ns/td"],
+        "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "@type": "tm:ThingModel",
         "links": [
             {
@@ -228,7 +228,7 @@ def test_tm_td_recursive_extension():
     }
 
     expected_result = {
-        "@context": ["http://www.w3.org/ns/td"],
+        "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "id": "urn:dev:ops:32473-WoTLamp-1234",
         "title": "MyLampThing",
         "@type": "Thing",
@@ -264,7 +264,7 @@ def test_tm_td_recursive_extension():
 
 def test_tm_td_link_preservation():
     input = {
-        "@context": ["http://www.w3.org/ns/td"],
+        "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "@type": "tm:ThingModel",
         "title": "Thing Title",
         "security": ["nosec_sc"],
@@ -273,7 +273,7 @@ def test_tm_td_link_preservation():
     }
 
     expected_result = {
-        "@context": ["http://www.w3.org/ns/td"],
+        "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "title": "Thing Title",
         "@type": "Thing",
         "securityDefinitions": {
@@ -289,7 +289,7 @@ def test_tm_td_link_preservation():
 def test_tm_td_tm_ref():
     # TODO: Handle case of TMs without forms
     input = {
-        "@context": ["http://www.w3.org/ns/td"],
+        "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "@type": "tm:ThingModel",
         "title": "Thing Title",
         "security": ["nosec_sc"],
@@ -304,7 +304,7 @@ def test_tm_td_tm_ref():
     }
 
     expected_result = {
-        "@context": ["http://www.w3.org/ns/td"],
+        "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "title": "Thing Title",
         "@type": "Thing",
         "securityDefinitions": {
@@ -332,7 +332,7 @@ def test_tm_td_tm_ref():
 
 def test_tm_td_tm_required():
     input = {
-        "@context": ["http://www.w3.org/ns/td"],
+        "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "@type": "tm:ThingModel",
         "title": "Thing Title",
         "security": ["nosec_sc"],
@@ -347,7 +347,7 @@ def test_tm_td_tm_required():
     }
 
     expected_result = {
-        "@context": ["http://www.w3.org/ns/td"],
+        "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "title": "Thing Title",
         "@type": "Thing",
         "securityDefinitions": {
