@@ -36,7 +36,7 @@ td_schema = {
             "const": "http://www.w3.org/ns/td",
         },
         "thing-context": {
-            "oneOf": [
+            "anyOf": [
                 {
                     "$comment": "New context URI with other vocabularies after it but not the old one",
                     "type": "array",
