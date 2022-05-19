@@ -1,89 +1,24 @@
-import json
 import argparse
 import sys
-import urllib.parse
-import urllib.request
-from typing import Dict, Callable, Optional, List
-import validators
+from typing import Dict, List
 
-from sdf_wot_converter.converters.wot_common import flatten_thing_models
+from .io import (
+    load_model,
+    save_model,
+    load_optional_json,
+    load_optional_json_file,
+    convert_model_from_path,
+    convert_model_from_json,
+    load_and_save_model,
+)
+
+from .converters.wot_common import flatten_thing_models
 from .converters import (
     sdf_to_wot,
     wot_to_sdf,
     tm_to_td,
     td_to_tm,
 )
-
-
-def _load_model_from_path(input_path: str) -> Dict:  # pragma: no cover
-    file = open(input_path)
-    return json.load(file)
-
-
-def _load_model_from_url(input_url: str) -> Dict:  # pragma: no cover
-    with urllib.request.urlopen(input_url) as url:
-        retrieved_model = json.loads(url.read().decode())
-        return retrieved_model
-
-
-def _load_model(path_or_url: str) -> Dict:  # pragma: no cover
-    if validators.url(path_or_url):
-        return _load_model_from_url(path_or_url)
-    else:
-        return _load_model_from_path(path_or_url)
-
-
-def _save_model(output_path: str, model: Dict, indent=4):  # pragma: no cover
-    file = open(output_path, "w")
-    json.dump(model, file, indent=indent)
-
-
-def _load_and_save_model(
-    input_path: str,
-    output_path: str,
-    indent=4,
-):  # pragma: no cover
-    model = _load_model(input_path)
-    _save_model(output_path, model, indent=indent)
-
-
-def _load_optional_json_file(path: Optional[str]) -> Optional[Dict]:
-    json_data = None
-    if path:
-        json_data = _load_model(path)
-
-    return json_data
-
-
-def _load_optional_json(json_string: Optional[str]) -> Optional[Dict]:
-    json_data = None
-    if json_string:
-        json_data = json.loads(json_string)
-
-    return json_data
-
-
-def _convert_model_from_path(
-    from_path: str,
-    to_path: str,
-    converter_function: Callable,
-    indent=4,
-    **kwargs,
-):  # pragma: no cover
-    from_model = _load_model(from_path)
-    to_model = converter_function(from_model, **kwargs)
-    _save_model(to_path, to_model, indent=indent)
-
-
-def _convert_model_from_json(
-    from_model_json: str,
-    converter_function: Callable,
-    indent=4,
-    **kwargs,
-):  # pragma: no cover
-    from_model = json.loads(from_model_json)
-    to_model = converter_function(from_model, **kwargs)
-    return json.dumps(to_model, indent=indent)
 
 
 def convert_wot_tm_to_td(
@@ -101,10 +36,10 @@ def convert_wot_td_to_tm(input: Dict):
 def convert_sdf_to_wot_tm_from_path(
     from_path: str, to_path: str, indent=4, origin_url=None
 ):
-    from_model = _load_model(from_path)
+    from_model = load_model(from_path)
     to_model = sdf_to_wot.convert_sdf_to_wot_tm(from_model, origin_url=origin_url)
 
-    _save_model(to_path, to_model, indent=indent)
+    save_model(to_path, to_model, indent=indent)
 
 
 def convert_wot_tm_to_sdf_from_paths(
@@ -114,19 +49,19 @@ def convert_wot_tm_to_sdf_from_paths(
     indent=4,
 ):
     resolved_tms = _resolve_tm_input(from_paths, True)
-    placeholder_map = _load_optional_json_file(placeholder_map_path)
+    placeholder_map = load_optional_json_file(placeholder_map_path)
     sdf_model = wot_to_sdf.convert_wot_tm_to_sdf(
         resolved_tms, placeholder_map=placeholder_map
     )
-    _save_model(to_path, sdf_model, indent=indent)
+    save_model(to_path, sdf_model, indent=indent)
 
 
 def convert_wot_tm_to_sdf_from_path(
     from_path: str, to_path: str, placeholder_map_path=None, indent=4
 ):
 
-    placeholder_map = _load_optional_json_file(placeholder_map_path)
-    return _convert_model_from_path(
+    placeholder_map = load_optional_json_file(placeholder_map_path)
+    return convert_model_from_path(
         from_path,
         to_path,
         wot_to_sdf.convert_wot_tm_to_sdf,
@@ -143,10 +78,10 @@ def convert_wot_tm_to_wot_td_from_path(
     bindings_path=None,
     indent=4,
 ):
-    placeholder_map = _load_optional_json_file(placeholder_map_path)
-    meta_data = _load_optional_json_file(meta_data_path)
-    bindings = _load_optional_json_file(bindings_path)
-    return _convert_model_from_path(
+    placeholder_map = load_optional_json_file(placeholder_map_path)
+    meta_data = load_optional_json_file(meta_data_path)
+    bindings = load_optional_json_file(bindings_path)
+    return convert_model_from_path(
         from_path,
         to_path,
         tm_to_td.convert_tm_to_td,
@@ -162,15 +97,15 @@ def convert_wot_tm_to_td_from_paths(
 ):
     # TODO: Refactor
     resolved_tms = _resolve_tm_input(from_paths, True)
-    placeholder_map = _load_optional_json_file(placeholder_map_path)
+    placeholder_map = load_optional_json_file(placeholder_map_path)
     sdf_model = wot_to_sdf.convert_wot_tm_to_sdf(
         resolved_tms, placeholder_map=placeholder_map
     )
-    _save_model(to_path, sdf_model, indent=indent)
+    save_model(to_path, sdf_model, indent=indent)
 
 
 def convert_wot_td_to_wot_tm_from_path(from_path: str, to_path: str, indent=4):
-    return _convert_model_from_path(
+    return convert_model_from_path(
         from_path,
         to_path,
         td_to_tm.convert_td_to_tm,
@@ -179,7 +114,7 @@ def convert_wot_td_to_wot_tm_from_path(from_path: str, to_path: str, indent=4):
 
 
 def convert_sdf_to_wot_tm_from_json(input: str, indent=4):
-    return _convert_model_from_json(
+    return convert_model_from_json(
         input,
         sdf_to_wot.convert_sdf_to_wot_tm,
         indent=indent,
@@ -187,7 +122,7 @@ def convert_sdf_to_wot_tm_from_json(input: str, indent=4):
 
 
 def convert_wot_tm_to_sdf_from_json(input: str, indent=4):
-    return _convert_model_from_json(
+    return convert_model_from_json(
         input,
         wot_to_sdf.convert_wot_tm_to_sdf,
         indent=indent,
@@ -201,10 +136,10 @@ def convert_wot_tm_to_wot_td_from_json(
     meta_data_json=None,
     bindings_json=None,
 ):
-    placeholder_map = _load_optional_json(placeholder_map_json)
-    meta_data = _load_optional_json(meta_data_json)
-    bindings = _load_optional_json(bindings_json)
-    return _convert_model_from_json(
+    placeholder_map = load_optional_json(placeholder_map_json)
+    meta_data = load_optional_json(meta_data_json)
+    bindings = load_optional_json(bindings_json)
+    return convert_model_from_json(
         input,
         tm_to_td.convert_tm_to_td,
         indent=indent,
@@ -215,15 +150,16 @@ def convert_wot_tm_to_wot_td_from_json(
 
 
 def convert_wot_td_to_wot_tm_from_json(input: str, indent=4):
-    return _convert_model_from_json(
+    return convert_model_from_json(
         input,
         td_to_tm.convert_td_to_tm,
         indent=indent,
     )
 
 
+# TODO: Turn into Thing Collection instead?
 def _resolve_tm_input(thing_model_paths: List[str], resolve_extensions):
-    thing_models = [_load_model(path) for path in thing_model_paths]
+    thing_models = [load_model(path) for path in thing_model_paths]
     flattened_thing_model = flatten_thing_models(thing_models, resolve_extensions)
     return flattened_thing_model
 
@@ -320,7 +256,7 @@ def _use_converter_cli(args):  # pragma: no cover
                 args.from_sdf, args.to_tm, indent=indent, origin_url=origin_url
             )
         elif args.to_sdf:
-            _load_and_save_model(args.from_sdf, args.to_sdf, indent=indent)
+            load_and_save_model(args.from_sdf, args.to_sdf, indent=indent)
         elif args.to_td:
             raise NotImplementedError("SDF -> TD conversion is not implemented, yet!")
     elif args.from_tm:
@@ -359,10 +295,10 @@ def _use_converter_cli(args):  # pragma: no cover
                 )
         elif args.to_tm:
             if len(args.from_tm) == 1:
-                _load_and_save_model(args.from_tm[0], args.to_tm)
+                load_and_save_model(args.from_tm[0], args.to_tm)
             else:
                 thing_model = _resolve_tm_input(args.from_tm, not args.no_extends)
-                _save_model(args.to_tm, thing_model, indent=args.indent)
+                save_model(args.to_tm, thing_model, indent=args.indent)
     elif args.from_td:
         if args.to_tm:
             convert_wot_td_to_wot_tm_from_path(
@@ -371,7 +307,7 @@ def _use_converter_cli(args):  # pragma: no cover
                 indent=indent,
             )
         elif args.to_td:
-            _load_and_save_model(args.from_td, args.to_td, indent=indent)
+            load_and_save_model(args.from_td, args.to_td, indent=indent)
         elif args.to_sdf:
             raise NotImplementedError("TD -> SDF conversion is not implemented, yet!")
 
