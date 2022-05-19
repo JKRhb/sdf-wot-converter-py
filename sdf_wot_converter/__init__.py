@@ -4,6 +4,7 @@ import sys
 import urllib.parse
 import urllib.request
 from typing import Dict, Callable, Optional, List
+import validators
 
 from sdf_wot_converter.converters.wot_common import flatten_thing_models
 from .converters import (
@@ -14,15 +15,22 @@ from .converters import (
 )
 
 
-def _load_model(input_path: str) -> Dict:  # pragma: no cover
-    parsed_input_path = urllib.parse.urlparse(input_path)
-    if parsed_input_path.scheme.startswith("http"):
-        with urllib.request.urlopen(input_path) as url:
-            retrieved_model = json.loads(url.read().decode())
-            return retrieved_model
+def _load_model_from_path(input_path: str) -> Dict:  # pragma: no cover
+    file = open(input_path)
+    return json.load(file)
+
+
+def _load_model_from_url(input_url: str) -> Dict:  # pragma: no cover
+    with urllib.request.urlopen(input_url) as url:
+        retrieved_model = json.loads(url.read().decode())
+        return retrieved_model
+
+
+def _load_model(path_or_url: str) -> Dict:  # pragma: no cover
+    if validators.url(path_or_url):
+        return _load_model_from_url(path_or_url)
     else:
-        file = open(input_path)
-        return json.load(file)
+        return _load_model_from_path(path_or_url)
 
 
 def _save_model(output_path: str, model: Dict, indent=4):  # pragma: no cover
