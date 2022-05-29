@@ -14,6 +14,7 @@ from .utility import (
     initialize_object_field,
     map_common_field,
     map_field,
+    negate,
 )
 import json
 import validators
@@ -212,10 +213,6 @@ def map_data_qualities(
 
     map_common_qualities(data_qualities, data_schema)
 
-    for sdf_field, wot_field in [("writable", "readOnly"), ("readable", "writeOnly")]:
-        if sdf_field in data_qualities:
-            data_schema[wot_field] = not data_qualities[sdf_field]
-
     map_common_json_schema_fields(data_qualities, data_schema)
     map_enum(data_qualities, data_schema)
 
@@ -229,6 +226,23 @@ def map_data_qualities(
     map_items(sdf_model, data_qualities, data_schema)
 
     map_properties(sdf_model, data_qualities, data_schema)
+
+    if is_property:
+        map_observable(data_qualities, data_schema)
+        map_writable(data_qualities, data_schema)
+        map_readable(data_qualities, data_schema)
+
+
+def map_writable(sdf_property, wot_property):
+    map_field(
+        sdf_property, wot_property, "writable", "readOnly", conversion_function=negate
+    )
+
+
+def map_readable(sdf_property, wot_property):
+    map_field(
+        sdf_property, wot_property, "readable", "writeOnly", conversion_function=negate
+    )
 
 
 def map_properties(sdf_model, data_qualities, data_schema):
@@ -307,7 +321,6 @@ def map_property_qualities(
     wot_property: Dict[str, Any] = {}
     collect_sdf_required(thing_model, sdf_property)
     collect_mapping(thing_model, json_pointer, "properties", affordance_key)
-    map_observable(sdf_property, wot_property)
 
     map_data_qualities(sdf_model, sdf_property, wot_property, is_property=True)
 

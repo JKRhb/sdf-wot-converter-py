@@ -30,7 +30,9 @@ def map_properties(
         initialize_object_field(sdf_model, "sdfProperty")
         sdf_property: Dict[str, Any] = {}
         map_interaction_affordance_fields(wot_property, sdf_property)
-        map_data_schema_fields(thing_model, wot_property, sdf_property, current_path)
+        map_data_schema_fields(
+            thing_model, wot_property, sdf_property, current_path, is_property=True
+        )
         map_observable(wot_property, sdf_property)
 
         sdf_model["sdfProperty"][key] = sdf_property
@@ -109,7 +111,11 @@ def map_event_fields(thing_model, wot_event, sdf_event, current_path: str):
 
 
 def map_data_schema_fields(
-    thing_model, wot_definition: Dict, sdf_definition: Dict, current_path: str
+    thing_model,
+    wot_definition: Dict,
+    sdf_definition: Dict,
+    current_path: str,
+    is_property=False,
 ):
     # TODO: Unmapped fields: @type, titles, descriptions, oneOf,
     # TODO: Deal with sdfType and nullable
@@ -120,8 +126,10 @@ def map_data_schema_fields(
     map_title(wot_definition, sdf_definition)
     map_description(wot_definition, sdf_definition)
     map_enum(wot_definition, sdf_definition)
-    map_read_only(wot_definition, sdf_definition)
-    map_write_only(wot_definition, sdf_definition)
+    if is_property:
+        # TODO: Add mapping for when not part of dataschema
+        map_read_only(wot_definition, sdf_definition)
+        map_write_only(wot_definition, sdf_definition)
     map_unique_items(wot_definition, sdf_definition)
     map_content_format(wot_definition, sdf_definition)
 
