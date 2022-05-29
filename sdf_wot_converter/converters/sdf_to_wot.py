@@ -8,6 +8,8 @@ from typing import (
 from jsonpointer import resolve_pointer
 import json_merge_patch
 import urllib.request
+
+from .common.jsonschema import map_common_json_schema_fields
 from .utility import (
     initialize_list_field,
     initialize_object_field,
@@ -215,32 +217,15 @@ def map_data_qualities(
         if sdf_field in data_qualities:
             data_schema[wot_field] = not data_qualities[sdf_field]
 
-    map_jsonschema_type(data_qualities, data_schema)
-    map_unit(data_qualities, data_schema)
+    map_common_json_schema_fields(data_qualities, data_schema)
     map_enum(data_qualities, data_schema)
-    map_const(data_qualities, data_schema)
-    map_default(data_qualities, data_schema)
-    map_multiple_of(data_qualities, data_schema)
-    map_min_length(data_qualities, data_schema)
-    map_max_length(data_qualities, data_schema)
-    map_min_items(data_qualities, data_schema)
-    map_max_items(data_qualities, data_schema)
-    map_minimum(data_qualities, data_schema)
-    map_maximum(data_qualities, data_schema)
-    map_required(data_qualities, data_schema)
-    map_format(data_qualities, data_schema)
-    map_unique_items(data_qualities, data_schema)
-    map_pattern(data_qualities, data_schema)
-    map_exclusive_minimum(data_qualities, data_schema)
-    map_exclusive_maximum(data_qualities, data_schema)
-    map_content_format(data_qualities, data_schema)
 
     # TODO: Revisit the mapping of these two fields
     map_nullable(data_qualities, data_schema)
     map_sdf_type(data_qualities, data_schema)
 
     map_sdf_choice(sdf_model, data_qualities, data_schema)
-
+    map_content_format(data_qualities, data_schema)
     map_observable(data_qualities, data_schema, is_property)
 
     map_items(sdf_model, data_qualities, data_schema)
@@ -280,75 +265,8 @@ def map_content_format(data_qualities, data_schema):
     map_field(data_qualities, data_schema, "contentFormat", "contentMediaType")
 
 
-def map_exclusive_maximum(data_qualities, data_schema):
-    map_field(data_qualities, data_schema, "exclusiveMaximum", "exclusiveMaximum")
-
-
-def map_exclusive_minimum(data_qualities, data_schema):
-    map_field(data_qualities, data_schema, "exclusiveMinimum", "exclusiveMinimum")
-
-
-def map_pattern(data_qualities, data_schema):
-    map_field(data_qualities, data_schema, "pattern", "pattern")
-
-
-def map_unique_items(data_qualities, data_schema):
-    map_field(data_qualities, data_schema, "uniqueItems", "uniqueItems")
-
-
-def map_format(data_qualities, data_schema):
-    map_field(data_qualities, data_schema, "format", "format")
-
-
-def map_required(data_qualities, data_schema):
-    map_field(data_qualities, data_schema, "required", "required")
-
-
-def map_maximum(data_qualities, data_schema):
-    map_field(data_qualities, data_schema, "maximum", "maximum")
-
-
-def map_minimum(data_qualities, data_schema):
-    map_field(data_qualities, data_schema, "minimum", "minimum")
-
-
-def map_max_items(data_qualities, data_schema):
-    map_field(data_qualities, data_schema, "maxItems", "maxItems")
-
-
-def map_min_items(data_qualities, data_schema):
-    map_field(data_qualities, data_schema, "minItems", "minItems")
-
-
-def map_max_length(data_qualities, data_schema):
-    map_field(data_qualities, data_schema, "maxLength", "maxLength")
-
-
-def map_min_length(data_qualities, data_schema):
-    map_field(data_qualities, data_schema, "minLength", "minLength")
-
-
-def map_multiple_of(data_qualities, data_schema):
-    map_field(data_qualities, data_schema, "multipleOf", "multipleOf")
-
-
-def map_default(data_qualities, data_schema):
-    map_field(data_qualities, data_schema, "default", "default")
-
-
-def map_const(data_qualities, data_schema):
-    map_field(data_qualities, data_schema, "const", "const")
-
-
 def map_enum(data_qualities, data_schema):
     map_common_field(data_qualities, data_schema, "enum")
-
-def map_unit(data_qualities, data_schema):
-    map_field(data_qualities, data_schema, "unit", "unit")
-
-
-def map_jsonschema_type(data_qualities, data_schema):
-    map_field(data_qualities, data_schema, "type", "type")
 
 
 def map_action_qualities(

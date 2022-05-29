@@ -8,6 +8,10 @@ from typing import (
 import warnings
 
 import jsonschema
+
+from .common.jsonschema import (
+    map_common_json_schema_fields,
+)
 from .utility import (
     initialize_list_field,
     initialize_object_field,
@@ -110,30 +114,15 @@ def map_data_schema_fields(
     # TODO: Deal with sdfType and nullable
     map_sdf_comment(wot_definition, sdf_definition)
 
+    map_common_json_schema_fields(wot_definition, sdf_definition)
+
     map_title(wot_definition, sdf_definition)
     map_description(wot_definition, sdf_definition)
-    map_const(wot_definition, sdf_definition)
-    map_default(wot_definition, sdf_definition)
-    map_unit(wot_definition, sdf_definition)
     map_enum(wot_definition, sdf_definition)
     map_read_only(wot_definition, sdf_definition)
     map_write_only(wot_definition, sdf_definition)
-    map_format(wot_definition, sdf_definition)
-    map_jsonschema_type(wot_definition, sdf_definition)
     map_observable(wot_definition, sdf_definition)
-
-    map_multiple_of(wot_definition, sdf_definition)
-    map_min_length(wot_definition, sdf_definition)
-    map_max_length(wot_definition, sdf_definition)
-    map_min_items(wot_definition, sdf_definition)
-    map_max_items(wot_definition, sdf_definition)
-    map_minimum(wot_definition, sdf_definition)
-    map_maximum(wot_definition, sdf_definition)
-    map_required(wot_definition, sdf_definition)
     map_unique_items(wot_definition, sdf_definition)
-    map_pattern(wot_definition, sdf_definition)
-    map_exclusive_minimum(wot_definition, sdf_definition)
-    map_exclusive_maximum(wot_definition, sdf_definition)
     map_content_format(wot_definition, sdf_definition)
 
     map_items(thing_model, wot_definition, sdf_definition, current_path)
@@ -142,82 +131,12 @@ def map_data_schema_fields(
     map_tm_ref(thing_model, wot_definition, sdf_definition, current_path)
 
 
-def map_const(wot_definition: Dict, sdf_definition: Dict):
-    if "const" in wot_definition:
-        sdf_definition["const"] = wot_definition["const"]
-
-
-def map_multiple_of(wot_definition: Dict, sdf_definition: Dict):
-    if "multipleOf" in wot_definition:
-        sdf_definition["multipleOf"] = wot_definition["multipleOf"]
-
-
-def map_min_length(wot_definition: Dict, sdf_definition: Dict):
-    if "minLength" in wot_definition:
-        sdf_definition["minLength"] = wot_definition["minLength"]
-
-
-def map_max_length(wot_definition: Dict, sdf_definition: Dict):
-    if "maxLength" in wot_definition:
-        sdf_definition["maxLength"] = wot_definition["maxLength"]
-
-
-def map_min_items(wot_definition: Dict, sdf_definition: Dict):
-    if "minItems" in wot_definition:
-        sdf_definition["minItems"] = wot_definition["minItems"]
-
-
-def map_max_items(wot_definition: Dict, sdf_definition: Dict):
-    if "maxItems" in wot_definition:
-        sdf_definition["maxItems"] = wot_definition["maxItems"]
-
-
-def map_minimum(wot_definition: Dict, sdf_definition: Dict):
-    if "minimum" in wot_definition:
-        sdf_definition["minimum"] = wot_definition["minimum"]
-
-
-def map_maximum(wot_definition: Dict, sdf_definition: Dict):
-    if "maximum" in wot_definition:
-        sdf_definition["maximum"] = wot_definition["maximum"]
-
-
-def map_required(wot_definition: Dict, sdf_definition: Dict):
-    if "required" in wot_definition:
-        sdf_definition["required"] = wot_definition["required"]
-
-
 def map_unique_items(wot_definition: Dict, sdf_definition: Dict):
     map_common_field(wot_definition, sdf_definition, "uniqueItems")
 
 
-def map_pattern(wot_definition: Dict, sdf_definition: Dict):
-    if "pattern" in wot_definition:
-        sdf_definition["pattern"] = wot_definition["pattern"]
-
-
-def map_exclusive_minimum(wot_definition: Dict, sdf_definition: Dict):
-    if "exclusiveMinimum" in wot_definition:
-        sdf_definition["exclusiveMinimum"] = wot_definition["exclusiveMinimum"]
-
-
-def map_exclusive_maximum(wot_definition: Dict, sdf_definition: Dict):
-    if "exclusiveMaximum" in wot_definition:
-        sdf_definition["exclusiveMaximum"] = wot_definition["exclusiveMaximum"]
-
-
 def map_content_format(wot_definition: Dict, sdf_definition: Dict):
     map_field(wot_definition, sdf_definition, "contentMediaType", "contentFormat")
-
-
-def map_default(wot_definition: Dict, sdf_definition: Dict):
-    if "default" in wot_definition:
-        sdf_definition["default"] = wot_definition["default"]
-
-
-def map_unit(wot_definition: Dict, sdf_definition: Dict):
-    if "unit" in wot_definition:
-        sdf_definition["unit"] = wot_definition["unit"]
 
 
 def map_enum(wot_definition: Dict, sdf_definition: Dict):
@@ -241,17 +160,6 @@ def map_read_only(wot_definition: Dict, sdf_definition: Dict):
 def map_write_only(wot_definition: Dict, sdf_definition: Dict):
     if "writeOnly" in wot_definition:
         sdf_definition["readable"] = not wot_definition["writeOnly"]
-
-
-def map_format(wot_definition: Dict, sdf_definition: Dict):
-    if "format" in wot_definition:
-        sdf_definition["format"] = wot_definition["format"]
-
-
-def map_jsonschema_type(wot_definition: Dict, sdf_definition: Dict):
-    # TODO: How to deal with NULL type?
-    if "type" in wot_definition:
-        sdf_definition["type"] = wot_definition["type"]
 
 
 def map_observable(wot_definition: Dict, sdf_definition: Dict):
