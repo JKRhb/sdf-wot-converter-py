@@ -230,6 +230,8 @@ def map_data_qualities(
 
     map_properties(sdf_model, data_qualities, data_schema)
 
+    if is_property:
+        map_observable(data_qualities, data_schema)
 
 def map_properties(sdf_model, data_qualities, data_schema):
     for key, property in data_qualities.get("properties", {}).items():
@@ -307,7 +309,6 @@ def map_property_qualities(
     wot_property: Dict[str, Any] = {}
     collect_sdf_required(thing_model, sdf_property)
     collect_mapping(thing_model, json_pointer, "properties", affordance_key)
-    map_observable(sdf_property, wot_property)
 
     map_data_qualities(sdf_model, sdf_property, wot_property, is_property=True)
 
