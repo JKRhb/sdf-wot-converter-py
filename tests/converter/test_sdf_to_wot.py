@@ -591,7 +591,7 @@ def test_sdf_tm_nested_model():
     }
 
     perform_conversion_test(input, expected_result)
-    perform_sdf_thing_collection_roundtrip_test(input, root_model_key="blah")
+    perform_sdf_thing_collection_roundtrip_test(input)
 
 
 def test_sdf_tm_looping_sdf_ref():
