@@ -14,7 +14,7 @@ from jsonpointer import resolve_pointer
 
 def flatten_thing_models(thing_models: List[dict], resolve_extensions=True):
     for thing_model in thing_models:
-        Draft7Validator(tm_schema.tm_schema).validate(thing_model)
+        validate_thing_model(thing_model)
     if resolve_extensions:
         thing_models = [resolve_extension(x) for x in thing_models]
     current_thing_model = thing_models[0]
