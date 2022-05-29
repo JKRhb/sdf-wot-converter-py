@@ -164,6 +164,10 @@ def test_tm_td_with_placeholder_conversion():
 
 def test_tm_td_extension():
     # TODO: Handle case of TMs without forms
+    extension_url = (
+        "https://raw.githubusercontent.com/JKRhb/"
+        "sdf-wot-converter-py/main/examples/wot/example-with-bindings.tm.jsonld"
+    )
     input = {
         "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "@type": "tm:ThingModel",
@@ -172,7 +176,7 @@ def test_tm_td_extension():
         "securityDefinitions": {"nosec_sc": {"scheme": "nosec"}},
         "links": [
             {
-                "href": "https://raw.githubusercontent.com/JKRhb/sdf-wot-converter-py/main/examples/wot/example-with-bindings.tm.jsonld",
+                "href": extension_url,
                 "rel": "tm:extends",
             }
         ],
@@ -216,12 +220,17 @@ def test_tm_td_extension():
 
 def test_tm_td_recursive_extension():
     # TODO: Handle case of TMs without forms
+    extension_url = (
+        "https://raw.githubusercontent.com/JKRhb/"
+        "sdf-wot-converter-py/main/examples/wot/example-with-tm-extends.tm.jsonld"
+    )
+
     input = {
         "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "@type": "tm:ThingModel",
         "links": [
             {
-                "href": "https://raw.githubusercontent.com/JKRhb/sdf-wot-converter-py/main/examples/wot/example-with-tm-extends.tm.jsonld",
+                "href": extension_url,
                 "rel": "tm:extends",
             }
         ],
@@ -288,6 +297,12 @@ def test_tm_td_link_preservation():
 
 def test_tm_td_tm_ref():
     # TODO: Handle case of TMs without forms
+
+    tm_ref_url = (
+        "https://raw.githubusercontent.com/JKRhb/sdf-wot-converter-py/"
+        "main/examples/wot/example-with-tm-ref.tm.jsonld#/properties/status"
+    )
+
     input = {
         "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "@type": "tm:ThingModel",
@@ -296,7 +311,7 @@ def test_tm_td_tm_ref():
         "securityDefinitions": {"nosec_sc": {"scheme": "nosec"}},
         "properties": {
             "status": {
-                "tm:ref": "https://raw.githubusercontent.com/JKRhb/sdf-wot-converter-py/main/examples/wot/example-with-tm-ref.tm.jsonld#/properties/status",
+                "tm:ref": tm_ref_url,
                 "readOnly": True,
             },
             "anotherStatus": {"tm:ref": "#/properties/status"},

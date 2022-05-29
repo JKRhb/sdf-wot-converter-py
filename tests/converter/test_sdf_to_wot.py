@@ -671,10 +671,10 @@ def test_sdf_tm_failing_URL_sdf_ref():
 
 
 def test_sdf_tm_succeeding_URL_sdf_ref():
+    test_url = "https://raw.githubusercontent.com/one-data-model/playground/master/sdfObject/sdfobject-accelerometer.sdf.json"
+
     input = {
-        "namespace": {
-            "test": "https://raw.githubusercontent.com/one-data-model/playground/master/sdfObject/sdfobject-accelerometer.sdf.json"
-        },
+        "namespace": {"test": test_url},
         "sdfObject": {
             "Test": {
                 "sdfProperty": {
@@ -691,7 +691,7 @@ def test_sdf_tm_succeeding_URL_sdf_ref():
             "https://www.w3.org/2022/wot/td/v1.1",
             {
                 "sdf": "https://example.com/sdf",
-                "test": "https://raw.githubusercontent.com/one-data-model/playground/master/sdfObject/sdfobject-accelerometer.sdf.json",
+                "test": test_url,
             },
         ],
         "@type": "tm:ThingModel",
