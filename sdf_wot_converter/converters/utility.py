@@ -28,6 +28,12 @@ def validate_thing_description(thing_description: Dict):
     Draft7Validator(td_schema).validate(thing_description)
 
 
+def negate(value: bool):
+    """Negates a boolean value. Supposed to be used as a dedicated conversion
+    function for `map_field` and `map_common_field` functions."""
+    return not value
+
+
 def map_field(
     source_definition: Dict,
     target_definition: Dict,
