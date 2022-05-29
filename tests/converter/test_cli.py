@@ -77,6 +77,11 @@ def test_resolve_tm_input():
 
 
 def test_resolve_tm_input_without_extends_resolution():
+    extension_url = (
+        "https://raw.githubusercontent.com/JKRhb/sdf-wot-converter-py/"
+        "main/examples/wot/example-with-bindings.tm.jsonld"
+    )
+
     expected_result = {
         "@context": "https://www.w3.org/2022/wot/td/v1.1",
         "@type": "tm:ThingModel",
@@ -85,7 +90,7 @@ def test_resolve_tm_input_without_extends_resolution():
         "securityDefinitions": {"basic_sc": {"in": "header", "scheme": "basic"}},
         "links": [
             {
-                "href": "https://raw.githubusercontent.com/JKRhb/sdf-wot-converter-py/main/examples/wot/example-with-bindings.tm.jsonld",
+                "href": extension_url,
                 "rel": "tm:extends",
             }
         ],
