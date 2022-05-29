@@ -226,7 +226,6 @@ def map_data_qualities(
 
     map_sdf_choice(sdf_model, data_qualities, data_schema)
     map_content_format(data_qualities, data_schema)
-    map_observable(data_qualities, data_schema, is_property)
 
     map_items(sdf_model, data_qualities, data_schema)
 
@@ -246,11 +245,8 @@ def map_items(sdf_model, data_qualities, data_schema):
         map_data_qualities(sdf_model, data_qualities["items"], data_schema["items"])
 
 
-def map_observable(data_qualities, data_schema, is_property):
-    if is_property:
-        map_field(data_qualities, data_schema, "observable", "observable")
-    else:
-        map_field(data_qualities, data_schema, "observable", "sdf:observable")
+def map_observable(wot_property: Dict, sdf_property: Dict):
+    sdf_property["observable"] = wot_property.get("observable", True)
 
 
 def map_sdf_type(data_qualities, data_schema):
@@ -312,6 +308,7 @@ def map_property_qualities(
     wot_property: Dict[str, Any] = {}
     collect_sdf_required(thing_model, sdf_property)
     collect_mapping(thing_model, json_pointer, "properties", affordance_key)
+    map_observable(sdf_property, wot_property)
 
     map_data_qualities(sdf_model, sdf_property, wot_property, is_property=True)
 

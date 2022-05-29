@@ -54,6 +54,7 @@ def test_wot_tm_to_sdf_conversion():
                         "description": "current status of the lamp (on|off)",
                         "type": "string",
                         "writable": False,
+                        "observable": False,
                     }
                 },
                 "sdfAction": {"toggle": {"description": "Turn the lamp on or off"}},
@@ -145,6 +146,7 @@ def test_tm_sdf_property_conversion():
                 "sdfProperty": {
                     "foo": {
                         "type": "integer",
+                        "observable": False,
                         "minimum": 0,
                         "maximum": 9001,
                         "exclusiveMaximum": 9002,
@@ -153,9 +155,15 @@ def test_tm_sdf_property_conversion():
                         "const": 5,
                         "default": 5,
                     },
-                    "boo": {"type": "boolean", "const": True, "default": True},
+                    "boo": {
+                        "type": "boolean",
+                        "observable": False,
+                        "const": True,
+                        "default": True,
+                    },
                     "bar": {
                         "type": "number",
+                        "observable": False,
                         "minimum": 0.0,
                         "maximum": 9001.0,
                         "exclusiveMaximum": 9002.0,
@@ -166,22 +174,27 @@ def test_tm_sdf_property_conversion():
                     },
                     "baz": {
                         "type": "string",
+                        "observable": False,
                         "minLength": 3,
                         "maxLength": 5,
                         "pattern": "email",
                     },
                     "foobar": {
                         "type": "array",
+                        "observable": False,
                         "minItems": 2,
                         "maxItems": 5,
                         "items": {"type": "string"},
                     },
                     "barfoo": {
                         "type": "object",
+                        "observable": False,
                         "properties": {"foo": {"type": "string"}},
                         "required": ["foo"],
                     },
-                    "fizzbuzz": {},
+                    "fizzbuzz": {
+                        "observable": False,
+                    },
                 },
             }
         }
@@ -290,7 +303,9 @@ def test_tm_sdf_composited_conversion():
                         "sdfEvent": {
                             "overheating": {"sdfOutputData": {"type": "string"}}
                         },
-                        "sdfProperty": {"status": {"type": "string"}},
+                        "sdfProperty": {
+                            "status": {"type": "string", "observable": False}
+                        },
                     }
                 }
             }
@@ -315,14 +330,14 @@ def test_tm_sdf_composited_conversion_with_affordance():
                 "instanceName": "smartlamp",
             }
         ],
-        "properties": {"status": {"type": "string"}},
+        "properties": {"status": {"type": "string", "observable": False}},
     }
 
     expected_result = {
         "sdfThing": {
             "sdfThing0": {
                 "label": "Top Level Lamp Thing",
-                "sdfProperty": {"status": {"type": "string"}},
+                "sdfProperty": {"status": {"type": "string", "observable": False}},
                 "sdfObject": {
                     "smartlamp": {
                         "label": "MyLampThing",
@@ -330,7 +345,9 @@ def test_tm_sdf_composited_conversion_with_affordance():
                         "sdfEvent": {
                             "overheating": {"sdfOutputData": {"type": "string"}}
                         },
-                        "sdfProperty": {"status": {"type": "string"}},
+                        "sdfProperty": {
+                            "status": {"type": "string", "observable": False}
+                        },
                     },
                 },
             }
@@ -377,7 +394,7 @@ def test_tm_collection_sdf_conversion():
             "@context": "https://www.w3.org/2022/wot/td/v1.1",
             "@type": "tm:ThingModel",
             "title": "LED Thing Model",
-            "properties": {"status": {"type": "string"}},
+            "properties": {"status": {"type": "string", "observable": False}},
             "actions": {"toggle": {}},
             "events": {"overheating": {"data": {"type": "string"}}},
         },
@@ -399,7 +416,9 @@ def test_tm_collection_sdf_conversion():
                         "sdfEvent": {
                             "overheating": {"sdfOutputData": {"type": "string"}}
                         },
-                        "sdfProperty": {"status": {"type": "string"}},
+                        "sdfProperty": {
+                            "status": {"type": "string", "observable": False}
+                        },
                     }
                 },
                 "sdfThing": {

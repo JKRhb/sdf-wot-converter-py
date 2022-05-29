@@ -31,6 +31,7 @@ def map_properties(
         sdf_property: Dict[str, Any] = {}
         map_interaction_affordance_fields(wot_property, sdf_property)
         map_data_schema_fields(thing_model, wot_property, sdf_property, current_path)
+        map_observable(wot_property, sdf_property)
 
         sdf_model["sdfProperty"][key] = sdf_property
 
@@ -121,7 +122,6 @@ def map_data_schema_fields(
     map_enum(wot_definition, sdf_definition)
     map_read_only(wot_definition, sdf_definition)
     map_write_only(wot_definition, sdf_definition)
-    map_observable(wot_definition, sdf_definition)
     map_unique_items(wot_definition, sdf_definition)
     map_content_format(wot_definition, sdf_definition)
 
@@ -162,11 +162,8 @@ def map_write_only(wot_definition: Dict, sdf_definition: Dict):
         sdf_definition["readable"] = not wot_definition["writeOnly"]
 
 
-def map_observable(wot_definition: Dict, sdf_definition: Dict):
-    if "observable" in wot_definition:
-        sdf_definition["observable"] = wot_definition["observable"]
-    elif "sdf:observable" in wot_definition:
-        sdf_definition["observable"] = wot_definition["sdf:observable"]
+def map_observable(wot_property: Dict, sdf_property: Dict):
+    sdf_property["observable"] = wot_property.get("observable", False)
 
 
 def map_interaction_affordance_fields(wot_definition: Dict, sdf_definition: Dict):
