@@ -1,4 +1,4 @@
-from ..utility import map_field, map_common_field
+from ..utility import map_common_field
 
 
 def map_common_json_schema_fields(source_definition: dict, target_definition: dict):
