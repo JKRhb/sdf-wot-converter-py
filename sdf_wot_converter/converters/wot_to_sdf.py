@@ -553,10 +553,9 @@ def detect_top_level_models(thing_model_collection: Dict):
     for thing_model in thing_model_collection.values():
         for key in _get_submodel_keys(thing_model):
             referenced_models.add(key)
-    top_level_keys = [
+    return {
         key for key in thing_model_collection.keys() if key not in referenced_models
-    ]
-    return set(top_level_keys)
+    }
 
 
 def convert_wot_tm_collection_to_sdf(
