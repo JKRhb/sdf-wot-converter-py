@@ -33,14 +33,33 @@ def map_field(
     target_definition: Dict,
     source_key: str,
     target_key: str,
+    conversion_function=None,
 ):
     """Maps a field from a source defiinition to a target definition, making a deep
     copy in the process."""
-    if source_key in source_definition:
-        target_definition[target_key] = copy.deepcopy(source_definition[source_key])
+    if source_key not in source_definition:
+        return
+
+    value = copy.deepcopy(source_definition[source_key])
+
+    if conversion_function is not None:
+        value = conversion_function(value)
+
+    target_definition[target_key] = value
 
 
-def map_common_field(source_definition: dict, target_definition: dict, common_key: str):
+def map_common_field(
+    source_definition: dict,
+    target_definition: dict,
+    common_key: str,
+    conversion_function=None,
+):
     """Maps a field from a source defiinition to a target definition that has the same
     name in both definitions."""
-    map_field(source_definition, target_definition, common_key, common_key)
+    map_field(
+        source_definition,
+        target_definition,
+        common_key,
+        common_key,
+        conversion_function=conversion_function,
+    )
