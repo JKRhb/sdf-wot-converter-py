@@ -247,69 +247,83 @@ def get_origin_url(path: str, url: str):
         return None
 
 
-def _use_converter_cli(args):  # pragma: no cover
+def _handle_from_sdf(args):  # pragma: no cover
     indent = args.indent
-    if args.from_sdf:
-        origin_url = get_origin_url(args.from_sdf, args.origin_url)
-        if args.to_tm:
-            convert_sdf_to_wot_tm_from_path(
-                args.from_sdf, args.to_tm, indent=indent, origin_url=origin_url
-            )
-        elif args.to_sdf:
-            load_and_save_model(args.from_sdf, args.to_sdf, indent=indent)
-        elif args.to_td:
-            raise NotImplementedError("SDF -> TD conversion is not implemented, yet!")
-    elif args.from_tm:
-        if args.to_sdf:
-            if len(args.from_tm) == 1:
-                convert_wot_tm_to_sdf_from_path(
-                    args.from_tm[0],
-                    args.to_sdf,
-                    placeholder_map_path=args.placeholder_map,
-                    indent=indent,
-                )
-            else:
-                convert_wot_tm_to_sdf_from_paths(
-                    args.from_tm,
-                    args.to_sdf,
-                    placeholder_map_path=args.placeholder_map,
-                    resolve_extensions=not args.no_extends,
-                    indent=indent,
-                )
-        elif args.to_td:
-            if len(args.from_tm) == 1:
-                convert_wot_tm_to_wot_td_from_path(
-                    args.from_tm[0],
-                    args.to_td,
-                    placeholder_map_path=args.placeholder_map,
-                    meta_data_path=args.meta_data,
-                    bindings_path=args.bindings,
-                    indent=indent,
-                )
-            else:
-                convert_wot_tm_to_td_from_paths(
-                    args.from_tm,
-                    args.to_sdf,
-                    placeholder_map_path=args.placeholder_map,
-                    indent=indent,
-                )
-        elif args.to_tm:
-            if len(args.from_tm) == 1:
-                load_and_save_model(args.from_tm[0], args.to_tm)
-            else:
-                thing_model = _resolve_tm_input(args.from_tm, not args.no_extends)
-                save_model(args.to_tm, thing_model, indent=args.indent)
-    elif args.from_td:
-        if args.to_tm:
-            convert_wot_td_to_wot_tm_from_path(
-                args.from_td,
-                args.to_tm,
+    origin_url = get_origin_url(args.from_sdf, args.origin_url)
+    if args.to_tm:
+        convert_sdf_to_wot_tm_from_path(
+            args.from_sdf, args.to_tm, indent=indent, origin_url=origin_url
+        )
+    elif args.to_sdf:
+        load_and_save_model(args.from_sdf, args.to_sdf, indent=indent)
+    elif args.to_td:
+        raise NotImplementedError("SDF -> TD conversion is not implemented, yet!")
+
+
+def _handle_from_tm(args):  # pragma: no cover
+    indent = args.indent
+    if args.to_sdf:
+        if len(args.from_tm) == 1:
+            convert_wot_tm_to_sdf_from_path(
+                args.from_tm[0],
+                args.to_sdf,
+                placeholder_map_path=args.placeholder_map,
                 indent=indent,
             )
-        elif args.to_td:
-            load_and_save_model(args.from_td, args.to_td, indent=indent)
-        elif args.to_sdf:
-            raise NotImplementedError("TD -> SDF conversion is not implemented, yet!")
+        else:
+            convert_wot_tm_to_sdf_from_paths(
+                args.from_tm,
+                args.to_sdf,
+                placeholder_map_path=args.placeholder_map,
+                resolve_extensions=not args.no_extends,
+                indent=indent,
+            )
+    elif args.to_td:
+        if len(args.from_tm) == 1:
+            convert_wot_tm_to_wot_td_from_path(
+                args.from_tm[0],
+                args.to_td,
+                placeholder_map_path=args.placeholder_map,
+                meta_data_path=args.meta_data,
+                bindings_path=args.bindings,
+                indent=indent,
+            )
+        else:
+            convert_wot_tm_to_td_from_paths(
+                args.from_tm,
+                args.to_sdf,
+                placeholder_map_path=args.placeholder_map,
+                indent=indent,
+            )
+    elif args.to_tm:
+        if len(args.from_tm) == 1:
+            load_and_save_model(args.from_tm[0], args.to_tm)
+        else:
+            thing_model = _resolve_tm_input(args.from_tm, not args.no_extends)
+            save_model(args.to_tm, thing_model, indent=args.indent)
+
+
+def _handle_from_td(args):  # pragma: no cover
+    indent = args.indent
+    if args.to_tm:
+        convert_wot_td_to_wot_tm_from_path(
+            args.from_td,
+            args.to_tm,
+            indent=indent,
+        )
+    elif args.to_td:
+        load_and_save_model(args.from_td, args.to_td, indent=indent)
+    elif args.to_sdf:
+        raise NotImplementedError("TD -> SDF conversion is not implemented, yet!")
+
+
+def _use_converter_cli(args):  # pragma: no cover
+    if args.from_sdf:
+        _handle_from_sdf(args)
+    elif args.from_tm:
+        _handle_from_tm(args)
+    elif args.from_td:
+        _handle_from_td(args)
 
 
 def main():  # pragma: no cover
