@@ -11,6 +11,8 @@ import urllib.request
 from .utility import (
     initialize_list_field,
     initialize_object_field,
+    map_common_field,
+    map_field,
 )
 import json
 import validators
@@ -164,11 +166,6 @@ def map_title(thing_model, infoblock):
     map_field(infoblock, thing_model, "title", "sdf:title")
 
 
-def map_field(sdf_definition: Dict, wot_definition: Dict, sdf_key: str, wot_key: str):
-    if sdf_key in sdf_definition:
-        wot_definition[wot_key] = copy.deepcopy(sdf_definition[sdf_key])
-
-
 def map_common_qualities(sdf_definition: Dict, wot_definition: Dict):
     map_label(sdf_definition, wot_definition)
     map_description(sdf_definition, wot_definition)
@@ -187,7 +184,7 @@ def map_comment(sdf_definition, wot_definition):
 
 
 def map_description(sdf_definition, wot_definition):
-    map_field(sdf_definition, wot_definition, "description", "description")
+    map_common_field(sdf_definition, wot_definition, "description")
 
 
 def map_label(sdf_definition: Dict, wot_definition: Dict):
