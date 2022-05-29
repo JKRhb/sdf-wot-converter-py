@@ -115,7 +115,6 @@ def _stringify_boolean(boolean: bool) -> str:
 def replace_placeholders(thing_model, placeholders):
     if placeholders is None:
         return thing_model
-    import re
 
     thing_model_as_string = json.dumps(thing_model)
 
