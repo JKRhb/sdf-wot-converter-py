@@ -63,7 +63,6 @@ def map_actions(
     thing_model: Dict, sdf_model: Dict, sdf_mapping_file, current_path: str
 ):
     for key, wot_action in thing_model.get("actions", {}).items():
-        affordance_path = f"{current_path}/sdfAction/{key}"
         initialize_object_field(sdf_model, "sdfAction")
         sdf_action: Dict[str, Any] = {}
         map_sdf_comment(wot_action, sdf_action)
