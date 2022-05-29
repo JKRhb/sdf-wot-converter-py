@@ -184,6 +184,14 @@ def test_sdf_tm_multiple_objects_and_things():
             "@type": "tm:ThingModel",
             "sdf:objectKey": "Test2",
         },
+        "Test3": {
+            "@context": [
+                "https://www.w3.org/2022/wot/td/v1.1",
+                {"sdf": "https://example.com/sdf"},
+            ],
+            "@type": "tm:ThingModel",
+            "sdf:objectKey": "Test3",
+        },
         "testThing1": {
             "@context": [
                 "https://www.w3.org/2022/wot/td/v1.1",
@@ -202,11 +210,15 @@ def test_sdf_tm_multiple_objects_and_things():
                 {"sdf": "https://example.com/sdf"},
             ],
             "@type": "tm:ThingModel",
+            "links": [
+                {"href": "#/Test3", "rel": "tm:submodel"},
+                {"href": "#/Test2", "rel": "tm:submodel"},
+            ],
             "sdf:thingKey": "testThing2",
         },
     }
 
-    # perform_conversion_test(input, expected_result)
+    perform_conversion_test(input, expected_result)
     perform_sdf_thing_collection_roundtrip_test(
         input, root_model_key="testThing1", top_model_keys={"testThing1", "testThing2"}
     )
