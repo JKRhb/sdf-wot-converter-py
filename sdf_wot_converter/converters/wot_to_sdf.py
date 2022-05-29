@@ -9,7 +9,10 @@ import warnings
 
 import jsonschema
 from .utility import (
+    initialize_list_field,
     initialize_object_field,
+    map_field,
+    map_common_field,
     validate_sdf_model,
 )
 from . import wot_common
@@ -20,8 +23,7 @@ def map_properties(
     thing_model: Dict, sdf_model: Dict, sdf_mapping_file, current_path: str
 ):
     for key, wot_property in thing_model.get("properties", {}).items():
-        if "sdfProperty" not in sdf_model:
-            sdf_model["sdfProperty"] = {}
+        initialize_object_field(sdf_model, "sdfProperty")
         sdf_property: Dict[str, Any] = {}
         map_interaction_affordance_fields(wot_property, sdf_property)
         map_data_schema_fields(thing_model, wot_property, sdf_property, current_path)
@@ -55,8 +57,7 @@ def map_actions(
 ):
     for key, wot_action in thing_model.get("actions", {}).items():
         affordance_path = f"{current_path}/sdfAction/{key}"
-        if "sdfAction" not in sdf_model:
-            sdf_model["sdfAction"] = {}
+        initialize_object_field(sdf_model, "sdfAction")
         sdf_action: Dict[str, Any] = {}
         map_sdf_comment(wot_action, sdf_action)
         map_interaction_affordance_fields(wot_action, sdf_action)
@@ -83,9 +84,7 @@ def map_action_fields(thing_model, wot_action, sdf_action, current_path: str):
 
 def map_events(thing_model: Dict, sdf_model: Dict, sdf_mapping_file, current_path: str):
     for key, wot_event in thing_model.get("events", {}).items():
-        if "sdfEvent" not in sdf_model:
-            sdf_model["sdfEvent"] = {}
-
+        initialize_object_field(sdf_model, "sdfEvent")
         sdf_event: Dict[str, Any] = {}
         map_sdf_comment(wot_event, sdf_event)
         map_interaction_affordance_fields(wot_event, sdf_event)
@@ -189,8 +188,7 @@ def map_required(wot_definition: Dict, sdf_definition: Dict):
 
 
 def map_unique_items(wot_definition: Dict, sdf_definition: Dict):
-    if "uniqueItems" in wot_definition:
-        sdf_definition["uniqueItems"] = wot_definition["uniqueItems"]
+    map_common_field(wot_definition, sdf_definition, "uniqueItems")
 
 
 def map_pattern(wot_definition: Dict, sdf_definition: Dict):
@@ -209,8 +207,7 @@ def map_exclusive_maximum(wot_definition: Dict, sdf_definition: Dict):
 
 
 def map_content_format(wot_definition: Dict, sdf_definition: Dict):
-    if "contentMediaType" in wot_definition:
-        sdf_definition["contentFormat"] = wot_definition["contentMediaType"]
+    map_field(wot_definition, sdf_definition, "contentMediaType", "contentFormat")
 
 
 def map_default(wot_definition: Dict, sdf_definition: Dict):
@@ -227,14 +224,12 @@ def map_enum(wot_definition: Dict, sdf_definition: Dict):
     if "enum" in wot_definition:
         for enum in wot_definition["enum"]:
             if type(enum) is dict and "sdf:choiceName" in enum:
-                if sdf_definition.get("sdfChoice") is None:
-                    sdf_definition["sdfChoice"] = {}
+                initialize_object_field(sdf_definition, "sdfChoice")
                 choice_name = enum["sdf:choiceName"]
                 sdf_definition["sdfChoice"][choice_name] = enum
                 del sdf_definition["sdfChoice"][choice_name]["sdf:choiceName"]
             else:
-                if sdf_definition.get("enum") is None:
-                    sdf_definition["enum"] = []
+                initialize_list_field(sdf_definition, "enum")
                 sdf_definition["enum"].append(enum)
 
 
@@ -273,13 +268,11 @@ def map_interaction_affordance_fields(wot_definition: Dict, sdf_definition: Dict
 
 
 def map_title(wot_definition: Dict, sdf_definition: Dict):
-    if "title" in wot_definition:
-        sdf_definition["label"] = wot_definition["title"]
+    map_field(wot_definition, sdf_definition, "title", "label")
 
 
 def map_description(wot_definition: Dict, sdf_definition: Dict):
-    if "description" in wot_definition:
-        sdf_definition["description"] = wot_definition["description"]
+    map_common_field(wot_definition, sdf_definition, "description")
 
 
 def map_schema_definitions(
@@ -296,16 +289,6 @@ def map_schema_definitions(
         map_tm_ref(thing_model, wot_schema_definitions, sdf_data, current_path)
 
         sdf_model["sdfData"][key] = sdf_data
-
-
-def map_thing_title(wot_definition: Dict, sdf_definition: Dict):
-    if "title" in wot_definition:
-        sdf_definition["label"] = wot_definition["title"]
-
-
-def map_thing_description(wot_definition: Dict, sdf_definition: Dict):
-    if "description" in wot_definition:
-        sdf_definition["description"] = wot_definition["description"]
 
 
 def map_links(wot_definition: Dict, sdf_definition: Dict, sdf_mapping_file):
@@ -398,8 +381,8 @@ def map_thing_model_to_sdf_object(
 
     sdf_object_path = f"{current_path}/sdfObject/{thing_model_key}"
 
-    map_thing_title(thing_model, sdf_object)
-    map_thing_description(thing_model, sdf_object)
+    map_title(thing_model, sdf_object)
+    map_description(thing_model, sdf_object)
     map_links(thing_model, sdf_object, sdf_mapping_file)
     map_version(thing_model, sdf_object, sdf_mapping_file)
 
@@ -437,8 +420,8 @@ def map_thing_model_to_sdf_thing(
 
     map_tm_required(thing_model, thing_model, sdf_thing, sdf_thing_path)
 
-    map_thing_title(thing_model, sdf_thing)
-    map_thing_description(thing_model, sdf_thing)
+    map_title(thing_model, sdf_thing)
+    map_description(thing_model, sdf_thing)
     map_links(thing_model, sdf_thing, sdf_mapping_file)
     map_version(thing_model, sdf_thing, sdf_mapping_file)
 
@@ -521,8 +504,7 @@ def map_infoblock_fields(thing_model, sdf_model):
     # TODO: How to deal with infoblock information in submodels?
     infoblock = {}
 
-    if "sdf:copyright" in thing_model:
-        infoblock["copyright"] = thing_model["sdf:copyright"]
+    map_field(thing_model, infoblock, "sdf:copyright", "copyright")
 
     license_link = get_license_link(thing_model)
     if license_link is not None:
@@ -530,8 +512,7 @@ def map_infoblock_fields(thing_model, sdf_model):
     elif "sdf:license" in thing_model:
         infoblock["license"] = thing_model["sdf:license"]
 
-    if "sdf:title" in thing_model:
-        infoblock["title"] = thing_model["sdf:title"]
+    map_field(thing_model, infoblock, "sdf:title", "title")
 
     if "model" in thing_model.get("version", {}):
         infoblock["version"] = thing_model["version"]["model"]

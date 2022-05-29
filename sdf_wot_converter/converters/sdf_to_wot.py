@@ -341,8 +341,7 @@ def map_const(data_qualities, data_schema):
 
 
 def map_enum(data_qualities, data_schema):
-    map_field(data_qualities, data_schema, "enum", "enum")
-
+    map_common_field(data_qualities, data_schema, "enum")
 
 def map_unit(data_qualities, data_schema):
     map_field(data_qualities, data_schema, "unit", "unit")
