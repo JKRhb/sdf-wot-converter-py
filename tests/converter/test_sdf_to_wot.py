@@ -67,6 +67,7 @@ def test_sdf_tm_example_conversion():
                     "value": {
                         "description": "The state of the switch; false for off and true for on.",
                         "type": "boolean",
+                        "observable": False,
                     }
                 },
                 "sdfAction": {
@@ -114,6 +115,7 @@ def test_sdf_tm_example_conversion():
             "value": {
                 "description": "The state of the switch; false for off and true for on.",
                 "type": "boolean",
+                "observable": False,
             }
         },
         "sdf:objectKey": "Switch",
@@ -243,6 +245,7 @@ def test_sdf_tm_type_conversion():
                         "$comment": "This is a comment!",
                         "type": "integer",
                         "readable": True,
+                        "observable": False,
                         "const": 5,
                         "default": 5,
                         "minimum": 0,
@@ -266,6 +269,7 @@ def test_sdf_tm_type_conversion():
                     },
                     "baz": {
                         "type": "string",
+                        "observable": False,
                         "minLength": 3,
                         "maxLength": 5,
                         "enum": ["hi", "hey"],
@@ -275,6 +279,7 @@ def test_sdf_tm_type_conversion():
                     },
                     "foobar": {
                         "type": "array",
+                        "observable": False,
                         "minItems": 2,
                         "maxItems": 5,
                         "uniqueItems": True,
@@ -282,7 +287,8 @@ def test_sdf_tm_type_conversion():
                     },
                     "barfoo": {
                         "type": "object",
-                        "properties": {"foo": {"type": "string", "observable": True}},
+                        "observable": False,
+                        "properties": {"foo": {"type": "string"}},
                         "required": ["foo"],
                     },
                 },
@@ -304,6 +310,7 @@ def test_sdf_tm_type_conversion():
                 "title": "This is a label.",
                 "sdf:$comment": "This is a comment!",
                 "writeOnly": False,
+                "observable": False,
                 "type": "integer",
                 "const": 5,
                 "default": 5,
@@ -328,6 +335,7 @@ def test_sdf_tm_type_conversion():
             },
             "baz": {
                 "type": "string",
+                "observable": False,
                 "minLength": 3,
                 "maxLength": 5,
                 "enum": ["hi", "hey"],
@@ -337,6 +345,7 @@ def test_sdf_tm_type_conversion():
             },
             "foobar": {
                 "type": "array",
+                "observable": False,
                 "minItems": 2,
                 "maxItems": 5,
                 "items": {"type": "string"},
@@ -344,7 +353,8 @@ def test_sdf_tm_type_conversion():
             },
             "barfoo": {
                 "type": "object",
-                "properties": {"foo": {"type": "string", "sdf:observable": True}},
+                "observable": False,
+                "properties": {"foo": {"type": "string"}},
                 "required": ["foo"],
             },
         },
@@ -431,8 +441,14 @@ def test_sdf_tm_sdf_ref_conversion():
                     "foobaz": {"sdfRef": "#/sdfObject/Test/sdfEvent/foobar"},
                 },
                 "sdfProperty": {
-                    "foobar": {"label": "hi"},
-                    "foobaz": {"sdfRef": "#/sdfObject/Test/sdfProperty/foobar"},
+                    "foobar": {
+                        "label": "hi",
+                        "observable": False,
+                    },
+                    "foobaz": {
+                        "sdfRef": "#/sdfObject/Test/sdfProperty/foobar",
+                        "observable": False,
+                    },
                 },
             }
         }
@@ -455,8 +471,10 @@ def test_sdf_tm_sdf_ref_conversion():
         "properties": {
             "foobar": {
                 "title": "hi",
+                "observable": False,
             },
             "foobaz": {
+                "observable": False,
                 "tm:ref": "#/properties/foobar",
             },
         },
@@ -486,7 +504,10 @@ def test_sdf_tm_nested_model():
                                 "sdfObject": {
                                     "baz": {
                                         "sdfProperty": {
-                                            "foobar": {"label": "hi"},
+                                            "foobar": {
+                                                "label": "hi",
+                                                "observable": True,
+                                            },
                                         },
                                         "sdfAction": {
                                             "foobar": {"label": "hi"},
@@ -538,6 +559,7 @@ def test_sdf_tm_nested_model():
             "properties": {
                 "foobar": {
                     "title": "hi",
+                    "observable": True,
                 }
             },
             "sdf:objectKey": "baz",
@@ -667,6 +689,7 @@ def test_sdf_tm_succeeding_URL_sdf_ref():
                 "description": "The measured value along the X axis.",
                 "readOnly": True,
                 "type": "number",
+                "observable": True,
             },
         },
         "sdf:objectKey": "Test",
@@ -680,8 +703,16 @@ def test_sdf_tm_sdf_choice():
         "sdfObject": {
             "Test": {
                 "sdfProperty": {
-                    "foobar": {"sdfChoice": {"blah": {"type": "string"}}},
+                    "foobar": {
+                        "observable": True,
+                        "sdfChoice": {
+                            "blah": {
+                                "type": "string",
+                            }
+                        },
+                    },
                     "foobaz": {
+                        "observable": True,
                         "enum": ["blargh"],
                         "sdfChoice": {
                             "blah": {"type": "string"},
@@ -701,9 +732,11 @@ def test_sdf_tm_sdf_choice():
         "@type": "tm:ThingModel",
         "properties": {
             "foobar": {
+                "observable": True,
                 "enum": [{"sdf:choiceName": "blah", "type": "string"}],
             },
             "foobaz": {
+                "observable": True,
                 "enum": [
                     "blargh",
                     {"sdf:choiceName": "blah", "type": "string"},
@@ -846,7 +879,11 @@ def test_sdf_tm_nested_sdf_conversion():
     input = {
         "sdfThing": {
             "foo": {
-                "sdfProperty": {"status": {}},
+                "sdfProperty": {
+                    "status": {
+                        "observable": True,
+                    }
+                },
                 "sdfObject": {"bar": {"sdfAction": {"toggle": {}}}},
             }
         },
@@ -878,7 +915,11 @@ def test_sdf_tm_nested_sdf_conversion():
             ],
             "@type": "tm:ThingModel",
             "links": [{"href": "#/bar", "rel": "tm:submodel"}],
-            "properties": {"status": {}},
+            "properties": {
+                "status": {
+                    "observable": True,
+                }
+            },
             "sdf:thingKey": "foo",
         },
     }
