@@ -1,5 +1,5 @@
 import copy
-from typing import Dict
+from typing import Dict, List, Optional
 from ..schemas.sdf_validation_schema import sdf_validation_schema
 from ..schemas.td_schema import td_schema
 from ..schemas.tm_schema import tm_schema
@@ -40,6 +40,7 @@ def map_field(
     source_key: str,
     target_key: str,
     conversion_function=None,
+    mapped_fields=None,
 ):
     """Maps a field from a source defiinition to a target definition, making a deep
     copy in the process."""
@@ -51,6 +52,9 @@ def map_field(
     if conversion_function is not None:
         value = conversion_function(value)
 
+    if mapped_fields is not None:
+        mapped_fields.append(source_key)
+
     target_definition[target_key] = value
 
 
@@ -59,6 +63,7 @@ def map_common_field(
     target_definition: dict,
     common_key: str,
     conversion_function=None,
+    mapped_fields=None,
 ):
     """Maps a field from a source defiinition to a target definition that has the same
     name in both definitions."""
@@ -68,4 +73,5 @@ def map_common_field(
         common_key,
         common_key,
         conversion_function=conversion_function,
+        mapped_fields=mapped_fields,
     )
