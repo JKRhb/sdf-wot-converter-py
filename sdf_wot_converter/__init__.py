@@ -98,10 +98,8 @@ def convert_wot_tm_to_td_from_paths(
     # TODO: Refactor
     resolved_tms = _resolve_tm_input(from_paths, True)
     placeholder_map = load_optional_json_file(placeholder_map_path)
-    sdf_model = wot_to_sdf.convert_wot_tm_to_sdf(
-        resolved_tms, placeholder_map=placeholder_map
-    )
-    save_model(to_path, sdf_model, indent=indent)
+    result = tm_to_td.convert_tm_to_td(resolved_tms, placeholder_map=placeholder_map)
+    save_model(to_path, result, indent=indent)
 
 
 def convert_wot_td_to_wot_tm_from_path(from_path: str, to_path: str, indent=4):
