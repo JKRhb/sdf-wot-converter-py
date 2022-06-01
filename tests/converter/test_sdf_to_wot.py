@@ -303,6 +303,7 @@ def test_sdf_tm_type_conversion():
                         "observable": False,
                         "properties": {"foo": {"type": "string"}},
                         "required": ["foo"],
+                        "nullable": True,
                     },
                 },
             }
@@ -370,6 +371,7 @@ def test_sdf_tm_type_conversion():
                 "observable": False,
                 "properties": {"foo": {"type": "string"}},
                 "required": ["foo"],
+                "sdf:nullable": True,
             },
         },
         "sdf:objectKey": "Test",

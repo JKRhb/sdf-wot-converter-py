@@ -131,12 +131,22 @@ def map_data_schema_fields(
         map_write_only(wot_definition, sdf_definition)
     map_unique_items(wot_definition, sdf_definition)
     map_content_format(wot_definition, sdf_definition)
+    map_nullable(wot_definition, sdf_definition)
     map_sdf_type(wot_definition, sdf_definition)
 
     map_items(thing_model, wot_definition, sdf_definition, current_path)
     map_dataschema_properties(thing_model, wot_definition, sdf_definition, current_path)
 
     map_tm_ref(thing_model, wot_definition, sdf_definition, current_path)
+
+
+def map_nullable(wot_definition: Dict, sdf_definition: Dict):
+    map_field(
+        wot_definition,
+        sdf_definition,
+        "sdf:nullable",
+        "nullable",
+    )
 
 
 def map_sdf_type(wot_definition: Dict, sdf_definition: Dict):
