@@ -116,6 +116,30 @@ def test_sdf_example_conversion():
     )
 
 
+def test_wot_minimal_example_conversion():
+    """Test for a WoT TM to SDF conversion, which does not lead to the creation of a
+    mapping file."""
+    # TODO: Check for correct test output
+    make_test_output_dir()
+    convert_wot_tm_to_sdf_from_path(
+        "examples/wot/minimal-example.tm.jsonld", "test_output/minimal-example.sdf.json"
+    )
+
+
+def test_wot_multiple_minimal_examples_conversion():
+    """Test for a WoT TM to SDF conversion with multiple inputs, which does not lead to the creation of a
+    mapping file."""
+    # TODO: Check for correct test output
+    make_test_output_dir()
+    convert_wot_tm_to_sdf_from_paths(
+        [
+            "examples/wot/minimal-example.tm.jsonld",
+            "examples/wot/minimal-example.tm.jsonld",
+        ],
+        "test_output/multiple-minimal-examples.sdf.json",
+    )
+
+
 def test_wot_example_conversion():
     # TODO: Check for correct test output
     make_test_output_dir()
