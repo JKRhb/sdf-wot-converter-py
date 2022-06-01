@@ -1,0 +1,24 @@
+{
+    "@context": [
+        "https://www.w3.org/2022/wot/td/v1.1"
+    ],
+    "title": "MyLampThing",
+    "@type": [
+        "tm:ThingModel"
+    ],
+    "properties": {
+        "status": {
+            "type": "string"
+        }
+    },
+    "actions": {
+        "toggle": {}
+    },
+    "events": {
+        "overheating": {
+            "data": {
+                "type": "string"
+            }
+        }
+    }
+}
