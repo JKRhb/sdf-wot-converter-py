@@ -288,6 +288,7 @@ def test_sdf_tm_type_conversion():
                         "pattern": "email",
                         "format": "uri-reference",
                         "contentFormat": "audio/mpeg",
+                        "sdfType": "byte-string",
                     },
                     "foobar": {
                         "type": "array",
@@ -354,6 +355,7 @@ def test_sdf_tm_type_conversion():
                 "pattern": "email",
                 "format": "uri-reference",
                 "contentMediaType": "audio/mpeg",
+                "sdf:sdfType": "byte-string",
             },
             "foobar": {
                 "type": "array",
