@@ -288,6 +288,7 @@ def test_sdf_tm_type_conversion():
                         "pattern": "email",
                         "format": "uri-reference",
                         "contentFormat": "audio/mpeg",
+                        "sdfType": "byte-string",
                     },
                     "foobar": {
                         "type": "array",
@@ -302,6 +303,7 @@ def test_sdf_tm_type_conversion():
                         "observable": False,
                         "properties": {"foo": {"type": "string"}},
                         "required": ["foo"],
+                        "nullable": True,
                     },
                 },
             }
@@ -354,6 +356,7 @@ def test_sdf_tm_type_conversion():
                 "pattern": "email",
                 "format": "uri-reference",
                 "contentMediaType": "audio/mpeg",
+                "sdf:sdfType": "byte-string",
             },
             "foobar": {
                 "type": "array",
@@ -368,6 +371,7 @@ def test_sdf_tm_type_conversion():
                 "observable": False,
                 "properties": {"foo": {"type": "string"}},
                 "required": ["foo"],
+                "sdf:nullable": True,
             },
         },
         "sdf:objectKey": "Test",
