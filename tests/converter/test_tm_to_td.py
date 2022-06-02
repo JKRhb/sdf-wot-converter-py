@@ -19,7 +19,7 @@ def test_empty_tm_td_conversion():
 
     expected_result = {
         "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
-        "@type": ["Thing", "test"],
+        "@type": ["test"],
         "title": "Thing Title",
         "security": ["nosec_sc"],
         "securityDefinitions": {"nosec_sc": {"scheme": "nosec"}},
@@ -77,7 +77,6 @@ def test_tm_td_with_meta_data_and_bindings_conversion():
 
     expected_result = {
         "@context": "https://www.w3.org/2022/wot/td/v1.1",
-        "@type": "Thing",
         "id": "urn:dev:ops:32473-WoTLamp-1234",
         "title": "MyLampThing",
         "securityDefinitions": {"basic_sc": {"scheme": "basic", "in": "header"}},
@@ -142,7 +141,6 @@ def test_tm_td_with_placeholder_conversion():
 
     expected_result = {
         "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
-        "@type": "Thing",
         "title": "Thing Title",
         "security": ["nosec_sc"],
         "securityDefinitions": {"nosec_sc": {"scheme": "nosec"}},
@@ -186,7 +184,6 @@ def test_tm_td_extension():
         "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "id": "urn:dev:ops:32473-WoTLamp-1234",
         "title": "Thing Title",
-        "@type": "Thing",
         "securityDefinitions": {
             "basic_sc": {"scheme": "basic", "in": "header"},
             "nosec_sc": {"scheme": "nosec"},
@@ -240,7 +237,6 @@ def test_tm_td_recursive_extension():
         "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "id": "urn:dev:ops:32473-WoTLamp-1234",
         "title": "MyLampThing",
-        "@type": "Thing",
         "securityDefinitions": {
             "basic_sc": {"scheme": "basic", "in": "header"},
         },
@@ -284,7 +280,6 @@ def test_tm_td_link_preservation():
     expected_result = {
         "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "title": "Thing Title",
-        "@type": "Thing",
         "securityDefinitions": {
             "nosec_sc": {"scheme": "nosec"},
         },
@@ -321,7 +316,6 @@ def test_tm_td_tm_ref():
     expected_result = {
         "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "title": "Thing Title",
-        "@type": "Thing",
         "securityDefinitions": {
             "nosec_sc": {"scheme": "nosec"},
         },
@@ -364,7 +358,6 @@ def test_tm_td_tm_required():
     expected_result = {
         "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "title": "Thing Title",
-        "@type": "Thing",
         "securityDefinitions": {
             "nosec_sc": {"scheme": "nosec"},
         },

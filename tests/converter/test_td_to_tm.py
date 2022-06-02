@@ -30,7 +30,6 @@ def test_td_tm_conversion_with_thing_type():
     input = {
         "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "title": "Thing Title",
-        "@type": "Thing",
         "security": ["nosec_sc"],
         "securityDefinitions": {"nosec_sc": {"scheme": "nosec"}},
     }
@@ -70,7 +69,7 @@ def test_td_tm_conversion_with_thing_type_array():
     input = {
         "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "title": "Thing Title",
-        "@type": ["Thing", "test"],
+        "@type": ["test"],
         "security": ["nosec_sc"],
         "securityDefinitions": {"nosec_sc": {"scheme": "nosec"}},
     }

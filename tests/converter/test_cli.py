@@ -239,7 +239,6 @@ def test_wot_tm_td_json_conversion():
 
     expected_result = {
         "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
-        "@type": "Thing",
         "title": "Thing Title",
         "security": ["nosec_sc"],
         "securityDefinitions": {"nosec_sc": {"scheme": "nosec"}},
@@ -264,7 +263,6 @@ def test_wot_tm_td_json_conversion_with_meta_data():
 
     expected_result = {
         "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
-        "@type": "Thing",
         "title": "Thing Title",
         "security": ["nosec_sc"],
         "securityDefinitions": {"nosec_sc": {"scheme": "nosec"}},
@@ -283,7 +281,6 @@ def test_wot_td_tm_json_conversion():
 
     input = {
         "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
-        "@type": "Thing",
         "title": "Thing Title",
         "security": ["nosec_sc"],
         "securityDefinitions": {"nosec_sc": {"scheme": "nosec"}},
