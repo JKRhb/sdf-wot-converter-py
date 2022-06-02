@@ -292,7 +292,13 @@ def _handle_from_sdf(args):  # pragma: no cover
     elif args.to_sdf:
         load_and_save_model(args.from_sdf, args.to_sdf, indent=indent)
     elif args.to_td:
-        raise NotImplementedError("SDF -> TD conversion is not implemented, yet!")
+        sdf_model = load_model(args.from_sdf)
+        mapping_file = load_optional_json_file(mapping_file_input_path)
+        thing_model = sdf_to_wot.convert_sdf_to_wot_tm(
+            sdf_model, sdf_mapping_file=mapping_file, origin_url=origin_url
+        )
+        thing_description = convert_wot_tm_to_td(thing_model)
+        save_model(args.to_td, thing_description, indent=indent)
 
 
 def _handle_from_tm(args):  # pragma: no cover
@@ -353,7 +359,15 @@ def _handle_from_td(args):  # pragma: no cover
     elif args.to_td:
         load_and_save_model(args.from_td, args.to_td, indent=indent)
     elif args.to_sdf:
-        raise NotImplementedError("TD -> SDF conversion is not implemented, yet!")
+        thing_description = load_model(args.from_td)
+        thing_model = td_to_tm.convert_td_to_tm(thing_description)
+        result = wot_to_sdf.convert_wot_tm_to_sdf(thing_model)
+        if isinstance(result, dict):
+            save_model(args.to_sdf, result, indent=indent)
+        else:
+            sdf_model, mapping_file = result
+            save_model(args.to_sdf, sdf_model, indent=indent)
+            save_model(args.mapping_file_output_path, mapping_file, indent=indent)
 
 
 def _use_converter_cli(args):  # pragma: no cover
