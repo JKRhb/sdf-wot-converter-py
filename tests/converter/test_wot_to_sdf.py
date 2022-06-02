@@ -310,6 +310,18 @@ def test_tm_sdf_composited_conversion():
                 }
             }
         }
+    }, {
+        "map": {
+            "#/sdfThing/sdfThing0/sdfObject/example": {
+                "id": "urn:dev:ops:32473-WoTLamp-1234"
+            },
+            "#/sdfThing/sdfThing0/sdfObject/example/sdfAction/toggle": {
+                "@type": "saref:ToggleCommand"
+            },
+            "#/sdfThing/sdfThing0/sdfObject/example/sdfProperty/status": {
+                "@type": "saref:OnOffState"
+            },
+        }
     }
 
     perform_conversion_test(input, expected_result)
@@ -351,6 +363,18 @@ def test_tm_sdf_composited_conversion_with_affordance():
                     },
                 },
             }
+        }
+    }, {
+        "map": {
+            "#/sdfThing/sdfThing0/sdfObject/smartlamp": {
+                "id": "urn:dev:ops:32473-WoTLamp-1234"
+            },
+            "#/sdfThing/sdfThing0/sdfObject/smartlamp/sdfAction/toggle": {
+                "@type": "saref:ToggleCommand"
+            },
+            "#/sdfThing/sdfThing0/sdfObject/smartlamp/sdfProperty/status": {
+                "@type": "saref:OnOffState"
+            },
         }
     }
 
@@ -436,3 +460,21 @@ def test_tm_collection_sdf_conversion():
     result = convert_wot_tm_collection_to_sdf(input)
 
     assert result == expected_result
+
+
+def test_mapping_file_conversion():
+
+    input = {
+        "@context": [
+            "https://www.w3.org/2022/wot/td/v1.1",
+            {"sdf": "https://example.com/sdf"},
+        ],
+        "@type": "tm:ThingModel",
+        "titles": {"de": "Lampending"},
+    }
+
+    expected_result = {"sdfObject": {"sdfObject0": {}}}, {
+        "map": {"#/sdfObject/sdfObject0": {"titles": {"de": "Lampending"}}}
+    }
+
+    perform_conversion_test(input, expected_result)

@@ -88,14 +88,21 @@ def resolve_sdf_ref(
     return sdf_definition
 
 
-def map_namespace(sdf_model: Dict, thing_model: Dict):
+def map_namespace(sdf_model: Dict, thing_model: Dict, mapped_fields: List[str]):
     namespaces = sdf_model.get("namespace", {}).copy()
+    mapped_fields.append("namespace")
     namespaces["sdf"] = "https://example.com/sdf"
     thing_model["@context"].append(namespaces)
 
 
-def map_default_namespace(sdf_model: Dict, thing_model: Dict):
-    map_field(sdf_model, thing_model, "defaultNamespace", "sdf:defaultNamespace")
+def map_default_namespace(sdf_model: Dict, thing_model: Dict, mapped_fields: List[str]):
+    map_field(
+        sdf_model,
+        thing_model,
+        "defaultNamespace",
+        "sdf:defaultNamespace",
+        mapped_fields=mapped_fields,
+    )
 
 
 def create_link(
@@ -151,9 +158,10 @@ def map_version(infoblock: Dict, thing_model: Dict):
         thing_model["version"] = {"model": version}
 
 
-def map_infoblock(sdf_model: Dict, thing_model: Dict):
+def map_infoblock(sdf_model: Dict, thing_model: Dict, mapped_fields: List[str]):
     infoblock = sdf_model.get("info")
     if infoblock:
+        mapped_fields.append("info")
         map_title(thing_model, infoblock)
         map_copyright(thing_model, infoblock)
         map_license(infoblock, thing_model)
@@ -168,37 +176,58 @@ def map_title(thing_model, infoblock):
     map_field(infoblock, thing_model, "title", "sdf:title")
 
 
-def map_common_qualities(sdf_definition: Dict, wot_definition: Dict):
-    map_label(sdf_definition, wot_definition)
-    map_description(sdf_definition, wot_definition)
-    map_comment(sdf_definition, wot_definition)
-    copy_sdf_ref(sdf_definition, wot_definition)
+def map_common_qualities(
+    sdf_definition: Dict, wot_definition: Dict, mapped_fields: List[str]
+):
+    map_label(sdf_definition, wot_definition, mapped_fields)
+    map_description(sdf_definition, wot_definition, mapped_fields)
+    map_comment(sdf_definition, wot_definition, mapped_fields)
+    copy_sdf_ref(sdf_definition, wot_definition, mapped_fields)
 
 
-def copy_sdf_ref(sdf_definition, wot_definition):
+def copy_sdf_ref(sdf_definition, wot_definition, mapped_fields: List[str]):
     sdf_ref = sdf_definition.get("sdfRef")
-    if sdf_ref and sdf_ref.startswith("#"):
-        wot_definition["tm:ref"] = sdf_definition["sdfRef"]
+    if sdf_ref is not None:
+        mapped_fields.append("sdfRef")
+        if sdf_ref.startswith("#"):
+            wot_definition["tm:ref"] = sdf_definition["sdfRef"]
 
 
-def map_comment(sdf_definition, wot_definition):
-    map_field(sdf_definition, wot_definition, "$comment", "sdf:$comment")
+def map_comment(sdf_definition, wot_definition, mapped_fields: List[str]):
+    map_field(
+        sdf_definition,
+        wot_definition,
+        "$comment",
+        "sdf:$comment",
+        mapped_fields=mapped_fields,
+    )
 
 
-def map_description(sdf_definition, wot_definition):
-    map_common_field(sdf_definition, wot_definition, "description")
+def map_description(sdf_definition, wot_definition, mapped_fields: List[str]):
+    map_common_field(
+        sdf_definition, wot_definition, "description", mapped_fields=mapped_fields
+    )
 
 
-def map_label(sdf_definition: Dict, wot_definition: Dict):
-    map_field(sdf_definition, wot_definition, "label", "title")
+def map_label(sdf_definition: Dict, wot_definition: Dict, mapped_fields: List[str]):
+    map_field(
+        sdf_definition, wot_definition, "label", "title", mapped_fields=mapped_fields
+    )
 
 
-def map_sdf_choice(sdf_model: Dict, data_qualities: Dict, data_schema: Dict):
+def map_sdf_choice(
+    sdf_model: Dict,
+    data_qualities: Dict,
+    data_schema: Dict,
+    mapped_fields: List[str],
+):
     if "sdfChoice" in data_qualities:
+        mapped_fields.append("sdfChoice")
         initialize_list_field(data_schema, "enum")
         for choice_name, choice in data_qualities["sdfChoice"].items():
             mapped_choice = {"sdf:choiceName": choice_name}
-            map_data_qualities(sdf_model, choice, mapped_choice)
+            mapped_choice_fields: List[str] = []
+            map_data_qualities(sdf_model, choice, mapped_choice, mapped_choice_fields)
             data_schema["enum"].append(mapped_choice)
 
 
@@ -206,76 +235,124 @@ def map_data_qualities(
     sdf_model: Dict,
     data_qualities: Dict,
     data_schema: Dict,
+    mapped_fields: List[str],
     is_property=False,
     is_choice=False,
 ):
     data_qualities = resolve_sdf_ref(sdf_model, data_qualities, None, [])
 
-    map_common_qualities(data_qualities, data_schema)
+    map_common_qualities(data_qualities, data_schema, mapped_fields)
 
-    map_common_json_schema_fields(data_qualities, data_schema)
-    map_enum(data_qualities, data_schema)
+    map_common_json_schema_fields(
+        data_qualities, data_schema, mapped_fields=mapped_fields
+    )
+    map_enum(data_qualities, data_schema, mapped_fields)
 
     # TODO: Revisit the mapping of these two fields
-    map_nullable(data_qualities, data_schema)
-    map_sdf_type(data_qualities, data_schema)
+    map_nullable(data_qualities, data_schema, mapped_fields)
+    map_sdf_type(data_qualities, data_schema, mapped_fields)
 
-    map_sdf_choice(sdf_model, data_qualities, data_schema)
-    map_content_format(data_qualities, data_schema)
+    map_sdf_choice(sdf_model, data_qualities, data_schema, mapped_fields)
+    map_content_format(data_qualities, data_schema, mapped_fields)
 
-    map_items(sdf_model, data_qualities, data_schema)
+    map_items(sdf_model, data_qualities, data_schema, mapped_fields)
 
-    map_properties(sdf_model, data_qualities, data_schema)
+    map_properties(sdf_model, data_qualities, data_schema, mapped_fields)
 
     if is_property:
-        map_observable(data_qualities, data_schema)
-        map_writable(data_qualities, data_schema)
-        map_readable(data_qualities, data_schema)
+        map_observable(data_qualities, data_schema, mapped_fields)
+        map_writable(data_qualities, data_schema, mapped_fields)
+        map_readable(data_qualities, data_schema, mapped_fields)
+
+    map_additional_fields(data_schema, data_qualities, mapped_fields)
 
 
-def map_writable(sdf_property, wot_property):
+def map_writable(sdf_property, wot_property, mapped_fields):
     map_field(
-        sdf_property, wot_property, "writable", "readOnly", conversion_function=negate
+        sdf_property,
+        wot_property,
+        "writable",
+        "readOnly",
+        conversion_function=negate,
+        mapped_fields=mapped_fields,
     )
 
 
-def map_readable(sdf_property, wot_property):
+def map_readable(sdf_property, wot_property, mapped_fields):
     map_field(
-        sdf_property, wot_property, "readable", "writeOnly", conversion_function=negate
+        sdf_property,
+        wot_property,
+        "readable",
+        "writeOnly",
+        conversion_function=negate,
+        mapped_fields=mapped_fields,
     )
 
 
-def map_properties(sdf_model, data_qualities, data_schema):
-    for key, property in data_qualities.get("properties", {}).items():
+def map_properties(sdf_model, data_qualities, data_schema, mapped_fields):
+    properties = data_qualities.get("properties")
+
+    if properties is None:
+        return
+
+    mapped_fields.append("properties")
+
+    for key, property in properties.items():
         initialize_object_field(data_schema, "properties")
         data_schema["properties"][key] = {}
-        map_data_qualities(sdf_model, property, data_schema["properties"][key])
+        mapped_property_fields = []
+        map_data_qualities(
+            sdf_model, property, data_schema["properties"][key], mapped_property_fields
+        )
 
 
-def map_items(sdf_model, data_qualities, data_schema):
+def map_items(sdf_model, data_qualities, data_schema, mapped_fields):
     if "items" in data_qualities:
+        mapped_fields.append("items")
         data_schema["items"] = {}
-        map_data_qualities(sdf_model, data_qualities["items"], data_schema["items"])
+        mapped_item_fields = []
+        map_data_qualities(
+            sdf_model, data_qualities["items"], data_schema["items"], mapped_item_fields
+        )
 
 
-def map_observable(wot_property: Dict, sdf_property: Dict):
+def map_observable(wot_property: Dict, sdf_property: Dict, mapped_fields):
+    mapped_fields.append("observable")
     sdf_property["observable"] = wot_property.get("observable", True)
 
 
-def map_sdf_type(data_qualities, data_schema):
-    map_field(data_qualities, data_schema, "sdfType", "sdf:sdfType")
+def map_sdf_type(data_qualities, data_schema, mapped_fields):
+    map_field(
+        data_qualities,
+        data_schema,
+        "sdfType",
+        "sdf:sdfType",
+        mapped_fields=mapped_fields,
+    )
 
 
-def map_nullable(data_qualities, data_schema):
-    map_field(data_qualities, data_schema, "nullable", "sdf:nullable")
+def map_nullable(data_qualities, data_schema, mapped_fields):
+    map_field(
+        data_qualities,
+        data_schema,
+        "nullable",
+        "sdf:nullable",
+        mapped_fields=mapped_fields,
+    )
 
 
-def map_content_format(data_qualities, data_schema):
-    map_field(data_qualities, data_schema, "contentFormat", "contentMediaType")
+def map_content_format(data_qualities, data_schema, mapped_fields):
+    map_field(
+        data_qualities,
+        data_schema,
+        "contentFormat",
+        "contentMediaType",
+        mapped_fields=mapped_fields,
+    )
 
 
-def map_enum(data_qualities, data_schema):
-    map_common_field(data_qualities, data_schema, "enum")
+def map_enum(data_qualities, data_schema, mapped_fields):
+    map_common_field(data_qualities, data_schema, "enum", mapped_fields=mapped_fields)
 
 
 def map_action_qualities(
@@ -289,22 +366,38 @@ def map_action_qualities(
     affordance_key = "_".join(prefix_list)
 
     wot_action: Dict[str, Any] = {}
-    collect_sdf_required(thing_model, sdf_action)
+    mapped_fields: List[str] = []
+    collect_sdf_required(thing_model, sdf_action, mapped_fields)
     collect_mapping(thing_model, json_pointer, "actions", affordance_key)
     sdf_action = resolve_sdf_ref(sdf_model, sdf_action, None, [])
 
-    map_common_qualities(sdf_action, wot_action)
+    map_common_qualities(sdf_action, wot_action, mapped_fields)
 
     data_map_pairs = [("sdfInputData", "input"), ("sdfOutputData", "output")]
 
     for sdf_field, wot_field in data_map_pairs:
         if sdf_field in sdf_action:
+            mapped_fields.append(sdf_field)
             wot_action[wot_field] = {}
-            map_data_qualities(sdf_model, sdf_action[sdf_field], wot_action[wot_field])
+            mapped_data_quality_fields: List[str] = []
+            map_data_qualities(
+                sdf_model,
+                sdf_action[sdf_field],
+                wot_action[wot_field],
+                mapped_data_quality_fields,
+            )
 
     map_sdf_data(
-        sdf_model, sdf_action, thing_model, prefix_list, json_pointer, suffix="action"
+        sdf_model,
+        sdf_action,
+        thing_model,
+        prefix_list,
+        json_pointer,
+        mapped_fields,
+        suffix="action",
     )
+
+    map_additional_fields(wot_action, sdf_action, mapped_fields)
 
     thing_model["actions"][affordance_key] = wot_action
 
@@ -319,10 +412,19 @@ def map_property_qualities(
     initialize_object_field(thing_model, "properties")
 
     wot_property: Dict[str, Any] = {}
-    collect_sdf_required(thing_model, sdf_property)
+    mapped_fields: List[str] = []
+    collect_sdf_required(thing_model, sdf_property, mapped_fields)
     collect_mapping(thing_model, json_pointer, "properties", affordance_key)
 
-    map_data_qualities(sdf_model, sdf_property, wot_property, is_property=True)
+    map_data_qualities(
+        sdf_model,
+        sdf_property,
+        wot_property,
+        mapped_fields,
+        is_property=True,
+    )
+
+    map_additional_fields(wot_property, sdf_property, mapped_fields)
 
     thing_model["properties"][affordance_key] = wot_property
 
@@ -331,19 +433,24 @@ def map_property_qualities(
 def map_sdf_data_qualities(
     sdf_model: Dict,
     thing_model: Dict,
-    sdf_property: Dict,
+    sdf_data: Dict,
     affordance_key: str,
     json_pointer: str,
 ):
     initialize_object_field(thing_model, "schemaDefinitions")
 
     wot_schema_definition: Dict[str, Any] = {}
-    collect_sdf_required(thing_model, sdf_property)
+    mapped_fields: List[str] = []
+    collect_sdf_required(thing_model, sdf_data, mapped_fields)
     collect_mapping(thing_model, json_pointer, "schemaDefinitions", affordance_key)
 
     map_data_qualities(
-        sdf_model, sdf_property, wot_schema_definition, is_property=False
+        sdf_model, sdf_data, wot_schema_definition, mapped_fields, is_property=False
     )
+
+    map_common_qualities(sdf_data, wot_schema_definition, mapped_fields)
+
+    map_additional_fields(wot_schema_definition, sdf_data, mapped_fields)
 
     thing_model["schemaDefinitions"][affordance_key] = wot_schema_definition
 
@@ -354,9 +461,17 @@ def map_sdf_data(
     thing_model: Dict,
     prefix_list: List[str],
     json_pointer_prefix: str,
+    mapped_fields: List[str],
     suffix="",
 ):
-    for key, sdf_property in sdf_definition.get("sdfData", {}).items():
+    sdf_data = sdf_definition.get("sdfData")
+
+    if sdf_data is None:
+        return
+
+    mapped_fields.append("sdfData")
+
+    for key, sdf_property in sdf_data.items():
         name_list = prefix_list + [key]
         if suffix:
             name_list.append(suffix)
@@ -373,8 +488,16 @@ def map_sdf_action(
     thing_model: Dict,
     prefix_list: List[str],
     json_pointer_prefix: str,
+    mapped_fields: List[str],
 ):
-    for key, sdf_action in sdf_definition.get("sdfAction", {}).items():
+    sdf_actions = sdf_definition.get("sdfAction")
+
+    if sdf_actions is None:
+        return
+
+    mapped_fields.append("sdfAction")
+
+    for key, sdf_action in sdf_actions.items():
         json_pointer = get_json_pointer(json_pointer_prefix, "sdfAction", key)
         map_action_qualities(
             sdf_model, thing_model, sdf_action, prefix_list + [key], json_pointer
@@ -392,8 +515,16 @@ def map_sdf_property(
     thing_model: Dict,
     prefix_list: List[str],
     json_pointer_prefix: str,
+    mapped_fields: List[str],
 ):
-    for key, sdf_property in sdf_definition.get("sdfProperty", {}).items():
+    sdf_properties = sdf_definition.get("sdfProperty")
+
+    if sdf_properties is None:
+        return
+
+    mapped_fields.append("sdfProperty")
+
+    for key, sdf_property in sdf_properties.items():
         affordance_key = "_".join(prefix_list + [key])
         json_pointer = get_json_pointer(json_pointer_prefix, "sdfProperty", key)
         map_property_qualities(
@@ -412,24 +543,43 @@ def map_event_qualities(
     affordance_key = "_".join(prefix_list)
 
     wot_event: Dict[str, Any] = {}
-    collect_sdf_required(thing_model, sdf_event)
+    mapped_fields: List[str] = []
+    collect_sdf_required(thing_model, sdf_event, mapped_fields)
     collect_mapping(thing_model, json_pointer, "events", affordance_key)
     sdf_event = resolve_sdf_ref(sdf_model, sdf_event, None, [])
 
-    map_common_qualities(sdf_event, wot_event)
+    map_common_qualities(sdf_event, wot_event, mapped_fields)
 
     if "sdfOutputData" in sdf_event:
+        mapped_fields.append("sdfOutputData")
         wot_event["data"] = {}
-        map_data_qualities(sdf_model, sdf_event["sdfOutputData"], wot_event["data"])
+        mapped_output_data_fields: List[str] = []
+        map_data_qualities(
+            sdf_model,
+            sdf_event["sdfOutputData"],
+            wot_event["data"],
+            mapped_output_data_fields,
+        )
 
     map_sdf_data(
-        sdf_model, sdf_event, thing_model, prefix_list, json_pointer, suffix="event"
+        sdf_model,
+        sdf_event,
+        thing_model,
+        prefix_list,
+        json_pointer,
+        mapped_fields,
+        suffix="event",
     )
+
+    map_additional_fields(wot_event, sdf_event, mapped_fields)
 
     thing_model["events"][affordance_key] = wot_event
 
 
-def collect_sdf_required(thing_model: Dict, sdf_definition: Dict):
+def collect_sdf_required(
+    thing_model: Dict, sdf_definition: Dict, mapped_fields: List[str]
+):
+    mapped_fields.append("sdfRequired")
     initialize_list_field(thing_model, "tm:required")
     thing_model["tm:required"].extend(sdf_definition.get("sdfRequired", []))
 
@@ -444,26 +594,41 @@ def map_sdf_event(
     thing_model: Dict,
     prefix_list: List[str],
     json_pointer_prefix: str,
+    mapped_fields: List[str],
 ):
-    for key, sdf_event in sdf_definition.get("sdfEvent", {}).items():
+    sdf_events = sdf_definition.get("sdfEvent")
+
+    if sdf_events is None:
+        return
+
+    mapped_fields.append("sdfEvent")
+
+    for key, sdf_event in sdf_events.items():
         json_pointer = get_json_pointer(json_pointer_prefix, "sdfEvent", key)
         map_event_qualities(
             sdf_model, thing_model, sdf_event, prefix_list + [key], json_pointer
         )
 
 
-def map_sdf_required(thing_model: Dict):
-    required_affordances = []
-    for pointer in thing_model.get("tm:required", []):
-        assert pointer in thing_model["mappings"]
-        required_affordances.append(thing_model["mappings"][pointer])
-    thing_model["tm:required"] = required_affordances
-    if not thing_model["tm:required"]:
+def map_sdf_required(thing_model: Dict, mapped_fields: List[str]):
+    tm_required = thing_model.get("tm:required")
+    mapped_fields.extend(["tm:required", "mappings"])
+
+    if tm_required is None:
+        return
+
+    thing_model["tm:required"] = [
+        thing_model["mappings"][pointer] for pointer in tm_required
+    ]
+
+    if len(thing_model["tm:required"]) == 0:
         del thing_model["tm:required"]
 
 
-def map_sdf_ref(thing_model: Dict, current_definition: Dict):
+def map_sdf_ref(thing_model: Dict, current_definition: Dict, mapped_fields=None):
     if "tm:ref" in current_definition:
+        if mapped_fields is not None:
+            mapped_fields.append("tm:ref")
         old_pointer = current_definition["tm:ref"]
         current_definition["tm:ref"] = thing_model["mappings"][old_pointer]
 
@@ -499,31 +664,57 @@ def map_sdf_objects(
     pointer_prefix: str,
     parent=None,
     origin_url=None,
+    parent_mapped_fields=None,
 ) -> None:
+    if parent_mapped_fields is not None:
+        parent_mapped_fields.append("sdfObject")
+
     for object_key, sdf_object in sdf_definition.get("sdfObject", {}).items():
         json_pointer = f"{pointer_prefix}/sdfObject/{object_key}"
 
+        mapped_fields: List[str] = []
+
         thing_model: Dict = create_basic_thing_model()
         thing_model["sdf:objectKey"] = object_key
-        collect_sdf_required(thing_model, sdf_object)
+        collect_sdf_required(thing_model, sdf_object, mapped_fields)
         # collect_mapping(thing_model, json_pointer, "events", affordance_key)
-        map_infoblock(sdf_model, thing_model)
-        map_namespace(sdf_model, thing_model)
-        map_default_namespace(sdf_model, thing_model)
-        map_common_qualities(sdf_object, thing_model)
-        map_sdf_data(sdf_model, sdf_object, thing_model, [], json_pointer)
-        map_sdf_action(sdf_model, sdf_object, thing_model, [], json_pointer)
-        map_sdf_property(sdf_model, sdf_object, thing_model, [], json_pointer)
-        map_sdf_event(sdf_model, sdf_object, thing_model, [], json_pointer)
+        map_infoblock(sdf_model, thing_model, mapped_fields)
+        map_namespace(sdf_model, thing_model, mapped_fields)
+        map_default_namespace(sdf_model, thing_model, mapped_fields)
+        map_common_qualities(sdf_object, thing_model, mapped_fields)
+        map_sdf_data(
+            sdf_model, sdf_object, thing_model, [], json_pointer, mapped_fields
+        )
+        map_sdf_action(
+            sdf_model, sdf_object, thing_model, [], json_pointer, mapped_fields
+        )
+        map_sdf_property(
+            sdf_model, sdf_object, thing_model, [], json_pointer, mapped_fields
+        )
+        map_sdf_event(
+            sdf_model, sdf_object, thing_model, [], json_pointer, mapped_fields
+        )
 
-        map_sdf_required(thing_model)
-        map_sdf_ref(thing_model, thing_model)
+        map_sdf_required(thing_model, mapped_fields)
+        map_sdf_ref(thing_model, thing_model, mapped_fields=mapped_fields)
         del thing_model["mappings"]
+
+        map_additional_fields(thing_model, sdf_object, mapped_fields)
 
         add_origin_link(thing_model, origin_url)
         add_link_to_parent(parent, object_key)
 
         thing_models[object_key] = thing_model
+
+
+def map_additional_fields(
+    wot_definition: dict, sdf_definition: dict, mapped_fields: List[str]
+):
+    for key, value in sdf_definition.items():
+        if key in mapped_fields:
+            continue
+
+        wot_definition[key] = value
 
 
 def add_link_to_parent(parent: dict, json_pointer: str):
@@ -545,25 +736,37 @@ def map_sdf_things(
     pointer_prefix: str,
     origin_url=None,
     parent=None,
+    parent_mapped_fields=None,
 ) -> None:
+    if parent_mapped_fields is not None:
+        parent_mapped_fields.append("sdfThing")
+
     for thing_key, sdf_thing in sdf_definition.get("sdfThing", {}).items():
         # TODO: Adjust prefix for nested sdfThings
         json_pointer = f"{pointer_prefix}/sdfThing/{thing_key}"
 
+        mapped_fields: List[str] = []
+
         thing_model: Dict = create_basic_thing_model()
         thing_model["sdf:thingKey"] = thing_key
-        collect_sdf_required(thing_model, sdf_thing)
-        map_infoblock(sdf_model, thing_model)
-        map_namespace(sdf_model, thing_model)
-        map_default_namespace(sdf_model, thing_model)
-        map_common_qualities(sdf_thing, thing_model)
-        map_sdf_data(sdf_model, sdf_thing, thing_model, [], json_pointer)
-        map_sdf_action(sdf_model, sdf_thing, thing_model, [], json_pointer)
-        map_sdf_property(sdf_model, sdf_thing, thing_model, [], json_pointer)
-        map_sdf_event(sdf_model, sdf_thing, thing_model, [], json_pointer)
+        collect_sdf_required(thing_model, sdf_thing, mapped_fields)
+        map_infoblock(sdf_model, thing_model, mapped_fields)
+        map_namespace(sdf_model, thing_model, mapped_fields)
+        map_default_namespace(sdf_model, thing_model, mapped_fields)
+        map_common_qualities(sdf_thing, thing_model, mapped_fields)
+        map_sdf_data(sdf_model, sdf_thing, thing_model, [], json_pointer, mapped_fields)
+        map_sdf_action(
+            sdf_model, sdf_thing, thing_model, [], json_pointer, mapped_fields
+        )
+        map_sdf_property(
+            sdf_model, sdf_thing, thing_model, [], json_pointer, mapped_fields
+        )
+        map_sdf_event(
+            sdf_model, sdf_thing, thing_model, [], json_pointer, mapped_fields
+        )
 
-        map_sdf_required(thing_model)
-        map_sdf_ref(thing_model, thing_model)
+        map_sdf_required(thing_model, mapped_fields)
+        map_sdf_ref(thing_model, thing_model, mapped_fields)
         del thing_model["mappings"]
 
         add_origin_link(thing_model, origin_url)
@@ -578,6 +781,7 @@ def map_sdf_things(
             json_pointer,
             parent=thing_model,
             origin_url=origin_url,
+            parent_mapped_fields=mapped_fields,
         )
         map_sdf_objects(
             thing_models,
@@ -586,10 +790,27 @@ def map_sdf_things(
             json_pointer,
             parent=thing_model,
             origin_url=origin_url,
+            parent_mapped_fields=mapped_fields,
         )
 
+        map_additional_fields(thing_model, sdf_thing, mapped_fields)
 
-def convert_sdf_to_wot_tm(sdf_model: Dict, origin_url=None) -> Dict[str, Dict]:
+
+def consolidate_sdf_model(sdf_model: Dict, sdf_mapping_file: Dict):
+    # TODO: Add mapping file validation
+
+    for pointer, value in sdf_mapping_file["map"].items():
+        original = resolve_pointer(sdf_model, pointer[1:])
+
+        json_merge_patch.merge(original, value)
+
+
+def convert_sdf_to_wot_tm(
+    sdf_model: Dict, sdf_mapping_file=None, origin_url=None
+) -> Dict[str, Dict]:
+
+    if sdf_mapping_file is not None:
+        consolidate_sdf_model(sdf_model, sdf_mapping_file)
 
     thing_models: Dict[str, Dict] = {}
     map_sdf_objects(thing_models, sdf_model, sdf_model, "#", origin_url=origin_url)

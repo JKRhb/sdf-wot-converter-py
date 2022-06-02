@@ -10,12 +10,14 @@ from . import wot_common
 
 
 def replace_type(thing_description: Dict):
+    # TODO: Can probably be done more elegantly
     json_ld_type = thing_description["@type"]
     if json_ld_type == "tm:ThingModel":
+        del thing_description["@type"]
         json_ld_type = "Thing"
-    else:
-        json_ld_type = ["Thing" if x == "tm:ThingModel" else x for x in json_ld_type]
-    thing_description["@type"] = json_ld_type
+    elif isinstance(json_ld_type, list) and "tm:ThingModel" in json_ld_type:
+        while "tm:ThingModel" in json_ld_type:
+            json_ld_type.remove("tm:ThingModel")
 
 
 def assert_tm_required(partial_td):
