@@ -12,8 +12,10 @@
     "defaultNamespace": "cap",
     "sdfThing": {
         "Freezer": {
+            "label": "Freezer",
             "sdfObject": {
                 "Switch": {
+                    "label": "Switch",
                     "sdfProperty": {
                         "value": {
                             "description": "The state of the switch; false for off and true for on.",

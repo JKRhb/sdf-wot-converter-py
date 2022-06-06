@@ -1,8 +1,8 @@
-from sdf_wot_converter import convert_wot_td_to_tm
+from sdf_wot_converter import convert_wot_td_to_wot_tm
 
 
 def perform_conversion_test(input, expected_result, **kwargs):
-    actual_result = convert_wot_td_to_tm(input, **kwargs)
+    actual_result = convert_wot_td_to_wot_tm(input, **kwargs)
 
     assert actual_result == expected_result
 

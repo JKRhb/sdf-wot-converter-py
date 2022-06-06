@@ -1,8 +1,9 @@
 from typing import Dict
 import copy
 
+from sdf_wot_converter.converters.wot_common import _is_thing_collection
+
 from .utility import (
-    initialize_list_field,
     validate_thing_description,
     validate_thing_model,
 )
@@ -24,9 +25,24 @@ def _replace_type(thing_model: Dict):
         thing_model["@type"] = [json_ld_type, thing_model_type]
 
 
+def convert_td_collection_to_tm_collection(
+    thing_collection: Dict[str, Dict]
+) -> Dict[str, Dict]:
+    result = {}
+
+    for key, value in thing_collection.items():
+        result[key] = convert_td_to_tm(value)
+
+    return result
+
+
 def convert_td_to_tm(thing_description: Dict) -> Dict:
+    if _is_thing_collection(thing_description):
+        return convert_td_collection_to_tm_collection(thing_description)
+
     validate_thing_description(thing_description)
     thing_model: Dict = copy.deepcopy(thing_description)
+    # TODO: Deal with item links
 
     _replace_type(thing_model)
     validate_thing_model(thing_model)

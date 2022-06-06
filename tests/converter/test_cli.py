@@ -1,30 +1,35 @@
-import json
-from sdf_wot_converter import (
-    _parse_arguments,
-    _resolve_tm_input,
-    convert_sdf_to_wot_tm_from_path,
-    convert_wot_tm_to_sdf_from_path,
-    convert_wot_tm_to_sdf_from_paths,
-    convert_wot_tm_to_td_from_paths,
-    convert_wot_tm_to_wot_td_from_path,
-    convert_wot_td_to_wot_tm_from_path,
-    convert_sdf_to_wot_tm_from_json,
-    convert_wot_tm_to_sdf_from_json,
-    convert_wot_tm_to_wot_td_from_json,
-    convert_wot_td_to_wot_tm_from_json,
-    get_origin_url,
-)
+from sdf_wot_converter import parse_arguments, use_converter_cli
 import os
+
+from sdf_wot_converter.cli import _get_origin_url
 
 
 def test_parse_arguments():
-    args1 = ["--from-sdf", "foo", "--to-tm", "bar"]
-    parsed_args1 = _parse_arguments(args1)
-    assert parsed_args1.from_sdf == "foo" and parsed_args1.to_tm == "bar"
+    args1 = ["sdf-to-tm", "-i", "foo", "--mapping-files", "bar"]
+    parsed_args1 = parse_arguments(args1)
+    assert parsed_args1.sdf_model == "foo"
+    assert parsed_args1.mapping_file_input_path == ["bar"]
 
-    args2 = ["--from-tm", "foo", "--to-sdf", "bar"]
-    parsed_args2 = _parse_arguments(args2)
-    assert parsed_args2.from_tm == ["foo"] and parsed_args2.to_sdf == "bar"
+    args2 = ["sdf-to-td", "-i", "foo", "--mapping-files", "bar"]
+    parsed_args2 = parse_arguments(args2)
+    assert parsed_args2.sdf_model == "foo"
+    assert parsed_args2.mapping_file_input_path == ["bar"]
+
+    args3 = ["tm-to-sdf", "-i", "foo"]
+    parsed_args3 = parse_arguments(args3)
+    assert parsed_args3.wot_tms == ["foo"]
+
+    args4 = ["tm-to-td", "-i", "foo"]
+    parsed_args4 = parse_arguments(args4)
+    assert parsed_args4.wot_tms == ["foo"]
+
+    args5 = ["td-to-tm", "-i", "foo"]
+    parsed_args5 = parse_arguments(args5)
+    assert parsed_args5.wot_tds == ["foo"]
+
+    args6 = ["td-to-tm", "-i", "foo"]
+    parsed_args6 = parse_arguments(args6)
+    assert parsed_args6.wot_tds == ["foo"]
 
 
 def make_test_output_dir():
@@ -34,275 +39,209 @@ def make_test_output_dir():
         pass
 
 
-def test_resolve_tm_input():
-    expected_result = {
-        "@context": "https://www.w3.org/2022/wot/td/v1.1",
-        "@type": "tm:ThingModel",
-        "actions": {
-            "toggle": {
-                "@type": "saref:ToggleCommand",
-                "forms": [{"href": "https://mylamp.example.com/toggle"}],
-            }
-        },
-        "events": {
-            "overheating": {
-                "data": {"type": "string"},
-                "forms": [
-                    {"href": "https://mylamp.example.com/oh", "subprotocol": "longpoll"}
-                ],
-            }
-        },
-        "id": "urn:dev:ops:32473-WoTLamp-1234",
-        "properties": {
-            "status": {
-                "@type": "saref:OnOffState",
-                "forms": [{"href": "https://mylamp.example.com/status"}],
-                "type": "string",
-            }
-        },
-        "security": "basic_sc",
-        "securityDefinitions": {"basic_sc": {"in": "header", "scheme": "basic"}},
-        "title": "MyLampThing",
-        "base": "BASE_ADDRESS",
-    }
-
-    result = _resolve_tm_input(
-        [
-            "examples/wot/example-with-placeholders.tm.jsonld",
-            "examples/wot/example-with-tm-extends.tm.jsonld",
-        ],
-        True,
-    )
-    assert result == expected_result
-
-
-def test_resolve_tm_input_without_extends_resolution():
-    extension_url = (
-        "https://raw.githubusercontent.com/JKRhb/sdf-wot-converter-py/"
-        "main/examples/wot/example-with-bindings.tm.jsonld"
-    )
-
-    expected_result = {
-        "@context": "https://www.w3.org/2022/wot/td/v1.1",
-        "@type": "tm:ThingModel",
-        "id": "urn:dev:ops:32473-WoTLamp-1234",
-        "security": "basic_sc",
-        "securityDefinitions": {"basic_sc": {"in": "header", "scheme": "basic"}},
-        "links": [
-            {
-                "href": extension_url,
-                "rel": "tm:extends",
-            }
-        ],
-        "title": "MyLampThing",
-        "base": "BASE_ADDRESS",
-    }
-
-    result = _resolve_tm_input(
-        [
-            "examples/wot/example-with-placeholders.tm.jsonld",
-            "examples/wot/example-with-tm-extends.tm.jsonld",
-        ],
-        False,
-    )
-    assert result == expected_result
-
-
 def test_sdf_example_conversion():
-    # TODO: Check for correct test output
+
     make_test_output_dir()
-    convert_sdf_to_wot_tm_from_path(
-        "examples/sdf/example.sdf.json", "test_output/blah.tm.jsonld"
-    )
+    args = [
+        "sdf-to-tm",
+        "-i",
+        "examples/sdf/example.sdf.json",
+        "-o",
+        "test_output/example-sdf.tm.json",
+    ]
+    parsed_args = parse_arguments(args)
+    use_converter_cli(parsed_args)
+
+
+def test_sdf_to_td_example_conversion():
+
+    make_test_output_dir()
+    args = [
+        "sdf-to-td",
+        "-i",
+        "examples/sdf/example.sdf.json",
+        "--mapping-files",
+        "examples/sdf/example.sdf-mapping.json",
+        "-o",
+        "test_output/example-sdf.td.json",
+    ]
+    parsed_args = parse_arguments(args)
+    use_converter_cli(parsed_args)
 
 
 def test_wot_minimal_example_conversion():
     """Test for a WoT TM to SDF conversion, which does not lead to the creation of a
     mapping file."""
-    # TODO: Check for correct test output
+
     make_test_output_dir()
-    convert_wot_tm_to_sdf_from_path(
-        "examples/wot/minimal-example.tm.jsonld", "test_output/minimal-example.sdf.json"
-    )
+    args = [
+        "tm-to-sdf",
+        "-i",
+        "examples/wot/minimal-example.tm.jsonld",
+        "-o",
+        "test_output/example-tm.sdf.json",
+    ]
+    parsed_args = parse_arguments(args)
+    use_converter_cli(parsed_args)
 
 
 def test_wot_multiple_minimal_examples_conversion():
     """Test for a WoT TM to SDF conversion with multiple inputs, which does not lead to the creation of a
     mapping file."""
-    # TODO: Check for correct test output
+
     make_test_output_dir()
-    convert_wot_tm_to_sdf_from_paths(
-        [
-            "examples/wot/minimal-example.tm.jsonld",
-            "examples/wot/minimal-example.tm.jsonld",
-        ],
-        "test_output/multiple-minimal-examples.sdf.json",
-    )
+    args = [
+        "tm-to-sdf",
+        "-i",
+        "examples/wot/minimal-example.tm.jsonld",
+        "examples/wot/minimal-example.tm.jsonld",
+        "-o",
+        "test_output/example-tm.sdf.json",
+    ]
+    parsed_args = parse_arguments(args)
+    use_converter_cli(parsed_args)
 
 
 def test_wot_example_conversion():
-    # TODO: Check for correct test output
     make_test_output_dir()
-    convert_wot_tm_to_sdf_from_path(
-        "examples/wot/example.tm.jsonld", "test_output/blah.sdf.json"
-    )
+    args = [
+        "tm-to-sdf",
+        "-i",
+        "examples/wot/example.tm.jsonld",
+        "-o",
+        "test_output/example-tm.sdf.json",
+        "--mapping-file-output",
+        "test_output/example-tm.sdf-mapping.json",
+    ]
+    parsed_args = parse_arguments(args)
+    use_converter_cli(parsed_args)
 
 
 def test_multiple_tms_to_sdf_conversion():
-    # TODO: Check for correct test output
     make_test_output_dir()
-    convert_wot_tm_to_sdf_from_paths(
-        [
-            "examples/wot/example.tm.jsonld",
-            "examples/wot/example-with-tm-extends.tm.jsonld",
-        ],
+    args = [
+        "tm-to-sdf",
+        "-i",
+        "examples/wot/example.tm.jsonld",
+        "examples/wot/example-with-tm-extends.tm.jsonld",
+        "-o",
         "test_output/multipleconvertedtms.sdf.json",
-    )
-
-
-def test_multiple_tms_to_td_conversion():
-    # TODO: Check for correct test output
-    make_test_output_dir()
-    convert_wot_tm_to_td_from_paths(
-        [
-            "examples/wot/example.tm.jsonld",
-            "examples/wot/example-with-tm-extends.tm.jsonld",
-        ],
-        "test_output/multipleconvertedtms.td.json",
-    )
+    ]
+    parsed_args = parse_arguments(args)
+    use_converter_cli(parsed_args)
 
 
 def test_wot_tm_td_example_conversion():
-    # TODO: Check for correct test output
     make_test_output_dir()
-    convert_wot_tm_to_wot_td_from_path(
-        "examples/wot/example-with-bindings.tm.jsonld", "test_output/blah.td.jsonld"
-    )
+    args = [
+        "tm-to-td",
+        "-i",
+        "examples/wot/example-with-bindings.tm.jsonld",
+        "-o",
+        "test_output/blah.td.jsonld",
+    ]
+    parsed_args = parse_arguments(args)
+    use_converter_cli(parsed_args)
+
+
+def test_multiple_tms_to_td_conversion():
+    # TODO: Check how to apply bindings to Thing Collections.
+    make_test_output_dir()
+    args = [
+        "tm-to-td",
+        "-i",
+        "examples/wot/example-with-bindings.tm.jsonld",
+        "examples/wot/example-with-bindings.tm.jsonld",
+        "-o",
+        "test_output/multipleconvertedtms.td.jsonld",
+    ]
+    parsed_args = parse_arguments(args)
+    use_converter_cli(parsed_args)
 
 
 def test_wot_tm_td_placeholder_example_conversion():
-    # TODO: Check for correct test output
     make_test_output_dir()
-    convert_wot_tm_to_wot_td_from_path(
+    args = [
+        "tm-to-td",
+        "-i",
         "examples/wot/example-with-placeholders.tm.jsonld",
-        "test_output/blah_placeholders.td.jsonld",
-        placeholder_map_path="examples/wot/placeholders.json",
-    )
+        "--placeholder-map",
+        "examples/wot/placeholders.json",
+        "-o",
+        "test_output/example-with-placeholders.td.jsonld",
+    ]
+    parsed_args = parse_arguments(args)
+    use_converter_cli(parsed_args)
 
 
 def test_wot_td_tm_example_conversion():
-    # TODO: Check for correct test output
     make_test_output_dir()
-    convert_wot_td_to_wot_tm_from_path(
-        "examples/wot/example.td.jsonld", "test_output/from_td.tm.jsonld"
-    )
+
+    args = [
+        "td-to-tm",
+        "-i",
+        "examples/wot/example.td.jsonld",
+        "-o",
+        "test_output/from_td.tm.jsonld",
+    ]
+    parsed_args = parse_arguments(args)
+    use_converter_cli(parsed_args)
 
 
-def test_sdf_json_conversion():
-    input = {"sdfObject": {"Test": {}}}
+def test_wot_td_sdf_example_conversion():
+    make_test_output_dir()
 
-    expected_result = {
-        "@context": [
-            "https://www.w3.org/2022/wot/td/v1.1",
-            {"sdf": "https://example.com/sdf"},
-        ],
-        "@type": "tm:ThingModel",
-        "sdf:objectKey": "Test",
-    }
-
-    result = json.loads(convert_sdf_to_wot_tm_from_json(json.dumps(input)))
-
-    assert result == expected_result
-
-
-def test_wot_json_conversion():
-    input = {
-        "@context": "https://www.w3.org/2022/wot/td/v1.1",
-        "@type": "tm:ThingModel",
-    }
-
-    expected_result = {"sdfObject": {"sdfObject0": {}}}
-
-    result = json.loads(convert_wot_tm_to_sdf_from_json(json.dumps(input)))
-
-    assert result == expected_result
+    args = [
+        "td-to-sdf",
+        "-i",
+        "examples/wot/example.td.jsonld",
+        "-o",
+        "test_output/example-td.sdf.json",
+        "--mapping-file-output",
+        "test_output/example-td.sdf-mapping.json",
+    ]
+    parsed_args = parse_arguments(args)
+    use_converter_cli(parsed_args)
 
 
-def test_wot_tm_td_json_conversion():
-    input = {
-        "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
-        "@type": "tm:ThingModel",
-        "title": "Thing Title",
-        "security": ["nosec_sc"],
-        "securityDefinitions": {"nosec_sc": {"scheme": "nosec"}},
-    }
-
-    expected_result = {
-        "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
-        "title": "Thing Title",
-        "security": ["nosec_sc"],
-        "securityDefinitions": {"nosec_sc": {"scheme": "nosec"}},
-    }
-
-    result = json.loads(convert_wot_tm_to_wot_td_from_json(json.dumps(input)))
-
-    assert result == expected_result
+def test_multiple_tds_to_td_conversion():
+    make_test_output_dir()
+    args = [
+        "td-to-sdf",
+        "-i",
+        "examples/wot/example.td.jsonld",
+        "examples/wot/example.td.jsonld",
+        "-o",
+        "test_output/multipleconvertedtds.td.jsonld",
+        "--mapping-file-output",
+        "test_output/multipleconvertedtds.sdf-mapping.json",
+    ]
+    parsed_args = parse_arguments(args)
+    use_converter_cli(parsed_args)
 
 
-def test_wot_tm_td_json_conversion_with_meta_data():
-    input = {
-        "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
-        "@type": "tm:ThingModel",
-    }
+def test_wot_td_sdf_from_url_conversion():
+    make_test_output_dir()
 
-    meta_data = {
-        "title": "Thing Title",
-        "security": ["nosec_sc"],
-        "securityDefinitions": {"nosec_sc": {"scheme": "nosec"}},
-    }
-
-    expected_result = {
-        "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
-        "title": "Thing Title",
-        "security": ["nosec_sc"],
-        "securityDefinitions": {"nosec_sc": {"scheme": "nosec"}},
-    }
-
-    result = json.loads(
-        convert_wot_tm_to_wot_td_from_json(
-            json.dumps(input), meta_data_json=json.dumps(meta_data)
-        )
-    )
-
-    assert result == expected_result
-
-
-def test_wot_td_tm_json_conversion():
-
-    input = {
-        "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
-        "title": "Thing Title",
-        "security": ["nosec_sc"],
-        "securityDefinitions": {"nosec_sc": {"scheme": "nosec"}},
-    }
-
-    expected_result = {
-        "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
-        "@type": "tm:ThingModel",
-        "title": "Thing Title",
-        "security": ["nosec_sc"],
-        "securityDefinitions": {"nosec_sc": {"scheme": "nosec"}},
-    }
-
-    result = json.loads(convert_wot_td_to_wot_tm_from_json(json.dumps(input)))
-
-    assert result == expected_result
+    args = [
+        "td-to-sdf",
+        "-i",
+        "https://raw.githubusercontent.com/JKRhb/sdf-wot-converter-py/main/examples/wot/example.td.jsonld",
+        "-o",
+        "test_output/example-td-from-url.sdf.json",
+        "--mapping-file-output",
+        "test_output/example-td-from-url.sdf-mapping.json",
+    ]
+    parsed_args = parse_arguments(args)
+    use_converter_cli(parsed_args)
 
 
 def test_get_origin_url():
-    assert get_origin_url(None, None) is None
-    assert get_origin_url("http://example.com", None) == "http://example.com"
-    assert get_origin_url("https://example.com", None) == "https://example.com"
-    assert get_origin_url(None, "http://example.com") == "http://example.com"
-    assert get_origin_url("http://hi.com", "http://example.com") == "http://example.com"
-    assert get_origin_url("this/is/a/file/path", None) is None
+    assert _get_origin_url(None, None) is None
+    assert _get_origin_url("http://example.com", None) == "http://example.com"
+    assert _get_origin_url("https://example.com", None) == "https://example.com"
+    assert _get_origin_url(None, "http://example.com") == "http://example.com"
+    assert (
+        _get_origin_url("http://hi.com", "http://example.com") == "http://example.com"
+    )
+    assert _get_origin_url("this/is/a/file/path", None) is None

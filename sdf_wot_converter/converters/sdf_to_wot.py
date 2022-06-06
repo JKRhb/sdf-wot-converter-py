@@ -3,6 +3,7 @@ from typing import (
     Dict,
     List,
     Optional,
+    Union,
 )
 from jsonpointer import resolve_pointer
 import json_merge_patch
@@ -152,20 +153,30 @@ def map_license(infoblock: Dict, thing_model: Dict):
             thing_model["sdf:license"] = license
 
 
-def map_version(infoblock: Dict, thing_model: Dict):
+def map_version(infoblock: Dict, thing_model: Dict, set_instance_version: bool):
     version = infoblock.get("version")
     if version is not None:
-        thing_model["version"] = {"model": version}
+        tm_version = {"model": version}
+
+        if set_instance_version:
+            tm_version["instance"] = version
+
+        thing_model["version"] = tm_version
 
 
-def map_infoblock(sdf_model: Dict, thing_model: Dict, mapped_fields: List[str]):
+def map_infoblock(
+    sdf_model: Dict,
+    thing_model: Dict,
+    set_instance_version: bool,
+    mapped_fields: List[str],
+):
     infoblock = sdf_model.get("info")
     if infoblock:
         mapped_fields.append("info")
         map_title(thing_model, infoblock)
         map_copyright(thing_model, infoblock)
         map_license(infoblock, thing_model)
-        map_version(infoblock, thing_model)
+        map_version(infoblock, thing_model, set_instance_version)
 
 
 def map_copyright(thing_model, infoblock):
@@ -665,6 +676,7 @@ def map_sdf_objects(
     parent=None,
     origin_url=None,
     parent_mapped_fields=None,
+    set_instance_version=False,
 ) -> None:
     if parent_mapped_fields is not None:
         parent_mapped_fields.append("sdfObject")
@@ -678,7 +690,7 @@ def map_sdf_objects(
         thing_model["sdf:objectKey"] = object_key
         collect_sdf_required(thing_model, sdf_object, mapped_fields)
         # collect_mapping(thing_model, json_pointer, "events", affordance_key)
-        map_infoblock(sdf_model, thing_model, mapped_fields)
+        map_infoblock(sdf_model, thing_model, set_instance_version, mapped_fields)
         map_namespace(sdf_model, thing_model, mapped_fields)
         map_default_namespace(sdf_model, thing_model, mapped_fields)
         map_common_qualities(sdf_object, thing_model, mapped_fields)
@@ -737,6 +749,7 @@ def map_sdf_things(
     origin_url=None,
     parent=None,
     parent_mapped_fields=None,
+    set_instance_version=False,
 ) -> None:
     if parent_mapped_fields is not None:
         parent_mapped_fields.append("sdfThing")
@@ -750,7 +763,7 @@ def map_sdf_things(
         thing_model: Dict = create_basic_thing_model()
         thing_model["sdf:thingKey"] = thing_key
         collect_sdf_required(thing_model, sdf_thing, mapped_fields)
-        map_infoblock(sdf_model, thing_model, mapped_fields)
+        map_infoblock(sdf_model, thing_model, set_instance_version, mapped_fields)
         map_namespace(sdf_model, thing_model, mapped_fields)
         map_default_namespace(sdf_model, thing_model, mapped_fields)
         map_common_qualities(sdf_thing, thing_model, mapped_fields)
@@ -796,7 +809,7 @@ def map_sdf_things(
         map_additional_fields(thing_model, sdf_thing, mapped_fields)
 
 
-def consolidate_sdf_model(sdf_model: Dict, sdf_mapping_file: Dict):
+def _apply_mapping_file(sdf_model: Dict, sdf_mapping_file: Dict):
     # TODO: Add mapping file validation
 
     for pointer, value in sdf_mapping_file["map"].items():
@@ -805,16 +818,38 @@ def consolidate_sdf_model(sdf_model: Dict, sdf_mapping_file: Dict):
         json_merge_patch.merge(original, value)
 
 
+def consolidate_sdf_model(sdf_model: Dict, sdf_mapping_files: List[Dict]):
+    for sdf_mapping_file in sdf_mapping_files:
+        _apply_mapping_file(sdf_model, sdf_mapping_file)
+
+
 def convert_sdf_to_wot_tm(
-    sdf_model: Dict, sdf_mapping_file=None, origin_url=None
+    sdf_model: Dict,
+    sdf_mapping_files: Optional[List[Dict]] = None,
+    origin_url=None,
+    set_instance_version=False,
 ) -> Dict[str, Dict]:
 
-    if sdf_mapping_file is not None:
-        consolidate_sdf_model(sdf_model, sdf_mapping_file)
+    if sdf_mapping_files is not None:
+        consolidate_sdf_model(sdf_model, sdf_mapping_files)
 
     thing_models: Dict[str, Dict] = {}
-    map_sdf_objects(thing_models, sdf_model, sdf_model, "#", origin_url=origin_url)
-    map_sdf_things(thing_models, sdf_model, sdf_model, "#", origin_url=origin_url)
+    map_sdf_objects(
+        thing_models,
+        sdf_model,
+        sdf_model,
+        "#",
+        origin_url=origin_url,
+        set_instance_version=set_instance_version,
+    )
+    map_sdf_things(
+        thing_models,
+        sdf_model,
+        sdf_model,
+        "#",
+        origin_url=origin_url,
+        set_instance_version=set_instance_version,
+    )
 
     # TODO: Find a better solution for this
     if len(thing_models) == 1:
