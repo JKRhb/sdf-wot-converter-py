@@ -88,14 +88,29 @@ def resolve_sdf_ref(
     return sdf_definition
 
 
-def map_namespace(sdf_model: Dict, thing_model: Dict, mapped_fields: List[str]):
+def map_namespace(
+    sdf_model: Dict,
+    thing_model: Dict,
+    suppress_roundtripping: bool,
+    mapped_fields: List[str],
+):
     namespaces = sdf_model.get("namespace", {}).copy()
     mapped_fields.append("namespace")
-    namespaces["sdf"] = "https://example.com/sdf"
-    thing_model["@context"].append(namespaces)
+    if not suppress_roundtripping:
+        namespaces["sdf"] = "https://example.com/sdf"
+    if len(namespaces) > 0:
+        thing_model["@context"].append(namespaces)
 
 
-def map_default_namespace(sdf_model: Dict, thing_model: Dict, mapped_fields: List[str]):
+def map_default_namespace(
+    sdf_model: Dict,
+    thing_model: Dict,
+    suppress_roundtripping: bool,
+    mapped_fields: List[str],
+):
+    if suppress_roundtripping:
+        return
+
     map_field(
         sdf_model,
         thing_model,
@@ -140,7 +155,7 @@ def add_link(
     thing_model["links"].append(link)
 
 
-def map_license(infoblock: Dict, thing_model: Dict):
+def map_license(infoblock: Dict, thing_model: Dict, suppress_roundtripping: bool):
     license = infoblock.get("license")
 
     if license is not None:
@@ -148,7 +163,7 @@ def map_license(infoblock: Dict, thing_model: Dict):
 
         if valid_url:
             add_link(thing_model, license, None, "license", None, None)
-        else:
+        elif not suppress_roundtripping:
             thing_model["sdf:license"] = license
 
 
@@ -167,31 +182,41 @@ def map_infoblock(
     sdf_model: Dict,
     thing_model: Dict,
     set_instance_version: bool,
+    suppress_roundtripping: bool,
     mapped_fields: List[str],
 ):
     infoblock = sdf_model.get("info")
     if infoblock:
         mapped_fields.append("info")
-        map_title(thing_model, infoblock)
-        map_copyright(thing_model, infoblock)
-        map_license(infoblock, thing_model)
+        map_title(thing_model, infoblock, suppress_roundtripping)
+        map_copyright(thing_model, infoblock, suppress_roundtripping)
+        map_license(infoblock, thing_model, suppress_roundtripping)
         map_version(infoblock, thing_model, set_instance_version)
 
 
-def map_copyright(thing_model, infoblock):
+def map_copyright(thing_model, infoblock, suppress_roundtripping: bool):
+    if suppress_roundtripping:
+        return
+
     map_field(infoblock, thing_model, "copyright", "sdf:copyright")
 
 
-def map_title(thing_model, infoblock):
+def map_title(thing_model, infoblock, suppress_roundtripping: bool):
+    if suppress_roundtripping:
+        return
+
     map_field(infoblock, thing_model, "title", "sdf:title")
 
 
 def map_common_qualities(
-    sdf_definition: Dict, wot_definition: Dict, mapped_fields: List[str]
+    sdf_definition: Dict,
+    wot_definition: Dict,
+    suppress_roundtripping,
+    mapped_fields: List[str],
 ):
     map_label(sdf_definition, wot_definition, mapped_fields)
     map_description(sdf_definition, wot_definition, mapped_fields)
-    map_comment(sdf_definition, wot_definition, mapped_fields)
+    map_comment(sdf_definition, wot_definition, suppress_roundtripping, mapped_fields)
     copy_sdf_ref(sdf_definition, wot_definition, mapped_fields)
 
 
@@ -203,7 +228,15 @@ def copy_sdf_ref(sdf_definition, wot_definition, mapped_fields: List[str]):
             wot_definition["tm:ref"] = sdf_definition["sdfRef"]
 
 
-def map_comment(sdf_definition, wot_definition, mapped_fields: List[str]):
+def map_comment(
+    sdf_definition,
+    wot_definition,
+    suppress_roundtripping: bool,
+    mapped_fields: List[str],
+):
+    if suppress_roundtripping:
+        return
+
     map_field(
         sdf_definition,
         wot_definition,
@@ -229,15 +262,24 @@ def map_sdf_choice(
     sdf_model: Dict,
     data_qualities: Dict,
     data_schema: Dict,
+    suppress_roundtripping: bool,
     mapped_fields: List[str],
 ):
     if "sdfChoice" in data_qualities:
         mapped_fields.append("sdfChoice")
         initialize_list_field(data_schema, "enum")
         for choice_name, choice in data_qualities["sdfChoice"].items():
-            mapped_choice = {"sdf:choiceName": choice_name}
+            mapped_choice = {}
+            if not suppress_roundtripping:
+                mapped_choice["sdf:choiceName"] = choice_name
             mapped_choice_fields: List[str] = []
-            map_data_qualities(sdf_model, choice, mapped_choice, mapped_choice_fields)
+            map_data_qualities(
+                sdf_model,
+                choice,
+                mapped_choice,
+                suppress_roundtripping,
+                mapped_choice_fields,
+            )
             data_schema["enum"].append(mapped_choice)
 
 
@@ -245,13 +287,16 @@ def map_data_qualities(
     sdf_model: Dict,
     data_qualities: Dict,
     data_schema: Dict,
+    suppress_roundtripping: bool,
     mapped_fields: List[str],
     is_property=False,
     is_choice=False,
 ):
     data_qualities = resolve_sdf_ref(sdf_model, data_qualities, None, [])
 
-    map_common_qualities(data_qualities, data_schema, mapped_fields)
+    map_common_qualities(
+        data_qualities, data_schema, suppress_roundtripping, mapped_fields
+    )
 
     map_common_json_schema_fields(
         data_qualities, data_schema, mapped_fields=mapped_fields
@@ -259,15 +304,21 @@ def map_data_qualities(
     map_enum(data_qualities, data_schema, mapped_fields)
 
     # TODO: Revisit the mapping of these two fields
-    map_nullable(data_qualities, data_schema, mapped_fields)
-    map_sdf_type(data_qualities, data_schema, mapped_fields)
+    map_nullable(data_qualities, data_schema, suppress_roundtripping, mapped_fields)
+    map_sdf_type(data_qualities, data_schema, suppress_roundtripping, mapped_fields)
 
-    map_sdf_choice(sdf_model, data_qualities, data_schema, mapped_fields)
+    map_sdf_choice(
+        sdf_model, data_qualities, data_schema, suppress_roundtripping, mapped_fields
+    )
     map_content_format(data_qualities, data_schema, mapped_fields)
 
-    map_items(sdf_model, data_qualities, data_schema, mapped_fields)
+    map_items(
+        sdf_model, data_qualities, data_schema, suppress_roundtripping, mapped_fields
+    )
 
-    map_properties(sdf_model, data_qualities, data_schema, mapped_fields)
+    map_properties(
+        sdf_model, data_qualities, data_schema, suppress_roundtripping, mapped_fields
+    )
 
     if is_property:
         map_observable(data_qualities, data_schema, mapped_fields)
@@ -299,7 +350,9 @@ def map_readable(sdf_property, wot_property, mapped_fields):
     )
 
 
-def map_properties(sdf_model, data_qualities, data_schema, mapped_fields):
+def map_properties(
+    sdf_model, data_qualities, data_schema, suppress_roundtripping: bool, mapped_fields
+):
     properties = data_qualities.get("properties")
 
     if properties is None:
@@ -310,19 +363,29 @@ def map_properties(sdf_model, data_qualities, data_schema, mapped_fields):
     for key, property in properties.items():
         initialize_object_field(data_schema, "properties")
         data_schema["properties"][key] = {}
-        mapped_property_fields = []
+        mapped_property_fields: List[str] = []
         map_data_qualities(
-            sdf_model, property, data_schema["properties"][key], mapped_property_fields
+            sdf_model,
+            property,
+            data_schema["properties"][key],
+            suppress_roundtripping,
+            mapped_property_fields,
         )
 
 
-def map_items(sdf_model, data_qualities, data_schema, mapped_fields):
+def map_items(
+    sdf_model, data_qualities, data_schema, suppress_roundtripping: bool, mapped_fields
+):
     if "items" in data_qualities:
         mapped_fields.append("items")
         data_schema["items"] = {}
-        mapped_item_fields = []
+        mapped_item_fields: List[str] = []
         map_data_qualities(
-            sdf_model, data_qualities["items"], data_schema["items"], mapped_item_fields
+            sdf_model,
+            data_qualities["items"],
+            data_schema["items"],
+            suppress_roundtripping,
+            mapped_item_fields,
         )
 
 
@@ -331,7 +394,12 @@ def map_observable(wot_property: Dict, sdf_property: Dict, mapped_fields):
     sdf_property["observable"] = wot_property.get("observable", True)
 
 
-def map_sdf_type(data_qualities, data_schema, mapped_fields):
+def map_sdf_type(
+    data_qualities, data_schema, suppress_roundtripping: bool, mapped_fields
+):
+    if suppress_roundtripping:
+        return
+
     map_field(
         data_qualities,
         data_schema,
@@ -341,7 +409,12 @@ def map_sdf_type(data_qualities, data_schema, mapped_fields):
     )
 
 
-def map_nullable(data_qualities, data_schema, mapped_fields):
+def map_nullable(
+    data_qualities, data_schema, suppress_roundtripping: bool, mapped_fields
+):
+    if suppress_roundtripping:
+        return
+
     map_field(
         data_qualities,
         data_schema,
@@ -371,6 +444,7 @@ def map_action_qualities(
     sdf_action: Dict,
     prefix_list: List[str],
     json_pointer: str,
+    suppress_roundtripping: bool,
 ):
     initialize_object_field(thing_model, "actions")
     affordance_key = "_".join(prefix_list)
@@ -381,7 +455,7 @@ def map_action_qualities(
     collect_mapping(thing_model, json_pointer, "actions", affordance_key)
     sdf_action = resolve_sdf_ref(sdf_model, sdf_action, None, [])
 
-    map_common_qualities(sdf_action, wot_action, mapped_fields)
+    map_common_qualities(sdf_action, wot_action, suppress_roundtripping, mapped_fields)
 
     data_map_pairs = [("sdfInputData", "input"), ("sdfOutputData", "output")]
 
@@ -394,6 +468,7 @@ def map_action_qualities(
                 sdf_model,
                 sdf_action[sdf_field],
                 wot_action[wot_field],
+                suppress_roundtripping,
                 mapped_data_quality_fields,
             )
 
@@ -403,6 +478,7 @@ def map_action_qualities(
         thing_model,
         prefix_list,
         json_pointer,
+        suppress_roundtripping,
         mapped_fields,
         suffix="action",
     )
@@ -418,6 +494,7 @@ def map_property_qualities(
     sdf_property: Dict,
     affordance_key: str,
     json_pointer: str,
+    suppress_roundtripping: bool,
 ):
     initialize_object_field(thing_model, "properties")
 
@@ -430,6 +507,7 @@ def map_property_qualities(
         sdf_model,
         sdf_property,
         wot_property,
+        suppress_roundtripping,
         mapped_fields,
         is_property=True,
     )
@@ -446,6 +524,7 @@ def map_sdf_data_qualities(
     sdf_data: Dict,
     affordance_key: str,
     json_pointer: str,
+    suppress_roundtripping: bool,
 ):
     initialize_object_field(thing_model, "schemaDefinitions")
 
@@ -455,10 +534,17 @@ def map_sdf_data_qualities(
     collect_mapping(thing_model, json_pointer, "schemaDefinitions", affordance_key)
 
     map_data_qualities(
-        sdf_model, sdf_data, wot_schema_definition, mapped_fields, is_property=False
+        sdf_model,
+        sdf_data,
+        wot_schema_definition,
+        suppress_roundtripping,
+        mapped_fields,
+        is_property=False,
     )
 
-    map_common_qualities(sdf_data, wot_schema_definition, mapped_fields)
+    map_common_qualities(
+        sdf_data, wot_schema_definition, suppress_roundtripping, mapped_fields
+    )
 
     map_additional_fields(wot_schema_definition, sdf_data, mapped_fields)
 
@@ -471,6 +557,7 @@ def map_sdf_data(
     thing_model: Dict,
     prefix_list: List[str],
     json_pointer_prefix: str,
+    suppress_roundtripping: bool,
     mapped_fields: List[str],
     suffix="",
 ):
@@ -488,7 +575,12 @@ def map_sdf_data(
         affordance_key = "_".join(name_list)
         json_pointer = get_json_pointer(json_pointer_prefix, "sdfData", key)
         map_sdf_data_qualities(
-            sdf_model, thing_model, sdf_property, affordance_key, json_pointer
+            sdf_model,
+            thing_model,
+            sdf_property,
+            affordance_key,
+            json_pointer,
+            suppress_roundtripping,
         )
 
 
@@ -498,6 +590,7 @@ def map_sdf_action(
     thing_model: Dict,
     prefix_list: List[str],
     json_pointer_prefix: str,
+    suppress_roundtripping: bool,
     mapped_fields: List[str],
 ):
     sdf_actions = sdf_definition.get("sdfAction")
@@ -510,7 +603,12 @@ def map_sdf_action(
     for key, sdf_action in sdf_actions.items():
         json_pointer = get_json_pointer(json_pointer_prefix, "sdfAction", key)
         map_action_qualities(
-            sdf_model, thing_model, sdf_action, prefix_list + [key], json_pointer
+            sdf_model,
+            thing_model,
+            sdf_action,
+            prefix_list + [key],
+            json_pointer,
+            suppress_roundtripping,
         )
 
 
@@ -525,6 +623,7 @@ def map_sdf_property(
     thing_model: Dict,
     prefix_list: List[str],
     json_pointer_prefix: str,
+    suppress_roundtripping: bool,
     mapped_fields: List[str],
 ):
     sdf_properties = sdf_definition.get("sdfProperty")
@@ -538,7 +637,12 @@ def map_sdf_property(
         affordance_key = "_".join(prefix_list + [key])
         json_pointer = get_json_pointer(json_pointer_prefix, "sdfProperty", key)
         map_property_qualities(
-            sdf_model, thing_model, sdf_property, affordance_key, json_pointer
+            sdf_model,
+            thing_model,
+            sdf_property,
+            affordance_key,
+            json_pointer,
+            suppress_roundtripping,
         )
 
 
@@ -548,6 +652,7 @@ def map_event_qualities(
     sdf_event: Dict,
     prefix_list: List[str],
     json_pointer: str,
+    suppress_roundtripping: bool,
 ):
     initialize_object_field(thing_model, "events")
     affordance_key = "_".join(prefix_list)
@@ -558,7 +663,7 @@ def map_event_qualities(
     collect_mapping(thing_model, json_pointer, "events", affordance_key)
     sdf_event = resolve_sdf_ref(sdf_model, sdf_event, None, [])
 
-    map_common_qualities(sdf_event, wot_event, mapped_fields)
+    map_common_qualities(sdf_event, wot_event, suppress_roundtripping, mapped_fields)
 
     if "sdfOutputData" in sdf_event:
         mapped_fields.append("sdfOutputData")
@@ -568,6 +673,7 @@ def map_event_qualities(
             sdf_model,
             sdf_event["sdfOutputData"],
             wot_event["data"],
+            suppress_roundtripping,
             mapped_output_data_fields,
         )
 
@@ -577,6 +683,7 @@ def map_event_qualities(
         thing_model,
         prefix_list,
         json_pointer,
+        suppress_roundtripping,
         mapped_fields,
         suffix="event",
     )
@@ -604,6 +711,7 @@ def map_sdf_event(
     thing_model: Dict,
     prefix_list: List[str],
     json_pointer_prefix: str,
+    suppress_roundtripping: bool,
     mapped_fields: List[str],
 ):
     sdf_events = sdf_definition.get("sdfEvent")
@@ -616,7 +724,12 @@ def map_sdf_event(
     for key, sdf_event in sdf_events.items():
         json_pointer = get_json_pointer(json_pointer_prefix, "sdfEvent", key)
         map_event_qualities(
-            sdf_model, thing_model, sdf_event, prefix_list + [key], json_pointer
+            sdf_model,
+            thing_model,
+            sdf_event,
+            prefix_list + [key],
+            json_pointer,
+            suppress_roundtripping,
         )
 
 
@@ -676,6 +789,7 @@ def map_sdf_objects(
     origin_url=None,
     parent_mapped_fields=None,
     set_instance_version=False,
+    suppress_roundtripping=False,
 ) -> None:
     if parent_mapped_fields is not None:
         parent_mapped_fields.append("sdfObject")
@@ -686,24 +800,59 @@ def map_sdf_objects(
         mapped_fields: List[str] = []
 
         thing_model: Dict = create_basic_thing_model()
-        thing_model["sdf:objectKey"] = object_key
+        if not suppress_roundtripping:
+            thing_model["sdf:objectKey"] = object_key
         collect_sdf_required(thing_model, sdf_object, mapped_fields)
         # collect_mapping(thing_model, json_pointer, "events", affordance_key)
-        map_infoblock(sdf_model, thing_model, set_instance_version, mapped_fields)
-        map_namespace(sdf_model, thing_model, mapped_fields)
-        map_default_namespace(sdf_model, thing_model, mapped_fields)
-        map_common_qualities(sdf_object, thing_model, mapped_fields)
+        map_infoblock(
+            sdf_model,
+            thing_model,
+            set_instance_version,
+            suppress_roundtripping,
+            mapped_fields,
+        )
+        map_namespace(sdf_model, thing_model, suppress_roundtripping, mapped_fields)
+        map_default_namespace(
+            sdf_model, thing_model, suppress_roundtripping, mapped_fields
+        )
+        map_common_qualities(
+            sdf_object, thing_model, suppress_roundtripping, mapped_fields
+        )
         map_sdf_data(
-            sdf_model, sdf_object, thing_model, [], json_pointer, mapped_fields
+            sdf_model,
+            sdf_object,
+            thing_model,
+            [],
+            json_pointer,
+            suppress_roundtripping,
+            mapped_fields,
         )
         map_sdf_action(
-            sdf_model, sdf_object, thing_model, [], json_pointer, mapped_fields
+            sdf_model,
+            sdf_object,
+            thing_model,
+            [],
+            json_pointer,
+            suppress_roundtripping,
+            mapped_fields,
         )
         map_sdf_property(
-            sdf_model, sdf_object, thing_model, [], json_pointer, mapped_fields
+            sdf_model,
+            sdf_object,
+            thing_model,
+            [],
+            json_pointer,
+            suppress_roundtripping,
+            mapped_fields,
         )
         map_sdf_event(
-            sdf_model, sdf_object, thing_model, [], json_pointer, mapped_fields
+            sdf_model,
+            sdf_object,
+            thing_model,
+            [],
+            json_pointer,
+            suppress_roundtripping,
+            mapped_fields,
         )
 
         map_sdf_required(thing_model, mapped_fields)
@@ -744,37 +893,74 @@ def map_sdf_things(
     thing_models: Dict[str, Dict],
     sdf_model: Dict,
     sdf_definition: Dict,
-    pointer_prefix: str,
+    current_prefix: str,
     origin_url=None,
     parent=None,
     parent_mapped_fields=None,
     set_instance_version=False,
+    suppress_roundtripping=False,
 ) -> None:
     if parent_mapped_fields is not None:
         parent_mapped_fields.append("sdfThing")
 
     for thing_key, sdf_thing in sdf_definition.get("sdfThing", {}).items():
-        # TODO: Adjust prefix for nested sdfThings
-        json_pointer = f"{pointer_prefix}/sdfThing/{thing_key}"
+        thing_prefix = f"{current_prefix}/sdfThing/{thing_key}"
 
         mapped_fields: List[str] = []
 
         thing_model: Dict = create_basic_thing_model()
-        thing_model["sdf:thingKey"] = thing_key
+        if not suppress_roundtripping:
+            thing_model["sdf:thingKey"] = thing_key
         collect_sdf_required(thing_model, sdf_thing, mapped_fields)
-        map_infoblock(sdf_model, thing_model, set_instance_version, mapped_fields)
-        map_namespace(sdf_model, thing_model, mapped_fields)
-        map_default_namespace(sdf_model, thing_model, mapped_fields)
-        map_common_qualities(sdf_thing, thing_model, mapped_fields)
-        map_sdf_data(sdf_model, sdf_thing, thing_model, [], json_pointer, mapped_fields)
+        map_infoblock(
+            sdf_model,
+            thing_model,
+            set_instance_version,
+            suppress_roundtripping,
+            mapped_fields,
+        )
+        map_namespace(sdf_model, thing_model, suppress_roundtripping, mapped_fields)
+        map_default_namespace(
+            sdf_model, thing_model, suppress_roundtripping, mapped_fields
+        )
+        map_common_qualities(
+            sdf_thing, thing_model, suppress_roundtripping, mapped_fields
+        )
+        map_sdf_data(
+            sdf_model,
+            sdf_thing,
+            thing_model,
+            [],
+            thing_prefix,
+            suppress_roundtripping,
+            mapped_fields,
+        )
         map_sdf_action(
-            sdf_model, sdf_thing, thing_model, [], json_pointer, mapped_fields
+            sdf_model,
+            sdf_thing,
+            thing_model,
+            [],
+            thing_prefix,
+            suppress_roundtripping,
+            mapped_fields,
         )
         map_sdf_property(
-            sdf_model, sdf_thing, thing_model, [], json_pointer, mapped_fields
+            sdf_model,
+            sdf_thing,
+            thing_model,
+            [],
+            thing_prefix,
+            suppress_roundtripping,
+            mapped_fields,
         )
         map_sdf_event(
-            sdf_model, sdf_thing, thing_model, [], json_pointer, mapped_fields
+            sdf_model,
+            sdf_thing,
+            thing_model,
+            [],
+            thing_prefix,
+            suppress_roundtripping,
+            mapped_fields,
         )
 
         map_sdf_required(thing_model, mapped_fields)
@@ -790,19 +976,21 @@ def map_sdf_things(
             thing_models,
             sdf_model,
             sdf_thing,
-            json_pointer,
+            thing_prefix,
             parent=thing_model,
             origin_url=origin_url,
             parent_mapped_fields=mapped_fields,
+            suppress_roundtripping=suppress_roundtripping,
         )
         map_sdf_objects(
             thing_models,
             sdf_model,
             sdf_thing,
-            json_pointer,
+            thing_prefix,
             parent=thing_model,
             origin_url=origin_url,
             parent_mapped_fields=mapped_fields,
+            suppress_roundtripping=suppress_roundtripping,
         )
 
         map_additional_fields(thing_model, sdf_thing, mapped_fields)
@@ -827,6 +1015,7 @@ def convert_sdf_to_wot_tm(
     sdf_mapping_files: Optional[List[Dict]] = None,
     origin_url=None,
     set_instance_version=False,
+    suppress_roundtripping=False,
 ) -> Dict[str, Dict]:
 
     if sdf_mapping_files is not None:
@@ -840,6 +1029,7 @@ def convert_sdf_to_wot_tm(
         "#",
         origin_url=origin_url,
         set_instance_version=set_instance_version,
+        suppress_roundtripping=suppress_roundtripping,
     )
     map_sdf_things(
         thing_models,
@@ -848,6 +1038,7 @@ def convert_sdf_to_wot_tm(
         "#",
         origin_url=origin_url,
         set_instance_version=set_instance_version,
+        suppress_roundtripping=suppress_roundtripping,
     )
 
     # TODO: Find a better solution for this

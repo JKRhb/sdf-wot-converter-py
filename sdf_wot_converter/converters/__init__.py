@@ -22,12 +22,14 @@ def convert_sdf_to_wot_tm(
     sdf_mapping_files: Optional[List[Dict]] = None,
     origin_url=None,
     set_instance_version=False,
+    suppress_roundtripping=False,
 ):
     return _convert_sdf_to_wot_tm(
         sdf_model,
         origin_url=origin_url,
         sdf_mapping_files=sdf_mapping_files,
         set_instance_version=set_instance_version,
+        suppress_roundtripping=suppress_roundtripping,
     )
 
 
@@ -35,6 +37,7 @@ def convert_sdf_to_wot_td(
     sdf_model: Dict,
     sdf_mapping_files: Optional[List[Dict]] = None,
     origin_url: Optional[str] = None,
+    suppress_roundtripping=False,
 ) -> Dict:
     """Converts an SDF model and one or more SDF mapping files to a Thing Description or Thing Description collection.
 
@@ -53,6 +56,7 @@ def convert_sdf_to_wot_td(
         sdf_mapping_files=sdf_mapping_files,
         origin_url=origin_url,
         set_instance_version=True,
+        suppress_roundtripping=suppress_roundtripping,
     )
 
     # TODO: Deal with Thing Collections
