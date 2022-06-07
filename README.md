@@ -7,7 +7,10 @@
 
 This repository provides a Python-based converter from [SDF](https://datatracker.ietf.org/doc/html/draft-ietf-asdf-sdf-05) to [WoT TD](https://www.w3.org/TR/wot-thing-description/) including Thing Models.
 
-The converter is both usable as a library and a command line tool. It is based on my [Rust implementation](https://github.com/JKRhb/sdf-wot-converter) but is (when it comes to the conversion from SDF to Thing Models) already more mature as development in Python turned out to be much faster. The final version of this converter, however, will be reimplemented in Rust once it is finished to also support more constrained environments.
+The converter is both usable as a library and a command line tool. It provides
+conversion functions between WoT Thing Descriptions, WoT Thing Models and SDF
+Models (one for each combination). You can find a number of examples for the
+usage of the converter down below.
 
 The CI pipeline is set up to automatically convert all (valid) models from the [oneDM playground](https://github.com/one-data-model/playground) to WoT Thing Models and upload to the results to [this repository](https://github.com/JKRhb/onedm-playground-wot-tm).
 
@@ -23,21 +26,43 @@ Afterwards, it can be used both as a command line tool and a library.
 
 ## Using the command line tool
 
-After installing the libary you should be able to call the converter in your terminal using `sdf-wot-converter`. You can display available parameters by typing `sdf-wot-converter --help`. So far, you can convert from SDF to WoT Thing Models and vice versa. Thing Descriptions are supposed to be added soon.
+After installing the libary you should be able to call the converter in your terminal using `sdf-wot-converter` and one of the six available subcommands:
 
-### Example
+* `sdf-to-tm`
+* `sdf-to-td`
+* `td-to-tm`
+* `td-to-sdf`
+* `tm-to-td`
+* `tm-to-sdf`
+
+You can display available parameters by typing `sdf-wot-converter --help`.
+A usage example for each subcommand can be found below.
+
+### Examples
 
 ```bash
 # Convert an SDF model to a WoT Thing Model
-sdf-wot-converter --from-sdf examples/sdf/example.sdf.json --to-tm converted-example.tm.jsonld
+sdf-wot-converter sdf-to-tm -i examples/sdf/example.sdf.json -o converted-example.tm.jsonld
+
+# Convert an SDF model to a WoT Thing Description
+sdf-wot-converter sdf-to-td -i examples/sdf/example.sdf.json --mapping-files examples/sdf/example.sdf-mapping.json -o converted-example.td.jsonld
 
 # Convert a WoT Thing Model to an SDF model
-sdf-wot-converter --from-tm examples/wot/example.tm.jsonld --to-sdf converted-example.sdf.json
+sdf-wot-converter tm-to-sdf -i examples/wot/example.tm.jsonld -o converted-example.sdf.json
+
+# Convert a WoT Thing Description to a WoT Thing Description
+sdf-wot-converter tm-to-td -i examples/wot/example-with-bindings.tm.jsonld -o converted-example.td.jsonld
+
+# Convert a WoT Thing Description to an SDF model and a mapping file
+sdf-wot-converter td-to-sdf -i examples/wot/example.td.jsonld -o converted-example.sdf.json --mapping-file-output converted-example.sdf-mapping.json
+
+# Convert a WoT Thing Description to a WoT Thing Model
+sdf-wot-converter td-to-tm -i examples/wot/example.td.jsonld -o converted-example.tm.jsonld
 ```
 
 ## Using the library
 
-With the converter installed, you can use also use it as a library in your own projects. Below you can see examples for how to convert an SDF model to a WoT Thing Model and back again. As you can see, nested definitions from `sdfObject`s or `sdfThing`s a prefixed with the respective object or thing names. Moreover, an `sdf:jsonPointer` field is added to each affordance to enable roundtripping. More detailed mapping tables will be added to this readme soon.
+With the converter installed, you can use also use it as a library in your own projects. Below you can see examples for how to convert an SDF model to a WoT Thing Model and back again. As you can see, nested definitions from `sdfObject`s or `sdfThing`s are prefixed with the respective object or thing names.
 
 ```python
 from sdf_wot_converter.converters import (
