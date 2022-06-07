@@ -1,13 +1,9 @@
 import pytest
 
-from sdf_wot_converter.converters.sdf_to_wot import (
-    add_origin_link,
-    convert_sdf_to_wot_tm,
-)
-from sdf_wot_converter.converters.wot_to_sdf import (
-    convert_wot_tm_collection_to_sdf,
-    convert_wot_tm_to_sdf,
-)
+from sdf_wot_converter.converters.sdf_to_wot import add_origin_link
+from sdf_wot_converter.converters.wot_to_sdf import convert_wot_tm_collection_to_sdf
+
+from sdf_wot_converter import convert_wot_tm_to_sdf, convert_sdf_to_wot_tm
 
 
 def perform_sdf_roundtrip_test(input):

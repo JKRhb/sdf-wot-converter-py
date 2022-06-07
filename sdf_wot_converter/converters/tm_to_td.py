@@ -20,6 +20,16 @@ def replace_type(thing_description: Dict):
             json_ld_type.remove("tm:ThingModel")
 
 
+def _replace_version(partial_td):
+    version = partial_td.get("version")
+
+    if version is None:
+        return
+
+    if "model" in version and "instance" not in version:
+        version["instance"] = version["model"]
+
+
 def assert_tm_required(partial_td):
     if "tm:required" not in partial_td:
         return
@@ -46,9 +56,34 @@ def _replace_bindings(partial_td, bindings) -> Dict:
     return json_merge_patch.merge(partial_td, bindings)
 
 
+def _resolve_submodels(thing_model: dict, thing_collection: dict):
+    links = thing_model.get("links")
+
+    if links is None:
+        return
+
+    for link in links:
+        if link.get("rel") == "tm:submodel":
+            # TODO: Apply proper mapping
+            link["rel"] = "item"
+
+
+def convert_tm_collection_to_td_collection(thing_collection):
+    result = {}
+
+    for key, value in thing_collection.items():
+        _resolve_submodels(value, result)
+        result[key] = convert_tm_to_td(value)
+
+    return result
+
+
 def convert_tm_to_td(
     thing_model: Dict, placeholder_map=None, meta_data=None, bindings=None
 ) -> Dict:
+    if wot_common._is_thing_collection(thing_model):
+        return convert_tm_collection_to_td_collection(thing_model)
+
     validate_thing_model(thing_model)
     partial_td: Dict = copy.deepcopy(thing_model)
 
@@ -59,6 +94,8 @@ def convert_tm_to_td(
     replace_type(partial_td)
 
     partial_td = wot_common.replace_placeholders(partial_td, placeholder_map)
+
+    _replace_version(partial_td)
 
     assert_tm_required(partial_td)
 

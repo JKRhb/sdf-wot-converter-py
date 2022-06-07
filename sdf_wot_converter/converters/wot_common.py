@@ -12,29 +12,18 @@ import copy
 from jsonpointer import resolve_pointer
 
 
-def flatten_thing_models(thing_models: List[dict], resolve_extensions=True):
-    for thing_model in thing_models:
-        validate_thing_model(thing_model)
-    if resolve_extensions:
-        thing_models = [resolve_extension(x) for x in thing_models]
-    current_thing_model = thing_models[0]
-    for thing_model in thing_models[1:]:
-        current_thing_model = json_merge_patch.merge(current_thing_model, thing_model)
-    return current_thing_model
-
-
 def validate_thing_model(thing_model):
     Draft7Validator(tm_schema.tm_schema).validate(thing_model)
 
 
-def retrieve_thing_model_from_url(tm_url: str):
+def _retrieve_thing_model_from_url(tm_url: str):
     with urllib.request.urlopen(tm_url) as url:
         retrieved_thing_model = json.loads(url.read().decode())
         validate_thing_model(retrieved_thing_model)
         return retrieved_thing_model
 
 
-def retrieve_thing_model_from_file_path(file_path: str):
+def _retrieve_thing_model_from_file_path(file_path: str):
     with open(file_path) as json_file:
         read_thing_model = json.load(json_file)
         validate_thing_model(read_thing_model)
@@ -45,14 +34,14 @@ def retrieve_thing_model(tm_url: str, thing_collection=None):
     url_scheme = urllib.parse.urlparse(tm_url).scheme
 
     if url_scheme.startswith("http"):
-        return retrieve_thing_model_from_url(tm_url)
+        return _retrieve_thing_model_from_url(tm_url)
     elif tm_url.startswith("#/") and thing_collection is not None:
         return resolve_pointer(thing_collection, tm_url[1:])
     else:
-        return retrieve_thing_model_from_file_path(tm_url)
+        return _retrieve_thing_model_from_file_path(tm_url)
 
 
-def perform_extension(
+def _perform_extension(
     partial_td: Dict,
     extension_href: str,
     extension_link_list: List[str],
@@ -98,7 +87,7 @@ def resolve_extension(
     if extension_href:
         assert extension_href not in extension_link_list
         extension_link_list.append(extension_href)
-        partial_td = perform_extension(
+        partial_td = _perform_extension(
             partial_td, extension_href, extension_link_list, resolve_relative_pointers
         )
 
@@ -187,3 +176,13 @@ def _resolve_tm_ref(
             result[key] = _resolve_tm_ref(partial_td, value, resolve_relative_pointers)
 
     return result
+
+
+def _is_thing_collection(thing_collection: Dict) -> bool:
+    """Determines if a dictionary should be treated as Thing Collection by checking
+    a JSON-LD @context is present.
+
+    If Thing Collections should become formally specified, this check needs to be
+    reworked.
+    """
+    return "@context" not in thing_collection

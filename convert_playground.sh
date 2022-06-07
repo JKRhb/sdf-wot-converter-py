@@ -6,5 +6,5 @@ mkdir -p output/tm
 cd playground
 for filename in sdfObject/*.sdf.json; do
     echo "Converting $filename ..."
-    sdf-wot-converter --from-sdf "$filename" --to-tm "../output/tm/$(basename "$filename" .sdf.json).tm.json" --origin-url $origin/$filename
+    sdf-wot-converter sdf-to-tm -i "$filename" -o "../output/tm/$(basename "$filename" .sdf.json).tm.json" --origin-url $origin/$filename
 done

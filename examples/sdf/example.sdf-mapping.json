@@ -1,0 +1,51 @@
+{
+    "info": {
+        "title": "Example file for OneDM Semantic Definition Format",
+        "version": "2019-04-24",
+        "copyright": "Copyright 2019 Example Corp. All rights reserved.",
+        "license": "https://example.com/license"
+    },
+    "namespace": {
+        "cap": "https://example.com/capability/cap",
+        "blah": "https://raw.githubusercontent.com/one-data-model/playground/master/sdfObject/sdfobject-actuation.sdf.json"
+    },
+    "defaultNamespace": "cap",
+    "map": {
+        "#/sdfThing/Freezer": {
+            "securityDefinitions": { "nosec_sc": { "scheme": "nosec" } },
+            "security": "nosec_sc"
+        },
+        "#/sdfThing/Freezer/sdfObject/Switch": {
+            "securityDefinitions": { "nosec_sc": { "scheme": "nosec" } },
+            "security": "nosec_sc"
+        },
+        "#/sdfThing/Freezer/sdfObject/Switch/sdfProperty/value": {
+            "forms": [
+                {
+                    "href": "coap://example.org/switch/value"
+                }
+            ]
+        },
+        "#/sdfThing/Freezer/sdfObject/Switch/sdfAction/on": {
+            "forms": [
+                {
+                    "href": "coap://example.org/switch/on"
+                }
+            ]
+        },
+        "#/sdfThing/Freezer/sdfObject/Switch/sdfAction/off": {
+            "forms": [
+                {
+                    "href": "coap://example.org/switch/off"
+                }
+            ]
+        },
+        "#/sdfThing/Freezer/sdfObject/Switch/sdfAction/toggle": {
+            "forms": [
+                {
+                    "href": "coap://example.org/switch/toggle"
+                }
+            ]
+        }
+    }
+}
