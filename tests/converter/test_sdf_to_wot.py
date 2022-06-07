@@ -24,8 +24,8 @@ def perform_sdf_thing_collection_roundtrip_test(
     assert input == result
 
 
-def perform_conversion_test(input, expected_result):
-    actual_result = convert_sdf_to_wot_tm(input)
+def perform_conversion_test(input, expected_result, **kwargs):
+    actual_result = convert_sdf_to_wot_tm(input, **kwargs)
 
     assert actual_result == expected_result
 
@@ -938,3 +938,57 @@ def test_sdf_tm_nested_sdf_conversion():
 
     perform_conversion_test(input, expected_result)
     perform_sdf_roundtrip_test(input)
+
+
+def test_sdf_tm_suppress_roundtripping_fields():
+    input = {
+        "info": {
+            "license": "MIT",
+            "title": "Test",
+            "description": "Test Description",
+            "copyright": "2022 Example Corp",
+        },
+        "sdfThing": {
+            "foo": {
+                "sdfProperty": {
+                    "status": {
+                        "observable": True,
+                        "sdfChoice": {"test": {"type": "string"}},
+                    },
+                },
+                "sdfObject": {"bar": {"sdfAction": {"toggle": {}}}},
+            }
+        },
+        "sdfObject": {"baz": {}},
+    }
+
+    expected_result = {
+        "bar": {
+            "@context": [
+                "https://www.w3.org/2022/wot/td/v1.1",
+            ],
+            "@type": "tm:ThingModel",
+            "actions": {"toggle": {}},
+        },
+        "baz": {
+            "@context": [
+                "https://www.w3.org/2022/wot/td/v1.1",
+            ],
+            "@type": "tm:ThingModel",
+        },
+        "foo": {
+            "@context": [
+                "https://www.w3.org/2022/wot/td/v1.1",
+            ],
+            "@type": "tm:ThingModel",
+            "links": [{"href": "#/bar", "rel": "tm:submodel"}],
+            "properties": {
+                "status": {
+                    "observable": True,
+                    "enum": [{"type": "string"}],
+                }
+            },
+        },
+    }
+
+    perform_conversion_test(input, expected_result, suppress_roundtripping=True)

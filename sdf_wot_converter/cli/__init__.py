@@ -256,6 +256,12 @@ def parse_arguments(args):
         help="Indentation depth for the output JSON files.",
     )
 
+    parser.add_argument(
+        "--suppress-roundtripping",
+        action="store_true",
+        help='Suppresses the addition of additional fields for enabling roundtripping, like "sdf:objectKey".',
+    )
+
     return parser.parse_args(args)
 
 
