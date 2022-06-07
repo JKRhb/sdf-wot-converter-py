@@ -3,7 +3,6 @@ from typing import (
     Dict,
     List,
     Optional,
-    Union,
 )
 from jsonpointer import resolve_pointer
 import json_merge_patch

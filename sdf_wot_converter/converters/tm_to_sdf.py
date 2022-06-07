@@ -23,7 +23,12 @@ from .utility import (
     negate,
     validate_sdf_model,
 )
-from . import wot_common
+from .wot_common import (
+    is_thing_collection,
+    replace_placeholders,
+    resolve_extension,
+    retrieve_thing_model,
+)
 import urllib.parse
 
 
@@ -800,10 +805,10 @@ def resolve_sub_things(thing_model: Dict, thing_collection=None, placeholder_map
 
     for link in thing_model.get("links", []):
         if link.get("rel") == "tm:submodel":
-            sub_model = wot_common.retrieve_thing_model(
+            sub_model = retrieve_thing_model(
                 link["href"], thing_collection=thing_collection
             )
-            wot_common.replace_placeholders(sub_model, placeholder_map)
+            replace_placeholders(sub_model, placeholder_map)
             key = _get_submodel_key_from_link(link)
             sub_models[key] = sub_model
 
@@ -817,7 +822,7 @@ def convert_wot_tm_to_sdf(
     thing_model_collection=None,
     top_model_keys: Union[Set[str], None] = None,
 ) -> Union[Dict, Tuple[Dict, Dict]]:
-    if thing_model_collection is None and "@context" not in thing_model:
+    if is_thing_collection(thing_model):
         return convert_wot_tm_collection_to_sdf(
             thing_model,
             top_model_keys=top_model_keys,
@@ -826,10 +831,8 @@ def convert_wot_tm_to_sdf(
     sdf_model: Dict = {}
     sdf_mapping_file: Dict = {}
 
-    thing_model = wot_common.resolve_extension(
-        thing_model, resolve_relative_pointers=False
-    )
-    thing_model = wot_common.replace_placeholders(thing_model, placeholder_map)
+    thing_model = resolve_extension(thing_model, resolve_relative_pointers=False)
+    thing_model = replace_placeholders(thing_model, placeholder_map)
 
     # TODO: @context of submoduls needs to be integrated as well
     # TODO: Revisit context mappings

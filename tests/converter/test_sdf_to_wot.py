@@ -1,7 +1,7 @@
 import pytest
 
-from sdf_wot_converter.converters.sdf_to_wot import add_origin_link
-from sdf_wot_converter.converters.wot_to_sdf import convert_wot_tm_collection_to_sdf
+from sdf_wot_converter.converters.sdf_to_tm import add_origin_link
+from sdf_wot_converter.converters.tm_to_sdf import convert_wot_tm_collection_to_sdf
 
 from sdf_wot_converter import convert_wot_tm_to_sdf, convert_sdf_to_wot_tm
 

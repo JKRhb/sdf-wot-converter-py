@@ -1,10 +1,9 @@
-import sys
 from typing import Dict, List, Optional, Tuple, Union
 
 from .tm_to_td import convert_tm_to_td as _convert_tm_to_td
 from .td_to_tm import convert_td_to_tm as _convert_td_to_tm
-from .wot_to_sdf import convert_wot_tm_to_sdf as _convert_wot_tm_to_sdf
-from .sdf_to_wot import convert_sdf_to_wot_tm as _convert_sdf_to_wot_tm
+from .tm_to_sdf import convert_wot_tm_to_sdf as _convert_wot_tm_to_sdf
+from .sdf_to_tm import convert_sdf_to_wot_tm as _convert_sdf_to_wot_tm
 
 ThingCollection = Dict[str, Dict]
 
