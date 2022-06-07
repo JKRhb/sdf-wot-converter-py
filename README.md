@@ -65,9 +65,9 @@ sdf-wot-converter td-to-tm -i examples/wot/example.td.jsonld -o converted-exampl
 With the converter installed, you can use also use it as a library in your own projects. Below you can see examples for how to convert an SDF model to a WoT Thing Model and back again. As you can see, nested definitions from `sdfObject`s or `sdfThing`s are prefixed with the respective object or thing names.
 
 ```python
-from sdf_wot_converter.converters import (
-    sdf_to_wot,
-    wot_to_sdf,
+from sdf_wot_converter import (
+    convert_sdf_to_wot_tm,
+    convert_wot_tm_to_sdf,
 )
 
 sdf_model = {
@@ -85,6 +85,7 @@ sdf_model = {
                 "value": {
                     "description": "The state of the switch; false for off and true for on.",
                     "type": "boolean",
+                    "observable": False,
                 }
             },
             "sdfAction": {
@@ -102,7 +103,7 @@ sdf_model = {
     },
 }
 
-thing_model = sdf_to_wot.convert_sdf_to_wot_tm(sdf_model)
+thing_model = convert_sdf_to_wot_tm(sdf_model)
 
 expected_thing_model = {
     "@context": [
@@ -133,6 +134,7 @@ expected_thing_model = {
         "value": {
             "description": "The state of the switch; false for off and true for on.",
             "type": "boolean",
+            "observable": False,
         }
     },
     "sdf:objectKey": "Switch",
@@ -140,7 +142,7 @@ expected_thing_model = {
 
 assert thing_model == expected_thing_model
 
-sdf_roundtrip_model = wot_to_sdf.convert_wot_tm_to_sdf(thing_model)
+sdf_roundtrip_model = convert_wot_tm_to_sdf(thing_model)
 
 assert sdf_model == sdf_roundtrip_model
 ```
