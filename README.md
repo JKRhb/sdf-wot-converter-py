@@ -50,7 +50,7 @@ sdf-wot-converter sdf-to-td -i examples/sdf/example.sdf.json --mapping-files exa
 # Convert a WoT Thing Model to an SDF model
 sdf-wot-converter tm-to-sdf -i examples/wot/example.tm.jsonld -o converted-example.sdf.json
 
-# Convert a WoT Thing Description to a WoT Thing Description
+# Convert a WoT Thing Model to a WoT Thing Description
 sdf-wot-converter tm-to-td -i examples/wot/example-with-bindings.tm.jsonld -o converted-example.td.jsonld
 
 # Convert a WoT Thing Description to an SDF model and a mapping file
