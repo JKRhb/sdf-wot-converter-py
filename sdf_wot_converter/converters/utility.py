@@ -1,5 +1,5 @@
 import copy
-from typing import Dict, List, Optional
+from typing import Dict
 from ..schemas.sdf_validation_schema import sdf_validation_schema
 from ..schemas.td_schema import td_schema
 from ..schemas.tm_schema import tm_schema

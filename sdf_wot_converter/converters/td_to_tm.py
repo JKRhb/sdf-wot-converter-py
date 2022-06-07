@@ -1,7 +1,7 @@
 from typing import Dict
 import copy
 
-from sdf_wot_converter.converters.wot_common import _is_thing_collection
+from .wot_common import is_thing_collection
 
 from .utility import (
     validate_thing_description,
@@ -37,7 +37,7 @@ def convert_td_collection_to_tm_collection(
 
 
 def convert_td_to_tm(thing_description: Dict) -> Dict:
-    if _is_thing_collection(thing_description):
+    if is_thing_collection(thing_description):
         return convert_td_collection_to_tm_collection(thing_description)
 
     validate_thing_description(thing_description)

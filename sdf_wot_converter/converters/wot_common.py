@@ -1,19 +1,10 @@
-from typing import (
-    Dict,
-    List,
-)
+from typing import Dict, List, Optional
 import urllib.request
-import urllib.parse
 import json_merge_patch
-from jsonschema import Draft7Validator
 import json
-from ..schemas import tm_schema
 import copy
 from jsonpointer import resolve_pointer
-
-
-def validate_thing_model(thing_model):
-    Draft7Validator(tm_schema.tm_schema).validate(thing_model)
+from .utility import validate_thing_model
 
 
 def _retrieve_thing_model_from_url(tm_url: str):
@@ -178,11 +169,11 @@ def _resolve_tm_ref(
     return result
 
 
-def _is_thing_collection(thing_collection: Dict) -> bool:
+def is_thing_collection(thing_collection: Optional[Dict]) -> bool:
     """Determines if a dictionary should be treated as Thing Collection by checking
     a JSON-LD @context is present.
 
     If Thing Collections should become formally specified, this check needs to be
     reworked.
     """
-    return "@context" not in thing_collection
+    return thing_collection is not None and "@context" not in thing_collection

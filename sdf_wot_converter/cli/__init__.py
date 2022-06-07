@@ -13,7 +13,6 @@ from ..converters import (
     convert_wot_td_to_wot_tm,
     convert_wot_tm_to_sdf,
     convert_wot_tm_to_wot_td,
-    convert_wot_tm_to_wot_td,
 )
 
 

@@ -1,6 +1,6 @@
 from sdf_wot_converter.converters import (
-    sdf_to_wot,
-    wot_to_sdf,
+    sdf_to_tm,
+    tm_to_sdf,
 )
 
 sdf_model = {
@@ -35,7 +35,7 @@ sdf_model = {
     },
 }
 
-thing_model = sdf_to_wot.convert_sdf_to_wot_tm(sdf_model)
+thing_model = sdf_to_tm.convert_sdf_to_wot_tm(sdf_model)
 
 expected_thing_model = {
     "@context": [
@@ -73,6 +73,6 @@ expected_thing_model = {
 
 assert thing_model == expected_thing_model
 
-sdf_roundtrip_model = wot_to_sdf.convert_wot_tm_to_sdf(thing_model)
+sdf_roundtrip_model = tm_to_sdf.convert_wot_tm_to_sdf(thing_model)
 
 assert sdf_model == sdf_roundtrip_model

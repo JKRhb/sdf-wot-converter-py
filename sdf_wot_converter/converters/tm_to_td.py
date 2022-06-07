@@ -6,7 +6,11 @@ import json_merge_patch
 from jsonpointer import resolve_pointer
 
 from .utility import validate_thing_description, validate_thing_model
-from . import wot_common
+from .wot_common import (
+    is_thing_collection,
+    replace_placeholders,
+    resolve_extension,
+)
 
 
 def replace_type(thing_description: Dict):
@@ -81,19 +85,19 @@ def convert_tm_collection_to_td_collection(thing_collection):
 def convert_tm_to_td(
     thing_model: Dict, placeholder_map=None, meta_data=None, bindings=None
 ) -> Dict:
-    if wot_common._is_thing_collection(thing_model):
+    if is_thing_collection(thing_model):
         return convert_tm_collection_to_td_collection(thing_model)
 
     validate_thing_model(thing_model)
     partial_td: Dict = copy.deepcopy(thing_model)
 
-    partial_td = wot_common.resolve_extension(partial_td)
+    partial_td = resolve_extension(partial_td)
     partial_td = _replace_meta_data(partial_td, meta_data)
     partial_td = _replace_bindings(partial_td, bindings)
 
     replace_type(partial_td)
 
-    partial_td = wot_common.replace_placeholders(partial_td, placeholder_map)
+    partial_td = replace_placeholders(partial_td, placeholder_map)
 
     _replace_version(partial_td)
 
