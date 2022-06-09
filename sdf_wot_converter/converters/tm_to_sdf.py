@@ -876,16 +876,7 @@ def convert_wot_tm_to_sdf(
                 thing_model_collection=thing_model_collection,
             )
 
-    # TODO: Schema needs to be updated.
-    try:
-        validate_sdf_model(sdf_model)
-    except jsonschema.exceptions.ValidationError:
-        warnings.warn(
-            "Conversion produced an invalid SDF model. "
-            "This might be the case because the SDF schema "
-            "has not been updated, yet."
-            "It is recommended that you check the result before using it."
-        )
+    validate_sdf_model(sdf_model)
 
     if sdf_mapping_file.get("map") is not None:
         for field_name in ["info", "namespace", "defaultNamespace"]:
