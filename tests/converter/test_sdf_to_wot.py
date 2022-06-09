@@ -945,7 +945,6 @@ def test_sdf_tm_suppress_roundtripping_fields():
         "info": {
             "license": "MIT",
             "title": "Test",
-            "description": "Test Description",
             "copyright": "2022 Example Corp",
         },
         "sdfThing": {
