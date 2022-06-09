@@ -1,4 +1,4 @@
-sdf_framework_schema = {  # pragma: no cover
+sdf_framework_schema = {
     "title": "sdf-framework.cddl -- Generated: 2022-06-06T12:50:46Z",
     "$schema": "http://json-schema.org/draft-07/schema#",
     "$ref": "#/definitions/sdf-syntax",
