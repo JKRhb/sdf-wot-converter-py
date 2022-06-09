@@ -8,9 +8,6 @@ from typing import (
     Tuple,
     Union,
 )
-import warnings
-
-import jsonschema
 
 from .common.jsonschema import (
     map_common_json_schema_fields,
