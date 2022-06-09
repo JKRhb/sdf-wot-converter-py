@@ -8,6 +8,8 @@ from jsonpointer import resolve_pointer
 import json_merge_patch
 import urllib.request
 
+from ..validation import validate_sdf_model
+
 from .common.jsonschema import map_common_json_schema_fields
 from .utility import (
     initialize_list_field,
@@ -72,6 +74,7 @@ def resolve_sdf_ref(
             try:
                 with urllib.request.urlopen(resolved_url) as url:
                     retrieved_sdf_model = json.loads(url.read().decode())
+                    validate_sdf_model(retrieved_sdf_model)
                     original = resolve_pointer(retrieved_sdf_model, "/" + pointer)
                     original = resolve_sdf_ref(
                         retrieved_sdf_model, original, resolved_url, sdf_ref_list
@@ -1009,6 +1012,8 @@ def consolidate_sdf_model(sdf_model: Dict, sdf_mapping_files: List[Dict]):
     for sdf_mapping_file in sdf_mapping_files:
         _apply_mapping_file(sdf_model, sdf_mapping_file)
 
+    validate_sdf_model(sdf_model, framework=True)
+
 
 def convert_sdf_to_wot_tm(
     sdf_model: Dict,
@@ -1017,6 +1022,8 @@ def convert_sdf_to_wot_tm(
     set_instance_version=False,
     suppress_roundtripping=False,
 ) -> Dict[str, Dict]:
+
+    validate_sdf_model(sdf_model)
 
     if sdf_mapping_files is not None:
         consolidate_sdf_model(sdf_model, sdf_mapping_files)
