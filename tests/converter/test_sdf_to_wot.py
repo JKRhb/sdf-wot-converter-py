@@ -1,3 +1,4 @@
+from jsonschema import ValidationError
 import pytest
 
 from sdf_wot_converter.converters.sdf_to_tm import add_origin_link
@@ -991,3 +992,10 @@ def test_sdf_tm_suppress_roundtripping_fields():
     }
 
     perform_conversion_test(input, expected_result, suppress_roundtripping=True)
+
+
+def test_td_tm_illegal_input():
+    input = {"info": "hello"}
+
+    with pytest.raises(ValidationError):
+        convert_sdf_to_wot_tm(input)

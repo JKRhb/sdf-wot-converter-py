@@ -10,14 +10,12 @@ from ..validation import validate_thing_model
 def _retrieve_thing_model_from_url(tm_url: str):
     with urllib.request.urlopen(tm_url) as url:
         retrieved_thing_model = json.loads(url.read().decode())
-        validate_thing_model(retrieved_thing_model)
         return retrieved_thing_model
 
 
 def _retrieve_thing_model_from_file_path(file_path: str):
     with open(file_path) as json_file:
         read_thing_model = json.load(json_file)
-        validate_thing_model(read_thing_model)
         return read_thing_model
 
 
@@ -25,11 +23,14 @@ def retrieve_thing_model(tm_url: str, thing_collection=None):
     url_scheme = urllib.parse.urlparse(tm_url).scheme
 
     if url_scheme.startswith("http"):
-        return _retrieve_thing_model_from_url(tm_url)
+        thing_model = _retrieve_thing_model_from_url(tm_url)
     elif tm_url.startswith("#/") and thing_collection is not None:
-        return resolve_pointer(thing_collection, tm_url[1:])
+        thing_model = resolve_pointer(thing_collection, tm_url[1:])
     else:
-        return _retrieve_thing_model_from_file_path(tm_url)
+        thing_model = _retrieve_thing_model_from_file_path(tm_url)
+
+    validate_thing_model(thing_model)
+    return thing_model
 
 
 def _perform_extension(
