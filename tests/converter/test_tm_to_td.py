@@ -1,3 +1,5 @@
+from jsonschema import ValidationError
+import pytest
 from sdf_wot_converter import convert_wot_tm_to_wot_td
 
 
@@ -371,3 +373,14 @@ def test_tm_td_tm_required():
     }
 
     perform_conversion_test(input, expected_result)
+
+
+def test_tm_td_illegal_input():
+    input = {
+        "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
+        "@type": "tm:ThingModel",
+        "title": 42,
+    }
+
+    with pytest.raises(ValidationError):
+        convert_wot_tm_to_wot_td(input)

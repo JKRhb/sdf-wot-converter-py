@@ -1,3 +1,5 @@
+from jsonschema import ValidationError
+import pytest
 from sdf_wot_converter import convert_wot_tm_to_sdf
 from sdf_wot_converter.converters.tm_to_sdf import convert_wot_tm_collection_to_sdf
 
@@ -478,3 +480,14 @@ def test_mapping_file_conversion():
     }
 
     perform_conversion_test(input, expected_result)
+
+
+def test_tm_sdf_illegal_input():
+    input = {
+        "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
+        "@type": "tm:ThingModel",
+        "title": 42,
+    }
+
+    with pytest.raises(ValidationError):
+        convert_wot_tm_to_sdf(input)
