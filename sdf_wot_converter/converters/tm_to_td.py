@@ -5,7 +5,7 @@ import copy
 import json_merge_patch
 from jsonpointer import resolve_pointer
 
-from .utility import validate_thing_description, validate_thing_model
+from ..validation import validate_thing_description, validate_thing_model
 from .wot_common import (
     is_thing_collection,
     replace_placeholders,

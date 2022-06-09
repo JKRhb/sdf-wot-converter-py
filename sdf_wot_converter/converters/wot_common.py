@@ -4,7 +4,7 @@ import json_merge_patch
 import json
 import copy
 from jsonpointer import resolve_pointer
-from .utility import validate_thing_model
+from ..validation import validate_thing_model
 
 
 def _retrieve_thing_model_from_url(tm_url: str):
