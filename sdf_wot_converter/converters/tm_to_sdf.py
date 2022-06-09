@@ -12,7 +12,7 @@ from typing import (
 from .common.jsonschema import (
     map_common_json_schema_fields,
 )
-from ..validation import validate_sdf_model
+from ..validation import validate_sdf_model, validate_thing_model
 from .utility import (
     initialize_list_field,
     initialize_object_field,
@@ -828,8 +828,10 @@ def convert_wot_tm_to_sdf(
     sdf_model: Dict = {}
     sdf_mapping_file: Dict = {}
 
+    validate_thing_model(thing_model)
     thing_model = resolve_extension(thing_model, resolve_relative_pointers=False)
     thing_model = replace_placeholders(thing_model, placeholder_map)
+    validate_thing_model(thing_model)
 
     # TODO: @context of submoduls needs to be integrated as well
     # TODO: Revisit context mappings
