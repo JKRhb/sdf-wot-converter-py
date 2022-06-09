@@ -15,13 +15,13 @@ import jsonschema
 from .common.jsonschema import (
     map_common_json_schema_fields,
 )
+from ..validation import validate_sdf_model
 from .utility import (
     initialize_list_field,
     initialize_object_field,
     map_field,
     map_common_field,
     negate,
-    validate_sdf_model,
 )
 from .wot_common import (
     is_thing_collection,

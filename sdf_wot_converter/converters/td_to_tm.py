@@ -3,7 +3,7 @@ import copy
 
 from .wot_common import is_thing_collection
 
-from .utility import (
+from ..validation import (
     validate_thing_description,
     validate_thing_model,
 )
