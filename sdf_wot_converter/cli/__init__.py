@@ -37,10 +37,7 @@ def _load_model_from_url(input_url: str) -> Dict:
         return retrieved_model
 
 
-def _load_single_model(paths_or_urls: Union[str, List[str]]) -> Dict:
-    if isinstance(paths_or_urls, list):
-        paths_or_urls = paths_or_urls[0]
-
+def _load_model(paths_or_urls: str) -> Dict:
     if validators.url(paths_or_urls):
         return _load_model_from_url(paths_or_urls)
     else:
@@ -52,12 +49,12 @@ def _load_model_or_collection(paths_or_urls: Union[str, List[str]], prefix: str)
         paths_or_urls = paths_or_urls[0]
 
     if isinstance(paths_or_urls, str):
-        return _load_single_model(paths_or_urls)
+        return _load_model(paths_or_urls)
 
     result: Dict = {}
 
     for index, path_or_url in enumerate(paths_or_urls):
-        result[f"{prefix}{index}"] = _load_single_model(path_or_url)
+        result[f"{prefix}{index}"] = _load_model(path_or_url)
 
     return result
 
@@ -69,7 +66,7 @@ def _load_sdf_mapping_files(paths_or_urls: Optional[List[str]]) -> Optional[List
     result: List[Dict] = []
 
     for path_or_url in paths_or_urls:
-        result.append(_load_single_model(path_or_url))
+        result.append(_load_model(path_or_url))
 
     return result
 
@@ -282,7 +279,7 @@ def _handle_from_sdf(args):
     command = args.command
 
     origin_url = _get_origin_url(input_path, args.origin_url)
-    sdf_model = _load_single_model(input_path)
+    sdf_model = _load_model(input_path)
     sdf_mapping_files = _load_sdf_mapping_files(mapping_file_input_path)
 
     output = None
@@ -356,7 +353,7 @@ def _handle_from_td(args):
 def _load_optional_json_file(path: Optional[str]) -> Optional[Dict]:
     json_data = None
     if path:
-        json_data = _load_single_model(path)
+        json_data = _load_model(path)
 
     return json_data
 

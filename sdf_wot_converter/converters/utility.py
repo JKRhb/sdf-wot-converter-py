@@ -12,6 +12,13 @@ def initialize_list_field(model: Dict, field_name: str):
         model[field_name] = []
 
 
+def ensure_value_is_list(value):
+    if isinstance(value, list):
+        return value
+
+    return [value]
+
+
 def negate(value: bool):
     """Negates a boolean value. Supposed to be used as a dedicated conversion
     function for `map_field` and `map_common_field` functions."""
