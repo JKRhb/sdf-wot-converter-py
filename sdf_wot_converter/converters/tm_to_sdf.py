@@ -452,12 +452,18 @@ def map_links(
     if "links" not in wot_definition:
         return
 
-    mapped_fields.append("links")
+    unmappable_relation_types = ["license", "item", "collection", "tm:submodel"]
 
-    # TODO: Deal with other link types
-    for link in wot_definition["links"]:
-        if link.get("rel") == "license":
-            continue
+    links = wot_definition["links"]
+    links = list(
+        filter(lambda link: link.get("rel") not in unmappable_relation_types, links)
+    )
+
+    if len(links) == 0:
+        del wot_definition["links"]
+        return
+
+    wot_definition["links"] = links
 
 
 def map_version(
@@ -559,6 +565,7 @@ def map_thing_model_to_sdf_object(
     current_path: str,
     placeholder_map=None,
 ):
+    thing_model = copy.deepcopy(thing_model)
     sdf_object: Dict = {}
 
     # TODO: Deal with @context and @type
@@ -657,6 +664,7 @@ def map_thing_model_to_sdf_thing(
     thing_model_collection=None,
 ):
     # TODO: Map @context, titles, descriptions of submodels?
+    thing_model = copy.deepcopy(thing_model)
     sdf_thing: Dict = {}
     mapped_fields: List[str] = [
         "@context",

@@ -206,8 +206,6 @@ def test_tm_sdf_property_conversion():
 
 
 def test_tm_sdf_link_conversion():
-    # TODO: Check how links should be mapped
-
     input = {
         "@context": [
             "https://www.w3.org/2022/wot/td/v1.1",
@@ -217,14 +215,14 @@ def test_tm_sdf_link_conversion():
         "links": [{"href": "https://example.org"}],
     }
 
-    expected_result = {"sdfObject": {"sdfObject0": {}}}
+    expected_result = {"sdfObject": {"sdfObject0": {}}}, {
+        "map": {"#/sdfObject/sdfObject0": {"links": [{"href": "https://example.org"}]}}
+    }
 
     perform_conversion_test(input, expected_result)
 
 
 def test_tm_sdf_schema_definition_conversion():
-    # TODO: Check how links should be mapped
-
     input = {
         "@context": [
             "https://www.w3.org/2022/wot/td/v1.1",
