@@ -1,10 +1,16 @@
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 import urllib.request
 import json_merge_patch
 import json
 import copy
 from jsonpointer import resolve_pointer
 from ..validation import validate_thing_model
+
+
+class PlaceholderException(Exception):
+    """Raised when an error occurs during the placeholder replacement process."""
+
+    pass
 
 
 def _retrieve_thing_model_from_url(tm_url: str):
@@ -93,26 +99,52 @@ def _stringify_boolean(boolean: bool) -> str:
         return "false"
 
 
-def replace_placeholders(thing_model, placeholders):
+def _has_placeholders(serialized_thing_model: str) -> bool:
+    return "{{" in serialized_thing_model
+
+
+def _format_placeholder_value(placeholer_value) -> str:
+    if isinstance(placeholer_value, bool):
+        return _stringify_boolean(placeholer_value)
+
+    if isinstance(placeholer_value, str):
+        return f'"{placeholer_value}"'
+
+    return str(placeholer_value)
+
+
+def _format_placeholder_key(placeholder_key: str) -> str:
+    prefix = "{{"
+    suffix = "}}"
+    return f'"{prefix}{placeholder_key}{suffix}"'
+
+
+def _replace_placeholder(
+    serialized_thing_model: str, placeholder: str, value: Any
+) -> str:
+    value = _format_placeholder_value(value)
+    placeholder = _format_placeholder_key(placeholder)
+
+    return serialized_thing_model.replace(placeholder, value)
+
+
+def replace_placeholders(thing_model: dict, placeholders: Optional[Dict[str, Any]]):
     if placeholders is None:
         return thing_model
 
-    thing_model_as_string = json.dumps(thing_model)
+    serialized_thing_model = json.dumps(thing_model)
 
     for placeholder, value in placeholders.items():
-        if isinstance(value, bool):
-            value = _stringify_boolean(value)
-        elif isinstance(value, str):
-            value = f'"{value}"'
-
-        thing_model_as_string = thing_model_as_string.replace(
-            '"{{' + placeholder + '}}"', str(value)
+        serialized_thing_model = _replace_placeholder(
+            serialized_thing_model,
+            placeholder,
+            value,
         )
 
-    # TODO: Raise exception instead
-    assert "{{" not in thing_model_as_string, "Not all placeholders have been replaced!"
+    if _has_placeholders(serialized_thing_model):
+        raise PlaceholderException("Not all placeholders have been replaced!")
 
-    return json.loads(thing_model_as_string)
+    return json.loads(serialized_thing_model)
 
 
 def _resolve_tm_ref(
