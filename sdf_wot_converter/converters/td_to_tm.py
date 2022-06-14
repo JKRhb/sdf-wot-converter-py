@@ -1,6 +1,7 @@
 from typing import Dict
 import copy
 
+from .utility import ensure_value_is_list
 from .wot_common import is_thing_collection
 
 from ..validation import (
@@ -17,12 +18,9 @@ def _replace_type(thing_model: Dict):
         thing_model["@type"] = thing_model_type
         return
 
-    json_ld_type = thing_model["@type"]
-
-    if isinstance(json_ld_type, list) and thing_model_type not in json_ld_type:
-        thing_model["@type"].append(thing_model_type)
-    elif isinstance(json_ld_type, str) and json_ld_type != thing_model_type:
-        thing_model["@type"] = [json_ld_type, thing_model_type]
+    json_ld_type = ensure_value_is_list(thing_model["@type"])
+    json_ld_type.append(thing_model_type)
+    thing_model["@type"] = json_ld_type
 
 
 def convert_td_collection_to_tm_collection(

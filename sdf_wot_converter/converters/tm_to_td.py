@@ -5,6 +5,7 @@ import copy
 import json_merge_patch
 from jsonpointer import resolve_pointer
 
+from .utility import ensure_value_is_list
 from ..validation import validate_thing_description, validate_thing_model
 from .wot_common import (
     is_thing_collection,
@@ -14,14 +15,13 @@ from .wot_common import (
 
 
 def replace_type(thing_description: Dict):
-    # TODO: Can probably be done more elegantly
-    json_ld_type = thing_description["@type"]
-    if json_ld_type == "tm:ThingModel":
+    json_ld_type = ensure_value_is_list(thing_description["@type"])
+    result = list(filter(lambda item: item != "tm:ThingModel", json_ld_type))
+    if len(result) == 0:
         del thing_description["@type"]
-        json_ld_type = "Thing"
-    elif isinstance(json_ld_type, list) and "tm:ThingModel" in json_ld_type:
-        while "tm:ThingModel" in json_ld_type:
-            json_ld_type.remove("tm:ThingModel")
+        return
+
+    thing_description["@type"] = result
 
 
 def _replace_version(partial_td):
