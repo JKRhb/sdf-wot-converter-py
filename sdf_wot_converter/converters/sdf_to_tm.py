@@ -10,7 +10,7 @@ import urllib.request
 
 from ..validation import validate_sdf_model
 
-from .common.jsonschema import map_common_json_schema_fields
+from .jsonschema import map_common_json_schema_fields
 from .utility import (
     initialize_list_field,
     initialize_object_field,
