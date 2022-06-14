@@ -10,7 +10,6 @@ def perform_conversion_test(input, expected_result, **kwargs):
 
 
 def test_empty_tm_td_conversion():
-    # TODO: Handle case of TMs without title or security
     input = {
         "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "@type": ["tm:ThingModel", "test"],
@@ -31,7 +30,6 @@ def test_empty_tm_td_conversion():
 
 
 def test_tm_td_with_meta_data_and_bindings_conversion():
-    # TODO: Handle case of TMs without title or security
     input = {
         "@context": "https://www.w3.org/2022/wot/td/v1.1",
         "@type": "tm:ThingModel",
@@ -114,7 +112,6 @@ def test_tm_td_with_meta_data_and_bindings_conversion():
 
 
 def test_tm_td_with_placeholder_conversion():
-    # TODO: Handle case of TMs without forms
     input = {
         "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "@type": "tm:ThingModel",
@@ -163,7 +160,6 @@ def test_tm_td_with_placeholder_conversion():
 
 
 def test_tm_td_extension():
-    # TODO: Handle case of TMs without forms
     extension_url = (
         "https://raw.githubusercontent.com/JKRhb/"
         "sdf-wot-converter-py/main/examples/wot/example-with-bindings.tm.jsonld"
@@ -218,7 +214,6 @@ def test_tm_td_extension():
 
 
 def test_tm_td_recursive_extension():
-    # TODO: Handle case of TMs without forms
     extension_url = (
         "https://raw.githubusercontent.com/JKRhb/"
         "sdf-wot-converter-py/main/examples/wot/example-with-tm-extends.tm.jsonld"
@@ -293,8 +288,6 @@ def test_tm_td_link_preservation():
 
 
 def test_tm_td_tm_ref():
-    # TODO: Handle case of TMs without forms
-
     tm_ref_url = (
         "https://raw.githubusercontent.com/JKRhb/sdf-wot-converter-py/"
         "main/examples/wot/example-with-tm-ref.tm.jsonld#/properties/status"
