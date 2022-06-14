@@ -9,7 +9,7 @@ from typing import (
     Union,
 )
 
-from .common.jsonschema import (
+from .jsonschema import (
     map_common_json_schema_fields,
 )
 from ..validation import validate_sdf_model, validate_thing_model
