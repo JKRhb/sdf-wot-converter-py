@@ -584,9 +584,6 @@ def map_thing_model_to_sdf_object(
     placeholder_map=None,
 ):
     thing_model = copy.deepcopy(thing_model)
-    sdf_object: Dict = {}
-
-    # TODO: Deal with @context and @type
     mapped_fields: List[str] = [
         "sdf:defaultNamespace",
         "sdf:title",
@@ -594,13 +591,11 @@ def map_thing_model_to_sdf_object(
         "sdf:license",
     ]
 
-    sdf_thing_key = thing_model.get("sdf:objectKey")
-    if sdf_thing_key is not None:
-        thing_model_key = sdf_thing_key
-        mapped_fields.append("sdf:objectKey")
-    elif thing_model_key is None:
-        thing_model_key = f"sdfObject{len(sdf_definition)}"
-    sdf_object_path = f"{current_path}/sdfObject/{thing_model_key}"
+    sdf_object_key = determine_thing_model_key(
+        thing_model, thing_model_key, sdf_definition, mapped_fields, is_sdf_thing=False
+    )
+    sdf_object_path = f"{current_path}/sdfObject/{sdf_object_key}"
+    sdf_object = initialize_object_field(sdf_definition, sdf_object_key)
 
     map_context_to_namespaces(thing_model, sdf_model)
     filter_at_type(thing_model)
@@ -630,18 +625,23 @@ def map_thing_model_to_sdf_object(
 
     map_additional_fields(sdf_mapping_file, thing_model, sdf_object_path, mapped_fields)
 
-    sdf_definition[thing_model_key] = sdf_object
-
 
 def determine_thing_model_key(
-    thing_model, thing_model_key, sdf_definition, mapped_fields: List[str]
+    thing_model,
+    thing_model_key,
+    sdf_definition,
+    mapped_fields: List[str],
+    is_sdf_thing=False,
 ):
-    sdf_thing_key = thing_model.get("sdf:thingKey")
+    wot_key = "sdf:thingKey" if is_sdf_thing else "sdf:objectKey"
+    prefix = "sdfThing" if is_sdf_thing else "sdfObject"
+
+    sdf_thing_key = thing_model.get(wot_key)
+    mapped_fields.append(wot_key)
     if sdf_thing_key is not None:
         thing_model_key = sdf_thing_key
-        mapped_fields.append("sdf:thingKey")
     elif thing_model_key is None:
-        thing_model_key = f"sdfThing{len(sdf_definition)}"
+        thing_model_key = f"{prefix}{len(sdf_definition)}"
 
     return thing_model_key
 
@@ -682,7 +682,6 @@ def map_thing_model_to_sdf_thing(
     thing_model_collection=None,
 ):
     thing_model = copy.deepcopy(thing_model)
-    sdf_thing: Dict = {}
     mapped_fields: List[str] = [
         "sdf:defaultNamespace",
         "sdf:title",
@@ -691,9 +690,10 @@ def map_thing_model_to_sdf_thing(
     ]
 
     thing_model_key = determine_thing_model_key(
-        thing_model, thing_model_key, sdf_definition, mapped_fields
+        thing_model, thing_model_key, sdf_definition, mapped_fields, is_sdf_thing=True
     )
 
+    sdf_thing = initialize_object_field(sdf_definition, thing_model_key)
     map_context_to_namespaces(thing_model, sdf_model)
     filter_at_type(thing_model)
 
@@ -718,8 +718,6 @@ def map_thing_model_to_sdf_thing(
     )
 
     map_additional_fields(sdf_mapping_file, thing_model, sdf_thing_path, mapped_fields)
-
-    sdf_definition[thing_model_key] = sdf_thing
 
     for key, value in sub_models.items():
         local_sub_models = resolve_sub_things(
