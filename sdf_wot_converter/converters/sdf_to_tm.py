@@ -1,5 +1,4 @@
 from typing import (
-    Any,
     Dict,
     List,
     Optional,
@@ -356,21 +355,21 @@ def map_readable(sdf_property, wot_property, mapped_fields):
 def map_properties(
     sdf_model, data_qualities, data_schema, suppress_roundtripping: bool, mapped_fields
 ):
-    properties = data_qualities.get("properties")
+    sdf_properties = data_qualities.get("properties")
 
-    if properties is None:
+    if sdf_properties is None:
         return
 
     mapped_fields.append("properties")
 
-    for key, property in properties.items():
-        initialize_object_field(data_schema, "properties")
-        data_schema["properties"][key] = {}
+    for key, sdf_property in sdf_properties.items():
+        wot_properties = initialize_object_field(data_schema, "properties")
+        wot_property = initialize_object_field(wot_properties, key)
         mapped_property_fields: List[str] = []
         map_data_qualities(
             sdf_model,
-            property,
-            data_schema["properties"][key],
+            sdf_property,
+            wot_property,
             suppress_roundtripping,
             mapped_property_fields,
         )
@@ -381,12 +380,13 @@ def map_items(
 ):
     if "items" in data_qualities:
         mapped_fields.append("items")
-        data_schema["items"] = {}
+        sdf_items = data_qualities["items"]
+        wot_items = initialize_object_field(data_schema, "items")
         mapped_item_fields: List[str] = []
         map_data_qualities(
             sdf_model,
-            data_qualities["items"],
-            data_schema["items"],
+            sdf_items,
+            wot_items,
             suppress_roundtripping,
             mapped_item_fields,
         )
@@ -449,28 +449,30 @@ def map_action_qualities(
     json_pointer: str,
     suppress_roundtripping: bool,
 ):
-    initialize_object_field(thing_model, "actions")
-    affordance_key = "_".join(prefix_list)
-
-    wot_action: Dict[str, Any] = {}
-    mapped_fields: List[str] = []
-    collect_sdf_required(thing_model, sdf_action, mapped_fields)
-    collect_mapping(thing_model, json_pointer, "actions", affordance_key)
     sdf_action = resolve_sdf_ref(sdf_model, sdf_action, None, [])
+
+    wot_actions = initialize_object_field(thing_model, "actions")
+    action_key = "_".join(prefix_list)
+    wot_action = initialize_object_field(wot_actions, action_key)
+    mapped_fields: List[str] = []
+
+    collect_sdf_required(thing_model, sdf_action, mapped_fields)
+    collect_mapping(thing_model, json_pointer, "actions", action_key)
 
     map_common_qualities(sdf_action, wot_action, suppress_roundtripping, mapped_fields)
 
     data_map_pairs = [("sdfInputData", "input"), ("sdfOutputData", "output")]
 
-    for sdf_field, wot_field in data_map_pairs:
-        if sdf_field in sdf_action:
-            mapped_fields.append(sdf_field)
-            wot_action[wot_field] = {}
+    for sdf_field_name, wot_field_name in data_map_pairs:
+        if sdf_field_name in sdf_action:
+            mapped_fields.append(sdf_field_name)
+            sdf_data_qualities = sdf_action[sdf_field_name]
+            wot_data_schema = initialize_object_field(wot_action, wot_field_name)
             mapped_data_quality_fields: List[str] = []
             map_data_qualities(
                 sdf_model,
-                sdf_action[sdf_field],
-                wot_action[wot_field],
+                sdf_data_qualities,
+                wot_data_schema,
                 suppress_roundtripping,
                 mapped_data_quality_fields,
             )
@@ -488,23 +490,21 @@ def map_action_qualities(
 
     map_additional_fields(wot_action, sdf_action, mapped_fields)
 
-    thing_model["actions"][affordance_key] = wot_action
-
 
 def map_property_qualities(
     sdf_model: Dict,
     thing_model: Dict,
     sdf_property: Dict,
-    affordance_key: str,
+    property_key: str,
     json_pointer: str,
     suppress_roundtripping: bool,
 ):
-    initialize_object_field(thing_model, "properties")
+    wot_properties = initialize_object_field(thing_model, "properties")
+    wot_property = initialize_object_field(wot_properties, property_key)
 
-    wot_property: Dict[str, Any] = {}
     mapped_fields: List[str] = []
     collect_sdf_required(thing_model, sdf_property, mapped_fields)
-    collect_mapping(thing_model, json_pointer, "properties", affordance_key)
+    collect_mapping(thing_model, json_pointer, "properties", property_key)
 
     map_data_qualities(
         sdf_model,
@@ -517,24 +517,26 @@ def map_property_qualities(
 
     map_additional_fields(wot_property, sdf_property, mapped_fields)
 
-    thing_model["properties"][affordance_key] = wot_property
-
 
 # TODO: Find a better name for this function
 def map_sdf_data_qualities(
     sdf_model: Dict,
     thing_model: Dict,
     sdf_data: Dict,
-    affordance_key: str,
+    schema_definition_key: str,
     json_pointer: str,
     suppress_roundtripping: bool,
 ):
-    initialize_object_field(thing_model, "schemaDefinitions")
+    schema_definitions = initialize_object_field(thing_model, "schemaDefinitions")
+    wot_schema_definition = initialize_object_field(
+        schema_definitions, schema_definition_key
+    )
 
-    wot_schema_definition: Dict[str, Any] = {}
     mapped_fields: List[str] = []
     collect_sdf_required(thing_model, sdf_data, mapped_fields)
-    collect_mapping(thing_model, json_pointer, "schemaDefinitions", affordance_key)
+    collect_mapping(
+        thing_model, json_pointer, "schemaDefinitions", schema_definition_key
+    )
 
     map_data_qualities(
         sdf_model,
@@ -550,8 +552,6 @@ def map_sdf_data_qualities(
     )
 
     map_additional_fields(wot_schema_definition, sdf_data, mapped_fields)
-
-    thing_model["schemaDefinitions"][affordance_key] = wot_schema_definition
 
 
 def map_sdf_data(
@@ -657,25 +657,25 @@ def map_event_qualities(
     json_pointer: str,
     suppress_roundtripping: bool,
 ):
-    initialize_object_field(thing_model, "events")
-    affordance_key = "_".join(prefix_list)
+    wot_events = initialize_object_field(thing_model, "events")
+    event_key = "_".join(prefix_list)
+    wot_event = initialize_object_field(wot_events, event_key)
 
-    wot_event: Dict[str, Any] = {}
     mapped_fields: List[str] = []
     collect_sdf_required(thing_model, sdf_event, mapped_fields)
-    collect_mapping(thing_model, json_pointer, "events", affordance_key)
+    collect_mapping(thing_model, json_pointer, "events", event_key)
     sdf_event = resolve_sdf_ref(sdf_model, sdf_event, None, [])
 
     map_common_qualities(sdf_event, wot_event, suppress_roundtripping, mapped_fields)
 
     if "sdfOutputData" in sdf_event:
         mapped_fields.append("sdfOutputData")
-        wot_event["data"] = {}
+        wot_data_schema = initialize_object_field(wot_event, "data")
         mapped_output_data_fields: List[str] = []
         map_data_qualities(
             sdf_model,
             sdf_event["sdfOutputData"],
-            wot_event["data"],
+            wot_data_schema,
             suppress_roundtripping,
             mapped_output_data_fields,
         )
@@ -692,8 +692,6 @@ def map_event_qualities(
     )
 
     map_additional_fields(wot_event, sdf_event, mapped_fields)
-
-    thing_model["events"][affordance_key] = wot_event
 
 
 def collect_sdf_required(
