@@ -13,14 +13,20 @@ def perform_conversion_test(input, expected_result):
 def test_empty_tm_sdf_conversion():
 
     input = {
-        "@context": [
-            "https://www.w3.org/2022/wot/td/v1.1",
-            {"sdf": "https://example.com/sdf"},
-        ],
+        "@context": "https://www.w3.org/2022/wot/td/v1.1",
         "@type": "tm:ThingModel",
     }
 
-    expected_result = {"sdfObject": {"sdfObject0": {}}}
+    expected_result = (
+        {"sdfObject": {"sdfObject0": {}}},
+        {
+            "map": {
+                "#/sdfObject/sdfObject0": {
+                    "@context": "https://www.w3.org/2022/wot/td/v1.1",
+                }
+            }
+        },
+    )
 
     perform_conversion_test(input, expected_result)
 
@@ -31,6 +37,9 @@ def test_wot_tm_to_sdf_conversion():
         "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "@type": "tm:ThingModel",
         "title": "Lamp Thing Model",
+        "version": {
+            "instance": "1.0.0",
+        },
         "properties": {
             "status": {
                 "description": "current status of the lamp (on|off)",
@@ -47,28 +56,50 @@ def test_wot_tm_to_sdf_conversion():
         },
     }
 
-    expected_result = {
-        "sdfObject": {
-            "sdfObject0": {
-                "label": "Lamp Thing Model",
-                "sdfProperty": {
-                    "status": {
-                        "description": "current status of the lamp (on|off)",
-                        "type": "string",
-                        "writable": False,
-                        "observable": False,
-                    }
-                },
-                "sdfAction": {"toggle": {"description": "Turn the lamp on or off"}},
-                "sdfEvent": {
-                    "overheating": {
-                        "description": "Lamp reaches a critical temperature (overheating)",
-                        "sdfOutputData": {"type": "string"},
-                    }
-                },
+    expected_result = (
+        {
+            "sdfObject": {
+                "sdfObject0": {
+                    "label": "Lamp Thing Model",
+                    "sdfAction": {
+                        "toggle": {"description": "Turn " "the " "lamp " "on or " "off"}
+                    },
+                    "sdfEvent": {
+                        "overheating": {
+                            "description": "Lamp "
+                            "reaches "
+                            "a "
+                            "critical "
+                            "temperature "
+                            "(overheating)",
+                            "sdfOutputData": {"type": "string"},
+                        }
+                    },
+                    "sdfProperty": {
+                        "status": {
+                            "description": "current "
+                            "status "
+                            "of "
+                            "the "
+                            "lamp "
+                            "(on|off)",
+                            "observable": False,
+                            "type": "string",
+                            "writable": False,
+                        }
+                    },
+                }
             },
         },
-    }
+        {
+            "map": {
+                "#/sdfObject/sdfObject0": {
+                    "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
+                    "version": {"instance": "1.0.0"},
+                }
+            },
+        },
+    )
 
     perform_conversion_test(input, expected_result)
 
@@ -86,11 +117,28 @@ def test_tm_sdf_namespace_conversion():
         "@type": "tm:ThingModel",
     }
 
-    expected_result = {
-        "namespace": {"foo": "https://example.com/foo"},
-        "defaultNamespace": "foo",
-        "sdfObject": {"sdfObject0": {}},
-    }
+    expected_result = (
+        {
+            "defaultNamespace": "foo",
+            "namespace": {"foo": "https://example.com/foo"},
+            "sdfObject": {"sdfObject0": {}},
+        },
+        {
+            "defaultNamespace": "foo",
+            "map": {
+                "#/sdfObject/sdfObject0": {
+                    "@context": [
+                        "https://www.w3.org/2022/wot/td/v1.1",
+                        {
+                            "foo": "https://example.com/foo",
+                            "sdf": "https://example.com/sdf",
+                        },
+                    ]
+                }
+            },
+            "namespace": {"foo": "https://example.com/foo"},
+        },
+    )
 
     perform_conversion_test(input, expected_result)
 
@@ -142,65 +190,72 @@ def test_tm_sdf_property_conversion():
         },
     }
 
-    expected_result = {
-        "sdfObject": {
-            "sdfObject0": {
-                "sdfProperty": {
-                    "foo": {
-                        "type": "integer",
-                        "observable": False,
-                        "minimum": 0,
-                        "maximum": 9001,
-                        "exclusiveMaximum": 9002,
-                        "exclusiveMinimum": 1,
-                        "multipleOf": 1,
-                        "const": 5,
-                        "default": 5,
-                    },
-                    "boo": {
-                        "type": "boolean",
-                        "observable": False,
-                        "const": True,
-                        "default": True,
-                    },
-                    "bar": {
-                        "type": "number",
-                        "observable": False,
-                        "minimum": 0.0,
-                        "maximum": 9001.0,
-                        "exclusiveMaximum": 9002.0,
-                        "exclusiveMinimum": 1.0,
-                        "multipleOf": 1.0,
-                        "const": 5.0,
-                        "default": 5.0,
-                    },
-                    "baz": {
-                        "type": "string",
-                        "observable": False,
-                        "minLength": 3,
-                        "maxLength": 5,
-                        "pattern": "email",
-                    },
-                    "foobar": {
-                        "type": "array",
-                        "observable": False,
-                        "minItems": 2,
-                        "maxItems": 5,
-                        "items": {"type": "string"},
-                    },
-                    "barfoo": {
-                        "type": "object",
-                        "observable": False,
-                        "properties": {"foo": {"type": "string"}},
-                        "required": ["foo"],
-                    },
-                    "fizzbuzz": {
-                        "observable": False,
-                    },
-                },
+    expected_result = (
+        {
+            "sdfObject": {
+                "sdfObject0": {
+                    "sdfProperty": {
+                        "bar": {
+                            "const": 5.0,
+                            "default": 5.0,
+                            "exclusiveMaximum": 9002.0,
+                            "exclusiveMinimum": 1.0,
+                            "maximum": 9001.0,
+                            "minimum": 0.0,
+                            "multipleOf": 1.0,
+                            "observable": False,
+                            "type": "number",
+                        },
+                        "barfoo": {
+                            "observable": False,
+                            "properties": {"foo": {"type": "string"}},
+                            "required": ["foo"],
+                            "type": "object",
+                        },
+                        "baz": {
+                            "maxLength": 5,
+                            "minLength": 3,
+                            "observable": False,
+                            "pattern": "email",
+                            "type": "string",
+                        },
+                        "boo": {
+                            "const": True,
+                            "default": True,
+                            "observable": False,
+                            "type": "boolean",
+                        },
+                        "fizzbuzz": {"observable": False},
+                        "foo": {
+                            "const": 5,
+                            "default": 5,
+                            "exclusiveMaximum": 9002,
+                            "exclusiveMinimum": 1,
+                            "maximum": 9001,
+                            "minimum": 0,
+                            "multipleOf": 1,
+                            "observable": False,
+                            "type": "integer",
+                        },
+                        "foobar": {
+                            "items": {"type": "string"},
+                            "maxItems": 5,
+                            "minItems": 2,
+                            "observable": False,
+                            "type": "array",
+                        },
+                    }
+                }
             }
-        }
-    }
+        },
+        {
+            "map": {
+                "#/sdfObject/sdfObject0": {
+                    "@context": ["https://www.w3.org/2022/wot/td/v1.1"]
+                }
+            }
+        },
+    )
 
     perform_conversion_test(input, expected_result)
 
@@ -215,9 +270,20 @@ def test_tm_sdf_link_conversion():
         "links": [{"href": "https://example.org"}],
     }
 
-    expected_result = {"sdfObject": {"sdfObject0": {}}}, {
-        "map": {"#/sdfObject/sdfObject0": {"links": [{"href": "https://example.org"}]}}
-    }
+    expected_result = (
+        {"sdfObject": {"sdfObject0": {}}},
+        {
+            "map": {
+                "#/sdfObject/sdfObject0": {
+                    "@context": [
+                        "https://www.w3.org/2022/wot/td/v1.1",
+                        {"sdf": "https://example.com/sdf"},
+                    ],
+                    "links": [{"href": "https://example.org"}],
+                }
+            }
+        },
+    )
 
     perform_conversion_test(input, expected_result)
 
@@ -239,9 +305,18 @@ def test_tm_sdf_schema_definition_conversion():
         "sdfObject": {
             "sdfObject0": {
                 "sdfData": {
-                    "foobar": {"type": "string"},
                     "barfoo": {"type": "integer"},
+                    "foobar": {"type": "string"},
                 }
+            }
+        }
+    }, {
+        "map": {
+            "#/sdfObject/sdfObject0": {
+                "@context": [
+                    "https://www.w3.org/2022/wot/td/v1.1",
+                    {"sdf": "https://example.com/sdf"},
+                ]
             }
         }
     }
@@ -263,7 +338,6 @@ def test_tm_sdf_relative_tm_ref_conversion():
     expected_result = {
         "sdfObject": {
             "sdfObject0": {
-                "sdfData": {"foobar": {"type": "string"}},
                 "sdfAction": {
                     "toggle": {
                         "sdfInputData": {
@@ -271,6 +345,16 @@ def test_tm_sdf_relative_tm_ref_conversion():
                         }
                     }
                 },
+                "sdfData": {"foobar": {"type": "string"}},
+            }
+        }
+    }, {
+        "map": {
+            "#/sdfObject/sdfObject0": {
+                "@context": [
+                    "https://www.w3.org/2022/wot/td/v1.1",
+                    {"sdf": "https://example.com/sdf"},
+                ]
             }
         }
     }
@@ -294,6 +378,7 @@ def test_tm_sdf_composited_conversion():
     }
 
     expected_result = {
+        "namespace": {"saref": "https://w3id.org/saref#"},
         "sdfThing": {
             "sdfThing0": {
                 "sdfObject": {
@@ -304,16 +389,27 @@ def test_tm_sdf_composited_conversion():
                             "overheating": {"sdfOutputData": {"type": "string"}}
                         },
                         "sdfProperty": {
-                            "status": {"type": "string", "observable": False}
+                            "status": {"observable": False, "type": "string"}
                         },
                     }
                 }
             }
-        }
+        },
     }, {
         "map": {
+            "#/sdfThing/sdfThing0": {
+                "@context": [
+                    "https://www.w3.org/2022/wot/td/v1.1",
+                    {"sdf": "https://example.com/sdf"},
+                ]
+            },
             "#/sdfThing/sdfThing0/sdfObject/example": {
-                "id": "urn:dev:ops:32473-WoTLamp-1234"
+                "@context": [
+                    "https://www.w3.org/2022/wot/td/v1.1",
+                    {"saref": "https://w3id.org/saref#"},
+                ],
+                "@type": ["saref:LightSwitch"],
+                "id": "urn:dev:ops:32473-WoTLamp-1234",
             },
             "#/sdfThing/sdfThing0/sdfObject/example/sdfAction/toggle": {
                 "@type": "saref:ToggleCommand"
@@ -321,7 +417,8 @@ def test_tm_sdf_composited_conversion():
             "#/sdfThing/sdfThing0/sdfObject/example/sdfProperty/status": {
                 "@type": "saref:OnOffState"
             },
-        }
+        },
+        "namespace": {"saref": "https://w3id.org/saref#"},
     }
 
     perform_conversion_test(input, expected_result)
@@ -346,6 +443,7 @@ def test_tm_sdf_composited_conversion_with_affordance():
     }
 
     expected_result = {
+        "namespace": {"saref": "https://w3id.org/saref#"},
         "sdfThing": {
             "sdfThing0": {
                 "label": "Top Level Lamp Thing",
@@ -363,11 +461,23 @@ def test_tm_sdf_composited_conversion_with_affordance():
                     },
                 },
             }
-        }
+        },
     }, {
+        "namespace": {"saref": "https://w3id.org/saref#"},
         "map": {
+            "#/sdfThing/sdfThing0": {
+                "@context": [
+                    "https://www.w3.org/2022/wot/td/v1.1",
+                    {"sdf": "https://example.com/sdf"},
+                ]
+            },
             "#/sdfThing/sdfThing0/sdfObject/smartlamp": {
-                "id": "urn:dev:ops:32473-WoTLamp-1234"
+                "@context": [
+                    "https://www.w3.org/2022/wot/td/v1.1",
+                    {"saref": "https://w3id.org/saref#"},
+                ],
+                "@type": ["saref:LightSwitch"],
+                "id": "urn:dev:ops:32473-WoTLamp-1234",
             },
             "#/sdfThing/sdfThing0/sdfObject/smartlamp/sdfAction/toggle": {
                 "@type": "saref:ToggleCommand"
@@ -375,7 +485,7 @@ def test_tm_sdf_composited_conversion_with_affordance():
             "#/sdfThing/sdfThing0/sdfObject/smartlamp/sdfProperty/status": {
                 "@type": "saref:OnOffState"
             },
-        }
+        },
     }
 
     perform_conversion_test(input, expected_result)
@@ -455,6 +565,19 @@ def test_tm_collection_sdf_conversion():
                 },
             }
         }
+    }, {
+        "map": {
+            "#/sdfThing/baseModel": {"@context": "https://www.w3.org/2022/wot/td/v1.1"},
+            "#/sdfThing/baseModel/sdfObject/led": {
+                "@context": "https://www.w3.org/2022/wot/td/v1.1"
+            },
+            "#/sdfThing/baseModel/sdfThing/ventilation": {
+                "@context": "https://www.w3.org/2022/wot/td/v1.1"
+            },
+            "#/sdfThing/baseModel/sdfThing/ventilation/sdfObject/ventilationSubmodel": {
+                "@context": "https://www.w3.org/2022/wot/td/v1.1"
+            },
+        }
     }
 
     result = convert_wot_tm_collection_to_sdf(input)
@@ -474,7 +597,15 @@ def test_mapping_file_conversion():
     }
 
     expected_result = {"sdfObject": {"sdfObject0": {}}}, {
-        "map": {"#/sdfObject/sdfObject0": {"titles": {"de": "Lampending"}}}
+        "map": {
+            "#/sdfObject/sdfObject0": {
+                "@context": [
+                    "https://www.w3.org/2022/wot/td/v1.1",
+                    {"sdf": "https://example.com/sdf"},
+                ],
+                "titles": {"de": "Lampending"},
+            }
+        }
     }
 
     perform_conversion_test(input, expected_result)
@@ -489,3 +620,28 @@ def test_tm_sdf_illegal_input():
 
     with pytest.raises(ValidationError):
         convert_wot_tm_to_sdf(input)
+
+
+def test_tm_to_sdf_context_conversion():
+    input = {
+        "@context": [
+            "https://www.w3.org/2022/wot/td/v1.1",
+            "https://example.org",
+            {"sdf": "https://example.com/sdf"},
+        ],
+        "@type": "tm:ThingModel",
+    }
+
+    expected_result = {"sdfObject": {"sdfObject0": {}}}, {
+        "map": {
+            "#/sdfObject/sdfObject0": {
+                "@context": [
+                    "https://www.w3.org/2022/wot/td/v1.1",
+                    "https://example.org",
+                    {"sdf": "https://example.com/sdf"},
+                ],
+            }
+        }
+    }
+
+    perform_conversion_test(input, expected_result)

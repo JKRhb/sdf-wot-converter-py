@@ -14,6 +14,7 @@ from .jsonschema import (
 )
 from ..validation import validate_sdf_model, validate_thing_model
 from .utility import (
+    ensure_value_is_list,
     initialize_list_field,
     initialize_object_field,
     map_field,
@@ -475,21 +476,18 @@ def map_version(
     if "version" not in wot_definition:
         return
 
-    mapped_fields.append("version")
-
     version_info = wot_definition["version"]
     if "model" in version_info:
-        for sdf_dict in [sdf_definition, sdf_mapping_file]:
-            pass
-            # initialize_info_block(sdf_dict)
-            # sdf_dict["info"]["version"] = version_info["model"]
+        del version_info["model"]
+
+    if len(version_info) == 0:
+        del wot_definition["version"]
 
 
-def map_context(wot_definition: Dict, sdf_definition: Dict, sdf_mapping_file):
-    # TODO: How to deal with context elements without namespace?
+def map_context_to_namespaces(wot_definition: Dict, sdf_model: Dict):
     context = wot_definition["@context"]
     if isinstance(context, str):
-        pass
+        return
     else:
         for context_element in context:
             if isinstance(context_element, dict):
@@ -497,11 +495,30 @@ def map_context(wot_definition: Dict, sdf_definition: Dict, sdf_mapping_file):
                     if namespace == "sdf":
                         continue
                     else:
-                        initialize_object_field(sdf_definition, "namespace")
-                        sdf_definition["namespace"][namespace] = url
+                        namespaces = initialize_object_field(sdf_model, "namespace")
+                        namespaces.setdefault(namespace, url)
             else:
-                continue  # pragma: no cover
+                continue
 
+
+def filter_at_type(wot_definition: Dict):
+    at_type = ensure_value_is_list(wot_definition["@type"])
+
+    at_type = list(
+        filter(
+            lambda value: value != "tm:ThingModel",
+            at_type,
+        ),
+    )
+
+    if len(at_type) == 0:
+        del wot_definition["@type"]
+        return
+
+    wot_definition["@type"] = at_type
+
+
+def map_default_namespace(wot_definition: Dict, sdf_definition: Dict):
     if "sdf:defaultNamespace" in wot_definition:
         sdf_definition["defaultNamespace"] = wot_definition["sdf:defaultNamespace"]
 
@@ -561,6 +578,7 @@ def map_thing_model_to_sdf_object(
     thing_model: Dict,
     thing_model_key: str,
     sdf_definition,
+    sdf_model,
     sdf_mapping_file,
     current_path: str,
     placeholder_map=None,
@@ -570,8 +588,6 @@ def map_thing_model_to_sdf_object(
 
     # TODO: Deal with @context and @type
     mapped_fields: List[str] = [
-        "@context",
-        "@type",
         "sdf:defaultNamespace",
         "sdf:title",
         "sdf:copyright",
@@ -584,8 +600,10 @@ def map_thing_model_to_sdf_object(
         mapped_fields.append("sdf:objectKey")
     elif thing_model_key is None:
         thing_model_key = f"sdfObject{len(sdf_definition)}"
-
     sdf_object_path = f"{current_path}/sdfObject/{thing_model_key}"
+
+    map_context_to_namespaces(thing_model, sdf_model)
+    filter_at_type(thing_model)
 
     map_title(thing_model, sdf_object, mapped_fields)
     map_description(thing_model, sdf_object, mapped_fields)
@@ -615,7 +633,6 @@ def map_thing_model_to_sdf_object(
     sdf_definition[thing_model_key] = sdf_object
 
 
-# TODO: Generalize
 def determine_thing_model_key(
     thing_model, thing_model_key, sdf_definition, mapped_fields: List[str]
 ):
@@ -658,17 +675,15 @@ def map_thing_model_to_sdf_thing(
     sub_models: Dict,
     thing_model_key: str,
     sdf_definition,
+    sdf_model,
     sdf_mapping_file,
     current_path,
     placeholder_map=None,
     thing_model_collection=None,
 ):
-    # TODO: Map @context, titles, descriptions of submodels?
     thing_model = copy.deepcopy(thing_model)
     sdf_thing: Dict = {}
     mapped_fields: List[str] = [
-        "@context",
-        "@type",
         "sdf:defaultNamespace",
         "sdf:title",
         "sdf:copyright",
@@ -678,6 +693,9 @@ def map_thing_model_to_sdf_thing(
     thing_model_key = determine_thing_model_key(
         thing_model, thing_model_key, sdf_definition, mapped_fields
     )
+
+    map_context_to_namespaces(thing_model, sdf_model)
+    filter_at_type(thing_model)
 
     sdf_thing_path = f"{current_path}/sdfThing/{thing_model_key}"
 
@@ -714,6 +732,7 @@ def map_thing_model_to_sdf_thing(
             local_sub_models,
             key,
             sdf_thing,
+            sdf_model,
             sdf_mapping_file,
             sdf_thing_path,
             placeholder_map=placeholder_map,
@@ -725,6 +744,7 @@ def map_thing_model(
     thing_model: Dict,
     sub_models: Dict,
     thing_model_key,
+    sdf_definition,
     sdf_model,
     sdf_mapping_file,
     current_path: str,
@@ -732,29 +752,27 @@ def map_thing_model(
     thing_model_collection=None,
 ):
     if len(sub_models) > 0 or "sdf:thingKey" in thing_model:
-        # TODO: Refactor into function
-        initialize_object_field(sdf_model, "sdfThing")
-        sdf_things = sdf_model["sdfThing"]
+        sdf_things = initialize_object_field(sdf_definition, "sdfThing")
 
         map_thing_model_to_sdf_thing(
             thing_model,
             sub_models,
             thing_model_key,
             sdf_things,
+            sdf_model,
             sdf_mapping_file,
             current_path,
             placeholder_map=placeholder_map,
             thing_model_collection=thing_model_collection,
         )
     else:
-        # TODO: Refactor into function
-        initialize_object_field(sdf_model, "sdfObject")
-        sdf_objects = sdf_model["sdfObject"]
+        sdf_objects = initialize_object_field(sdf_definition, "sdfObject")
 
         map_thing_model_to_sdf_object(
             thing_model,
             thing_model_key,
             sdf_objects,
+            sdf_model,
             sdf_mapping_file,
             current_path,
             placeholder_map=placeholder_map,
@@ -843,7 +861,7 @@ def convert_wot_tm_to_sdf(
 
     # TODO: @context of submoduls needs to be integrated as well
     # TODO: Revisit context mappings
-    map_context(thing_model, sdf_model, sdf_mapping_file)
+    map_default_namespace(thing_model, sdf_model)
     map_infoblock_fields(thing_model, sdf_model)
 
     # TODO: This distinction needs to be revisited
@@ -857,6 +875,7 @@ def convert_wot_tm_to_sdf(
             thing_model,
             sub_models,
             thing_model_key,
+            sdf_model,
             sdf_model,
             sdf_mapping_file,
             "#",
@@ -876,6 +895,7 @@ def convert_wot_tm_to_sdf(
                 model,
                 sub_models,
                 key,
+                sdf_model,
                 sdf_model,
                 sdf_mapping_file,
                 "#",

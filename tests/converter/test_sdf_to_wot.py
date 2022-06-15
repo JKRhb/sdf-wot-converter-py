@@ -11,7 +11,7 @@ def perform_sdf_roundtrip_test(input):
     converted_model = convert_sdf_to_wot_tm(input)
     result = convert_wot_tm_to_sdf(converted_model)
 
-    assert input == result
+    assert input == result[0]
 
 
 def perform_sdf_thing_collection_roundtrip_test(
@@ -22,7 +22,7 @@ def perform_sdf_thing_collection_roundtrip_test(
         converted_model, root_model_key=root_model_key, top_model_keys=top_model_keys
     )
 
-    assert input == result
+    assert input == result[0]
 
 
 def perform_conversion_test(input, expected_result, **kwargs):
