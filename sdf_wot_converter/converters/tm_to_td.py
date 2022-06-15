@@ -11,6 +11,7 @@ from .wot_common import (
     is_thing_collection,
     replace_placeholders,
     resolve_extension,
+    resolve_sub_things,
 )
 
 
@@ -83,10 +84,21 @@ def convert_tm_collection_to_td_collection(thing_collection):
 
 
 def convert_tm_to_td(
-    thing_model: Dict, placeholder_map=None, meta_data=None, bindings=None
+    thing_model: Dict,
+    placeholder_map=None,
+    meta_data=None,
+    bindings=None,
+    root_model_key="root",
 ) -> Dict:
     if is_thing_collection(thing_model):
         return convert_tm_collection_to_td_collection(thing_model)
+
+    sub_models = resolve_sub_things(thing_model, replace_href=True)
+    if len(sub_models) > 0:
+        sub_models[root_model_key] = thing_model
+        for key, value in sub_models.items():
+            sub_models[key] = resolve_extension(value, resolve_relative_pointers=True)
+        return convert_tm_collection_to_td_collection(sub_models)
 
     validate_thing_model(thing_model)
     partial_td: Dict = copy.deepcopy(thing_model)

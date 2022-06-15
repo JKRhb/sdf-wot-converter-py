@@ -391,3 +391,130 @@ def test_tm_td_illegal_input():
 
     with pytest.raises(ValidationError):
         convert_wot_tm_to_wot_td(input)
+
+
+def test_tm_td_with_nesting():
+    input = {
+        "@context": [
+            "https://www.w3.org/2022/wot/td/v1.1",
+            {"saref": "https://w3id.org/saref#"},
+        ],
+        "id": "urn:dev:ops:32473-WoTLamp-1234",
+        "title": "MyLampThing",
+        "@type": ["tm:ThingModel", "saref:LightSwitch"],
+        "securityDefinitions": {"basic_sc": {"scheme": "basic", "in": "header"}},
+        "security": "basic_sc",
+        "properties": {
+            "status": {
+                "@type": "saref:OnOffState",
+                "type": "string",
+                "forms": [{"href": "https://mylamp.example.com/status"}],
+            }
+        },
+        "actions": {
+            "toggle": {
+                "@type": "saref:ToggleCommand",
+                "forms": [{"href": "https://mylamp.example.com/toggle"}],
+            }
+        },
+        "events": {
+            "overheating": {
+                "data": {"type": "string"},
+                "forms": [
+                    {"href": "https://mylamp.example.com/oh", "subprotocol": "longpoll"}
+                ],
+            },
+            "overheating2": {"tm:ref": "#/events/overheating"},
+        },
+        "links": [
+            {
+                "href": "./examples/wot/example-with-bindings.tm.jsonld",
+                "rel": "tm:submodel",
+            }
+        ],
+    }
+
+    expected_result = {
+        "example-with-bindings": {
+            "@context": [
+                "https://www.w3.org/2022/wot/td/v1.1",
+                {"saref": "https://w3id.org/saref#"},
+            ],
+            "@type": ["saref:LightSwitch"],
+            "actions": {
+                "toggle": {
+                    "@type": "saref:ToggleCommand",
+                    "forms": [{"href": "https://mylamp.example.com/toggle"}],
+                }
+            },
+            "events": {
+                "overheating": {
+                    "data": {"type": "string"},
+                    "forms": [
+                        {
+                            "href": "https://mylamp.example.com/oh",
+                            "subprotocol": "longpoll",
+                        }
+                    ],
+                }
+            },
+            "id": "urn:dev:ops:32473-WoTLamp-1234",
+            "properties": {
+                "status": {
+                    "@type": "saref:OnOffState",
+                    "forms": [{"href": "https://mylamp.example.com/status"}],
+                    "type": "string",
+                }
+            },
+            "security": "basic_sc",
+            "securityDefinitions": {"basic_sc": {"in": "header", "scheme": "basic"}},
+            "title": "MyLampThing",
+        },
+        "root": {
+            "@context": [
+                "https://www.w3.org/2022/wot/td/v1.1",
+                {"saref": "https://w3id.org/saref#"},
+            ],
+            "@type": ["saref:LightSwitch"],
+            "actions": {
+                "toggle": {
+                    "@type": "saref:ToggleCommand",
+                    "forms": [{"href": "https://mylamp.example.com/toggle"}],
+                }
+            },
+            "events": {
+                "overheating": {
+                    "data": {"type": "string"},
+                    "forms": [
+                        {
+                            "href": "https://mylamp.example.com/oh",
+                            "subprotocol": "longpoll",
+                        }
+                    ],
+                },
+                "overheating2": {
+                    "data": {"type": "string"},
+                    "forms": [
+                        {
+                            "href": "https://mylamp.example.com/oh",
+                            "subprotocol": "longpoll",
+                        }
+                    ],
+                },
+            },
+            "id": "urn:dev:ops:32473-WoTLamp-1234",
+            "links": [{"href": "#/example-with-bindings", "rel": "item"}],
+            "properties": {
+                "status": {
+                    "@type": "saref:OnOffState",
+                    "forms": [{"href": "https://mylamp.example.com/status"}],
+                    "type": "string",
+                }
+            },
+            "security": "basic_sc",
+            "securityDefinitions": {"basic_sc": {"in": "header", "scheme": "basic"}},
+            "title": "MyLampThing",
+        },
+    }
+
+    perform_conversion_test(input, expected_result)
