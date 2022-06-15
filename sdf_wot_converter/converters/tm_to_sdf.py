@@ -536,14 +536,17 @@ def map_sdf_comment(
 
 
 def convert_pointer(pointer: str, current_path: str) -> str:
-    # TODO: Maybe this can be done more elegantly
-    # TODO: Check if there are more possible mappings
-    pointer = pointer.replace("events", "sdfEvent")
-    pointer = pointer.replace("actions", "sdfAction")
-    pointer = pointer.replace("properties", "sdfProperty")
-    pointer = pointer.replace("schemaDefinitions", "sdfData")
-    pointer = pointer.replace("input", "sdfInputData")
-    pointer = pointer.replace("output", "sdfOutputData")
+    replacements = {
+        "events": "sdfEvent",
+        "actions": "sdfAction",
+        "properties": "sdfProperty",
+        "schemaDefinitions": "sdfData",
+        "input": "sdfInputData",
+        "output": "sdfOutputData",
+    }
+    for wot_string, sdf_string in replacements.items():
+        pointer = pointer.replace(wot_string, sdf_string)
+
     return current_path + pointer[1:]
 
 
