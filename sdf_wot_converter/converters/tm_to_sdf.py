@@ -158,7 +158,6 @@ def map_action_fields(
     current_path: str,
     mapped_fields: List[str],
 ):
-    # TODO: Missing fields: safe, idempotent
     if "input" in wot_action:
         sdf_input_data = initialize_object_field(sdf_action, "sdfInputData")
         mapped_fields.append("input")
@@ -266,7 +265,6 @@ def map_data_schema_fields(
     map_description(wot_definition, sdf_definition, mapped_fields)
     map_enum(wot_definition, sdf_definition, mapped_fields)
     if is_property:
-        # TODO: Add mapping for when not part of dataschema
         map_read_only(wot_definition, sdf_definition, mapped_fields)
         map_write_only(wot_definition, sdf_definition, mapped_fields)
     map_unique_items(wot_definition, sdf_definition, mapped_fields)
@@ -384,7 +382,6 @@ def map_observable(wot_property: Dict, sdf_property: Dict, mapped_fields: List[s
 def map_interaction_affordance_fields(
     wot_definition: Dict, sdf_definition: Dict, mapped_fields: List[str]
 ):
-    # TODO: Unmapped fields: @type, titles, descriptions, forms, uriVariables
     map_title(wot_definition, sdf_definition, mapped_fields)
     map_description(wot_definition, sdf_definition, mapped_fields)
 
@@ -862,8 +859,6 @@ def convert_wot_tm_to_sdf(
     thing_model = replace_placeholders(thing_model, placeholder_map)
     validate_thing_model(thing_model)
 
-    # TODO: @context of submoduls needs to be integrated as well
-    # TODO: Revisit context mappings
     map_default_namespace(thing_model, sdf_model)
     map_infoblock_fields(thing_model, sdf_model)
 

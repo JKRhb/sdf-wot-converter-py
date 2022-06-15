@@ -305,7 +305,6 @@ def map_data_qualities(
     )
     map_enum(data_qualities, data_schema, mapped_fields)
 
-    # TODO: Revisit the mapping of these two fields
     map_nullable(data_qualities, data_schema, suppress_roundtripping, mapped_fields)
     map_sdf_type(data_qualities, data_schema, suppress_roundtripping, mapped_fields)
 
