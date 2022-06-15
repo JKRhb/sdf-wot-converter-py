@@ -43,8 +43,8 @@ def map_properties(
     mapped_fields.append("properties")
 
     for key, wot_property in thing_model["properties"].items():
-        initialize_object_field(sdf_model, "sdfProperty")
-        sdf_property: Dict[str, Any] = {}
+        sdf_properties = initialize_object_field(sdf_model, "sdfProperty")
+        sdf_property = initialize_object_field(sdf_properties, key)
         mapped_property_fields: List[str] = []
         property_path = f"{current_path}/sdfProperty/{key}"
 
@@ -63,8 +63,6 @@ def map_properties(
             property_path=property_path,
         )
 
-        sdf_model["sdfProperty"][key] = sdf_property
-
 
 def map_items(
     thing_model,
@@ -74,16 +72,20 @@ def map_items(
     current_path: str,
     mapped_fields: List[str],
 ):
-    if "items" in wot_definition:
-        mapped_fields.append("items")
-        sdf_definition["items"] = {}
-        map_data_schema_fields(
-            thing_model,
-            wot_definition["items"],
-            sdf_definition["items"],
-            sdf_mapping_file,
-            current_path,
-        )
+    wot_items = wot_definition.get("items")
+
+    if wot_items is None:
+        return
+
+    sdf_items = initialize_object_field(sdf_definition, "items")
+    mapped_fields.append("items")
+    map_data_schema_fields(
+        thing_model,
+        wot_items,
+        sdf_items,
+        sdf_mapping_file,
+        current_path,
+    )
 
 
 def map_dataschema_properties(
@@ -100,12 +102,12 @@ def map_dataschema_properties(
     mapped_fields.append("properties")
 
     for key, property in wot_definition["properties"].items():
-        initialize_object_field(sdf_definition, "properties")
-        sdf_definition["properties"][key] = {}
+        properties = initialize_object_field(sdf_definition, "properties")
+        property_field = initialize_object_field(properties, key)
         map_data_schema_fields(
             thing_model,
             property,
-            sdf_definition["properties"][key],
+            property_field,
             sdf_mapping_file,
             current_path,
         )
@@ -123,11 +125,11 @@ def map_actions(
 
     mapped_fields.append("actions")
 
-    for key, wot_action in thing_model["actions"].items():
-        initialize_object_field(sdf_model, "sdfAction")
-        sdf_action: Dict[str, Any] = {}
+    for action_key, wot_action in thing_model["actions"].items():
+        sdf_actions = initialize_object_field(sdf_model, "sdfAction")
+        sdf_action = initialize_object_field(sdf_actions, action_key)
         mapped_action_fields: List[str] = []
-        action_path = f"{current_path}/sdfAction/{key}"
+        action_path = f"{current_path}/sdfAction/{action_key}"
 
         map_sdf_comment(wot_action, sdf_action, mapped_action_fields)
         map_interaction_affordance_fields(wot_action, sdf_action, mapped_action_fields)
@@ -147,8 +149,6 @@ def map_actions(
             sdf_mapping_file, wot_action, action_path, mapped_action_fields
         )
 
-        sdf_model["sdfAction"][key] = sdf_action
-
 
 def map_action_fields(
     thing_model,
@@ -158,9 +158,8 @@ def map_action_fields(
     current_path: str,
     mapped_fields: List[str],
 ):
-    # TODO: Missing fields: safe, idempotent
     if "input" in wot_action:
-        sdf_input_data: Dict[str, Any] = {}
+        sdf_input_data = initialize_object_field(sdf_action, "sdfInputData")
         mapped_fields.append("input")
         map_data_schema_fields(
             thing_model,
@@ -169,9 +168,8 @@ def map_action_fields(
             sdf_mapping_file,
             current_path,
         )
-        sdf_action["sdfInputData"] = sdf_input_data
     if "output" in wot_action:
-        sdf_output_data: Dict[str, Any] = {}
+        sdf_output_data = initialize_object_field(sdf_action, "sdfOutputData")
         mapped_fields.append("output")
         map_data_schema_fields(
             thing_model,
@@ -180,7 +178,6 @@ def map_action_fields(
             sdf_mapping_file,
             current_path,
         )
-        sdf_action["sdfOutputData"] = sdf_output_data
 
 
 def map_events(
@@ -195,11 +192,11 @@ def map_events(
 
     mapped_fields.append("events")
 
-    for key, wot_event in thing_model["events"].items():
-        initialize_object_field(sdf_model, "sdfEvent")
-        sdf_event: Dict[str, Any] = {}
+    for event_key, wot_event in thing_model["events"].items():
+        sdf_events = initialize_object_field(sdf_model, "sdfEvent")
+        sdf_event = initialize_object_field(sdf_events, event_key)
+        event_path = f"{current_path}/sdfEvent/{event_key}"
         mapped_event_fields: List[str] = []
-        event_path = f"{current_path}/sdfEvent/{key}"
 
         map_sdf_comment(wot_event, sdf_event, mapped_event_fields)
         map_interaction_affordance_fields(wot_event, sdf_event, mapped_event_fields)
@@ -217,8 +214,6 @@ def map_events(
             sdf_mapping_file, wot_event, event_path, mapped_event_fields
         )
 
-        sdf_model["sdfEvent"][key] = sdf_event
-
 
 def map_event_fields(
     thing_model,
@@ -228,19 +223,21 @@ def map_event_fields(
     current_path: str,
     mapped_fields: List[str],
 ):
-    # TODO: Missing fields: subscription, cancellation
-    if "data" in wot_event:
-        sdf_input_data: Dict = {}
-        mapped_fields.append("data")
-        map_data_schema_fields(
-            thing_model,
-            wot_event["data"],
-            sdf_input_data,
-            sdf_mapping_file,
-            current_path,
-            mapped_fields,
-        )
-        sdf_event["sdfOutputData"] = sdf_input_data
+    wot_event_data = wot_event.get("data")
+
+    if wot_event_data is None:
+        return
+
+    sdf_output_data = initialize_object_field(sdf_event, "sdfOutputData")
+    mapped_fields.append("data")
+    map_data_schema_fields(
+        thing_model,
+        wot_event_data,
+        sdf_output_data,
+        sdf_mapping_file,
+        current_path,
+        mapped_fields,
+    )
 
 
 def map_data_schema_fields(
@@ -268,7 +265,6 @@ def map_data_schema_fields(
     map_description(wot_definition, sdf_definition, mapped_fields)
     map_enum(wot_definition, sdf_definition, mapped_fields)
     if is_property:
-        # TODO: Add mapping for when not part of dataschema
         map_read_only(wot_definition, sdf_definition, mapped_fields)
         map_write_only(wot_definition, sdf_definition, mapped_fields)
     map_unique_items(wot_definition, sdf_definition, mapped_fields)
@@ -386,7 +382,6 @@ def map_observable(wot_property: Dict, sdf_property: Dict, mapped_fields: List[s
 def map_interaction_affordance_fields(
     wot_definition: Dict, sdf_definition: Dict, mapped_fields: List[str]
 ):
-    # TODO: Unmapped fields: @type, titles, descriptions, forms, uriVariables
     map_title(wot_definition, sdf_definition, mapped_fields)
     map_description(wot_definition, sdf_definition, mapped_fields)
 
@@ -412,36 +407,34 @@ def map_schema_definitions(
     current_path: str,
     mapped_fields: List[str],
 ):
-    if "schemaDefinitions" not in thing_model:
+    wot_schema_definitions = thing_model.get("schemaDefinitions")
+    if wot_schema_definitions is None:
         return
 
     mapped_fields.append("schemaDefinitions")
+    sdf_data = initialize_object_field(sdf_model, "sdfData")
 
-    for key, wot_schema_definitions in thing_model["schemaDefinitions"].items():
-        if "sdfData" not in sdf_model:
-            sdf_model["sdfData"] = {}
-        sdf_data: Dict[str, Any] = {}
+    for schema_definition_key, wot_schema_definition in wot_schema_definitions.items():
+        sdf_data_field = initialize_object_field(sdf_data, schema_definition_key)
         mapped_schema_definitions_fields: List[str] = []
         map_sdf_comment(
-            wot_schema_definitions, sdf_data, mapped_schema_definitions_fields
+            wot_schema_definition, sdf_data_field, mapped_schema_definitions_fields
         )
         map_data_schema_fields(
             thing_model,
-            wot_schema_definitions,
-            sdf_data,
+            wot_schema_definition,
+            sdf_data_field,
             sdf_mapping_file,
             current_path,
             mapped_fields=mapped_schema_definitions_fields,
         )
         map_tm_ref(
             thing_model,
-            wot_schema_definitions,
-            sdf_data,
+            wot_schema_definition,
+            sdf_data_field,
             current_path,
             mapped_schema_definitions_fields,
         )
-
-        sdf_model["sdfData"][key] = sdf_data
 
 
 def map_links(
@@ -536,14 +529,17 @@ def map_sdf_comment(
 
 
 def convert_pointer(pointer: str, current_path: str) -> str:
-    # TODO: Maybe this can be done more elegantly
-    # TODO: Check if there are more possible mappings
-    pointer = pointer.replace("events", "sdfEvent")
-    pointer = pointer.replace("actions", "sdfAction")
-    pointer = pointer.replace("properties", "sdfProperty")
-    pointer = pointer.replace("schemaDefinitions", "sdfData")
-    pointer = pointer.replace("input", "sdfInputData")
-    pointer = pointer.replace("output", "sdfOutputData")
+    replacements = {
+        "events": "sdfEvent",
+        "actions": "sdfAction",
+        "properties": "sdfProperty",
+        "schemaDefinitions": "sdfData",
+        "input": "sdfInputData",
+        "output": "sdfOutputData",
+    }
+    for wot_string, sdf_string in replacements.items():
+        pointer = pointer.replace(wot_string, sdf_string)
+
     return current_path + pointer[1:]
 
 
@@ -554,10 +550,13 @@ def map_tm_ref(
     current_path: str,
     mapped_fields: List[str],
 ):
-    if "tm:ref" in wot_definition:
-        pointer = wot_definition["tm:ref"]
-        mapped_fields.append("tm:ref")
-        sdf_definition["sdfRef"] = convert_pointer(pointer, current_path)
+    pointer = wot_definition.get("tm:ref")
+
+    if pointer is None:
+        return
+
+    mapped_fields.append("tm:ref")
+    sdf_definition["sdfRef"] = convert_pointer(pointer, current_path)
 
 
 def map_tm_required(
@@ -567,11 +566,14 @@ def map_tm_required(
     current_path: str,
     mapped_fields: List[str],
 ):
-    if "tm:required" in wot_definition:
-        mapped_fields.append("tm:required")
-        pointers = wot_definition["tm:required"]
-        converted_pointers = [convert_pointer(x, current_path) for x in pointers]
-        sdf_definition["sdfRequired"] = converted_pointers
+    pointers = wot_definition.get("tm:required")
+
+    if pointers is None:
+        return
+
+    mapped_fields.append("tm:required")
+    converted_pointers = [convert_pointer(x, current_path) for x in pointers]
+    sdf_definition["sdfRequired"] = converted_pointers
 
 
 def map_thing_model_to_sdf_object(
@@ -584,9 +586,6 @@ def map_thing_model_to_sdf_object(
     placeholder_map=None,
 ):
     thing_model = copy.deepcopy(thing_model)
-    sdf_object: Dict = {}
-
-    # TODO: Deal with @context and @type
     mapped_fields: List[str] = [
         "sdf:defaultNamespace",
         "sdf:title",
@@ -594,13 +593,11 @@ def map_thing_model_to_sdf_object(
         "sdf:license",
     ]
 
-    sdf_thing_key = thing_model.get("sdf:objectKey")
-    if sdf_thing_key is not None:
-        thing_model_key = sdf_thing_key
-        mapped_fields.append("sdf:objectKey")
-    elif thing_model_key is None:
-        thing_model_key = f"sdfObject{len(sdf_definition)}"
-    sdf_object_path = f"{current_path}/sdfObject/{thing_model_key}"
+    sdf_object_key = determine_thing_model_key(
+        thing_model, thing_model_key, sdf_definition, mapped_fields, is_sdf_thing=False
+    )
+    sdf_object_path = f"{current_path}/sdfObject/{sdf_object_key}"
+    sdf_object = initialize_object_field(sdf_definition, sdf_object_key)
 
     map_context_to_namespaces(thing_model, sdf_model)
     filter_at_type(thing_model)
@@ -630,18 +627,23 @@ def map_thing_model_to_sdf_object(
 
     map_additional_fields(sdf_mapping_file, thing_model, sdf_object_path, mapped_fields)
 
-    sdf_definition[thing_model_key] = sdf_object
-
 
 def determine_thing_model_key(
-    thing_model, thing_model_key, sdf_definition, mapped_fields: List[str]
+    thing_model,
+    thing_model_key,
+    sdf_definition,
+    mapped_fields: List[str],
+    is_sdf_thing=False,
 ):
-    sdf_thing_key = thing_model.get("sdf:thingKey")
+    wot_key = "sdf:thingKey" if is_sdf_thing else "sdf:objectKey"
+    prefix = "sdfThing" if is_sdf_thing else "sdfObject"
+
+    sdf_thing_key = thing_model.get(wot_key)
+    mapped_fields.append(wot_key)
     if sdf_thing_key is not None:
         thing_model_key = sdf_thing_key
-        mapped_fields.append("sdf:thingKey")
     elif thing_model_key is None:
-        thing_model_key = f"sdfThing{len(sdf_definition)}"
+        thing_model_key = f"{prefix}{len(sdf_definition)}"
 
     return thing_model_key
 
@@ -682,7 +684,6 @@ def map_thing_model_to_sdf_thing(
     thing_model_collection=None,
 ):
     thing_model = copy.deepcopy(thing_model)
-    sdf_thing: Dict = {}
     mapped_fields: List[str] = [
         "sdf:defaultNamespace",
         "sdf:title",
@@ -691,9 +692,10 @@ def map_thing_model_to_sdf_thing(
     ]
 
     thing_model_key = determine_thing_model_key(
-        thing_model, thing_model_key, sdf_definition, mapped_fields
+        thing_model, thing_model_key, sdf_definition, mapped_fields, is_sdf_thing=True
     )
 
+    sdf_thing = initialize_object_field(sdf_definition, thing_model_key)
     map_context_to_namespaces(thing_model, sdf_model)
     filter_at_type(thing_model)
 
@@ -719,16 +721,14 @@ def map_thing_model_to_sdf_thing(
 
     map_additional_fields(sdf_mapping_file, thing_model, sdf_thing_path, mapped_fields)
 
-    sdf_definition[thing_model_key] = sdf_thing
-
-    for key, value in sub_models.items():
+    for key, sub_model in sub_models.items():
         local_sub_models = resolve_sub_things(
-            value,
+            sub_model,
             placeholder_map=placeholder_map,
             thing_collection=thing_model_collection,
         )
         map_thing_model(
-            value,
+            sub_model,
             local_sub_models,
             key,
             sdf_thing,
@@ -859,8 +859,6 @@ def convert_wot_tm_to_sdf(
     thing_model = replace_placeholders(thing_model, placeholder_map)
     validate_thing_model(thing_model)
 
-    # TODO: @context of submoduls needs to be integrated as well
-    # TODO: Revisit context mappings
     map_default_namespace(thing_model, sdf_model)
     map_infoblock_fields(thing_model, sdf_model)
 
