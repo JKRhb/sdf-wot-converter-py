@@ -85,6 +85,19 @@ def test_wot_minimal_example_conversion():
     use_converter_cli(parsed_args)
 
 
+def test_tm_sdf_minimal_example_print():
+    """Test for a WoT TM to SDF conversion, printing out the outputs."""
+
+    make_test_output_dir()
+    args = [
+        "tm-to-sdf",
+        "-i",
+        "examples/wot/minimal-example.tm.jsonld",
+    ]
+    parsed_args = parse_arguments(args)
+    use_converter_cli(parsed_args)
+
+
 def test_wot_multiple_minimal_examples_conversion():
     """Test for a WoT TM to SDF conversion with multiple inputs, which does not lead to the creation of a
     mapping file."""

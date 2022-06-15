@@ -71,12 +71,21 @@ def _load_sdf_mapping_files(paths_or_urls: Optional[List[str]]) -> Optional[List
     return result
 
 
-def save_or_print_model(output_path: Optional[str], model: Dict, indent=4):
+def save_model(output_path: str, model: Dict, indent=4):
+    file = open(output_path, "w")
+    json.dump(model, file, indent=indent)
+    file.close()
+
+
+def save_or_print_model(
+    output_path: Optional[str],
+    model: Dict,
+    indent=4,
+    print_enabled=True,
+):
     if output_path is not None:
-        file = open(output_path, "w")
-        json.dump(model, file, indent=indent)
-        file.close()
-    else:
+        save_model(output_path, model, indent=indent)
+    elif print_enabled:
         pprint(model, indent=indent)
 
 
@@ -320,8 +329,13 @@ def _handle_from_tm(args):
             sdf_model, sdf_mapping_file = output
 
             save_or_print_model(output_path, sdf_model, indent=indent)
+
+            print_enabled = output_path is None
             save_or_print_model(
-                mapping_file_output_path, sdf_mapping_file, indent=indent
+                mapping_file_output_path,
+                sdf_mapping_file,
+                indent=indent,
+                print_enabled=print_enabled,
             )
 
     elif command == "tm-to-td":
@@ -347,7 +361,14 @@ def _handle_from_td(args):
     elif command == "td-to-sdf":
         sdf_model, mapping_file = convert_wot_td_to_sdf(thing_description)
         save_or_print_model(output_path, sdf_model, indent=indent)
-        save_or_print_model(args.mapping_file_output_path, mapping_file, indent=indent)
+
+        print_enabled = output_path is None
+        save_or_print_model(
+            args.mapping_file_output_path,
+            mapping_file,
+            indent=indent,
+            print_enabled=print_enabled,
+        )
 
 
 def _load_optional_json_file(path: Optional[str]) -> Optional[Dict]:
