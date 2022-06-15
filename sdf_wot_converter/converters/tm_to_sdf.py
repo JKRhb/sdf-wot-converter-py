@@ -25,9 +25,8 @@ from .wot_common import (
     is_thing_collection,
     replace_placeholders,
     resolve_extension,
-    retrieve_thing_model,
+    resolve_sub_things,
 )
-import urllib.parse
 
 
 def map_properties(
@@ -827,36 +826,6 @@ def map_infoblock_fields(thing_model, sdf_model, custom_infoblock: Optional[Dict
 
     if len(infoblock) > 0:
         sdf_model["info"] = infoblock
-
-
-def _get_submodel_key_from_link(link: Dict) -> str:
-    key = link.get("instanceName")
-    if key is None:
-        href: str = link["href"]
-        if href.startswith("#/"):
-            href = href[1:]
-        # TODO: Check if the actual map key should be the path/
-        parsed_href = urllib.parse.urlparse(href)
-        key = parsed_href.path
-        key = os.path.split(key)[1]
-        for file_extension in ["jsonld", "json", "tm", "td"]:
-            key = key.replace(f".{file_extension}", "")
-    return key
-
-
-def resolve_sub_things(thing_model: Dict, thing_collection=None, placeholder_map=None):
-    sub_models: Dict = {}
-
-    for link in thing_model.get("links", []):
-        if link.get("rel") == "tm:submodel":
-            sub_model = retrieve_thing_model(
-                link["href"], thing_collection=thing_collection
-            )
-            replace_placeholders(sub_model, placeholder_map)
-            key = _get_submodel_key_from_link(link)
-            sub_models[key] = sub_model
-
-    return sub_models
 
 
 def convert_wot_tm_to_sdf(
