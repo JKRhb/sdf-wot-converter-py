@@ -361,7 +361,7 @@ def test_sdf_tm_type_conversion():
                 "minItems": 2,
                 "maxItems": 5,
                 "items": {"type": "string"},
-                "uniqueItems": True,
+                "sdf:uniqueItems": True,
             },
             "barfoo": {
                 "type": "object",

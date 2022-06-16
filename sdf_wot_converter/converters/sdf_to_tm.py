@@ -305,6 +305,7 @@ def map_data_qualities(
     )
     map_enum(data_qualities, data_schema, mapped_fields)
 
+    map_unique_items(data_qualities, data_schema, suppress_roundtripping, mapped_fields)
     map_nullable(data_qualities, data_schema, suppress_roundtripping, mapped_fields)
     map_sdf_type(data_qualities, data_schema, suppress_roundtripping, mapped_fields)
 
@@ -407,6 +408,21 @@ def map_sdf_type(
         data_schema,
         "sdfType",
         "sdf:sdfType",
+        mapped_fields=mapped_fields,
+    )
+
+
+def map_unique_items(
+    data_qualities, data_schema, suppress_roundtripping: bool, mapped_fields: List[str]
+):
+    if suppress_roundtripping:
+        return
+
+    map_field(
+        data_qualities,
+        data_schema,
+        "uniqueItems",
+        "sdf:uniqueItems",
         mapped_fields=mapped_fields,
     )
 

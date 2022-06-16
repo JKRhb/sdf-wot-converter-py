@@ -319,8 +319,12 @@ def map_sdf_type(wot_definition: Dict, sdf_definition: Dict, mapped_fields: List
 def map_unique_items(
     wot_definition: Dict, sdf_definition: Dict, mapped_fields: List[str]
 ):
-    map_common_field(
-        wot_definition, sdf_definition, "uniqueItems", mapped_fields=mapped_fields
+    map_field(
+        wot_definition,
+        sdf_definition,
+        "sdf:uniqueItems",
+        "uniqueItems",
+        mapped_fields=mapped_fields,
     )
 
 
