@@ -879,7 +879,6 @@ def map_additional_fields(
     wot_definition: dict, sdf_definition: dict, mapped_fields: List[str]
 ):
     for key, value in sdf_definition.items():
-        print(key)
         if key in mapped_fields:
             continue
 

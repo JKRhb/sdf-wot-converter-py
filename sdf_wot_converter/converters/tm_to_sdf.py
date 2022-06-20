@@ -494,8 +494,6 @@ def map_context_to_namespaces(wot_definition: Dict, sdf_model: Dict):
                     else:
                         namespaces = initialize_object_field(sdf_model, "namespace")
                         namespaces.setdefault(namespace, url)
-            else:
-                continue
 
 
 def filter_at_type(wot_definition: Dict):
