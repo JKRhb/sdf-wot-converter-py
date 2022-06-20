@@ -322,21 +322,18 @@ def _handle_from_tm(args):
             thing_models,
             placeholder_map=placeholder_map,
         )
-        if isinstance(output, dict):
-            save_or_print_model(output_path, output, indent=indent)
-        else:
-            mapping_file_output_path = args.mapping_file_output_path
-            sdf_model, sdf_mapping_file = output
+        mapping_file_output_path = args.mapping_file_output_path
+        sdf_model, sdf_mapping_file = output
 
-            save_or_print_model(output_path, sdf_model, indent=indent)
+        save_or_print_model(output_path, sdf_model, indent=indent)
 
-            print_enabled = output_path is None
-            save_or_print_model(
-                mapping_file_output_path,
-                sdf_mapping_file,
-                indent=indent,
-                print_enabled=print_enabled,
-            )
+        print_enabled = output_path is None
+        save_or_print_model(
+            mapping_file_output_path,
+            sdf_mapping_file,
+            indent=indent,
+            print_enabled=print_enabled,
+        )
 
     elif command == "tm-to-td":
         output = convert_wot_tm_to_wot_td(
