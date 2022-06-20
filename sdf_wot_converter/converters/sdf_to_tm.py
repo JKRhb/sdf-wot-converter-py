@@ -151,10 +151,9 @@ def add_link(
     anchor: Optional[str],
     sizes: Optional[str],
 ):
-    initialize_list_field(thing_model, "links")
-
+    links = initialize_list_field(thing_model, "links")
     link = create_link(href, type, rel, anchor, sizes)
-    thing_model["links"].append(link)
+    links.append(link)
 
 
 def map_license(infoblock: Dict, thing_model: Dict, suppress_roundtripping: bool):
@@ -269,7 +268,7 @@ def map_sdf_choice(
 ):
     if "sdfChoice" in data_qualities:
         mapped_fields.append("sdfChoice")
-        initialize_list_field(data_schema, "enum")
+        enum = initialize_list_field(data_schema, "enum")
         for choice_name, choice in data_qualities["sdfChoice"].items():
             mapped_choice = {}
             if not suppress_roundtripping:
@@ -282,7 +281,7 @@ def map_sdf_choice(
                 suppress_roundtripping,
                 mapped_choice_fields,
             )
-            data_schema["enum"].append(mapped_choice)
+            enum.append(mapped_choice)
 
 
 def map_data_qualities(
@@ -713,8 +712,8 @@ def collect_sdf_required(
     thing_model: Dict, sdf_definition: Dict, mapped_fields: List[str]
 ):
     mapped_fields.append("sdfRequired")
-    initialize_list_field(thing_model, "tm:required")
-    thing_model["tm:required"].extend(sdf_definition.get("sdfRequired", []))
+    tm_required = initialize_list_field(thing_model, "tm:required")
+    tm_required.extend(sdf_definition.get("sdfRequired", []))
 
 
 def collect_mapping(thing_model, json_pointer, definition_type, definition_key):
