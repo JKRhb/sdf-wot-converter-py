@@ -345,13 +345,13 @@ def map_enum(wot_definition: Dict, sdf_definition: Dict, mapped_fields: List[str
         mapped_fields.append("enum")
         for enum in wot_definition["enum"]:
             if type(enum) is dict and "sdf:choiceName" in enum:
-                initialize_object_field(sdf_definition, "sdfChoice")
+                sdf_choice = initialize_object_field(sdf_definition, "sdfChoice")
                 choice_name = enum["sdf:choiceName"]
-                sdf_definition["sdfChoice"][choice_name] = enum
-                del sdf_definition["sdfChoice"][choice_name]["sdf:choiceName"]
+                sdf_choice[choice_name] = enum
+                del sdf_choice[choice_name]["sdf:choiceName"]
             else:
-                initialize_list_field(sdf_definition, "enum")
-                sdf_definition["enum"].append(enum)
+                sdf_enum = initialize_list_field(sdf_definition, "enum")
+                sdf_enum.append(enum)
 
 
 def map_read_only(wot_definition: Dict, sdf_definition: Dict, mapped_fields: List[str]):
@@ -655,11 +655,9 @@ def determine_thing_model_key(
 def map_additional_field(
     mapping_file: dict, wot_definition: dict, current_sdf_path: str, key: str
 ):
-    initialize_object_field(mapping_file, "map")
-    map = mapping_file["map"]
-
-    initialize_object_field(map, current_sdf_path)
-    map[current_sdf_path][key] = wot_definition
+    map = initialize_object_field(mapping_file, "map")
+    map_entry = initialize_object_field(map, current_sdf_path)
+    map_entry[key] = wot_definition
 
 
 def map_additional_fields(
