@@ -747,9 +747,8 @@ def map_sdf_event(
         )
 
 
-def map_sdf_required(thing_model: Dict, mapped_fields: List[str]):
+def map_sdf_required(thing_model: Dict):
     tm_required = initialize_list_field(thing_model, "tm:required")
-    mapped_fields.extend(["tm:required", "mappings"])
 
     thing_model["tm:required"] = [
         thing_model["mappings"][pointer] for pointer in tm_required
@@ -759,10 +758,8 @@ def map_sdf_required(thing_model: Dict, mapped_fields: List[str]):
         del thing_model["tm:required"]
 
 
-def map_sdf_ref(thing_model: Dict, current_definition: Dict, mapped_fields=None):
+def map_sdf_ref(thing_model: Dict, current_definition: Dict):
     if "tm:ref" in current_definition:
-        if mapped_fields is not None:
-            mapped_fields.append("tm:ref")
         old_pointer = current_definition["tm:ref"]
         current_definition["tm:ref"] = thing_model["mappings"][old_pointer]
 
@@ -866,8 +863,8 @@ def map_sdf_objects(
             mapped_fields,
         )
 
-        map_sdf_required(thing_model, mapped_fields)
-        map_sdf_ref(thing_model, thing_model, mapped_fields=mapped_fields)
+        map_sdf_required(thing_model)
+        map_sdf_ref(thing_model, thing_model)
         del thing_model["mappings"]
 
         map_additional_fields(thing_model, sdf_object, mapped_fields)
@@ -882,6 +879,7 @@ def map_additional_fields(
     wot_definition: dict, sdf_definition: dict, mapped_fields: List[str]
 ):
     for key, value in sdf_definition.items():
+        print(key)
         if key in mapped_fields:
             continue
 
@@ -974,8 +972,8 @@ def map_sdf_things(
             mapped_fields,
         )
 
-        map_sdf_required(thing_model, mapped_fields)
-        map_sdf_ref(thing_model, thing_model, mapped_fields)
+        map_sdf_required(thing_model)
+        map_sdf_ref(thing_model, thing_model)
         del thing_model["mappings"]
 
         add_origin_link(thing_model, origin_url)

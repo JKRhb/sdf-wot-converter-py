@@ -328,14 +328,23 @@ def test_tm_sdf_relative_tm_ref_conversion():
     input = {
         "@context": [
             "https://www.w3.org/2022/wot/td/v1.1",
-            {"sdf": "https://example.com/sdf"},
+            {"sdf": "https://example.com/sdf", "test": "https://example.org/test"},
         ],
         "@type": "tm:ThingModel",
         "schemaDefinitions": {"foobar": {"type": "string"}},
         "actions": {"toggle": {"input": {"tm:ref": "#/schemaDefinitions/foobar"}}},
+        "properties": {
+            "status1": {"type": "string", "observable": False},
+            "status2": {
+                "tm:ref": "#/properties/status1",
+                "observable": False,
+                "test:foo": "test",
+            },
+        },
     }
 
     expected_result = {
+        "namespace": {"test": "https://example.org/test"},
         "sdfObject": {
             "sdfObject0": {
                 "sdfAction": {
@@ -345,18 +354,30 @@ def test_tm_sdf_relative_tm_ref_conversion():
                         }
                     }
                 },
+                "sdfProperty": {
+                    "status1": {"type": "string", "observable": False},
+                    "status2": {
+                        "observable": False,
+                        "sdfRef": "#/sdfObject/sdfObject0/sdfProperty/status1",
+                    },
+                },
                 "sdfData": {"foobar": {"type": "string"}},
             }
-        }
+        },
     }, {
+        "namespace": {"test": "https://example.org/test"},
         "map": {
             "#/sdfObject/sdfObject0": {
                 "@context": [
                     "https://www.w3.org/2022/wot/td/v1.1",
-                    {"sdf": "https://example.com/sdf"},
+                    {
+                        "sdf": "https://example.com/sdf",
+                        "test": "https://example.org/test",
+                    },
                 ]
-            }
-        }
+            },
+            "#/sdfObject/sdfObject0/sdfProperty/status2": {"test:foo": "test"},
+        },
     }
 
     perform_conversion_test(input, expected_result)
