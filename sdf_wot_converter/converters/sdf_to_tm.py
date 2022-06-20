@@ -1,3 +1,4 @@
+import copy
 from typing import (
     Dict,
     List,
@@ -1035,9 +1036,11 @@ def convert_sdf_to_wot_tm(
     suppress_roundtripping=False,
 ) -> Dict[str, Dict]:
 
+    sdf_model = copy.deepcopy(sdf_model)
     validate_sdf_model(sdf_model)
 
     if sdf_mapping_files is not None:
+        sdf_mapping_files = copy.deepcopy(sdf_mapping_files)
         consolidate_sdf_model(sdf_model, sdf_mapping_files)
 
     thing_models: Dict[str, Dict] = {}
