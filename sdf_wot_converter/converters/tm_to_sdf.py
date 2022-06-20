@@ -846,7 +846,7 @@ def convert_wot_tm_to_sdf(
     placeholder_map=None,
     thing_model_collection=None,
     top_model_keys: Union[Set[str], None] = None,
-) -> Union[Dict, Tuple[Dict, Dict]]:
+) -> Tuple[Dict, Dict]:
     if is_thing_collection(thing_model):
         return convert_wot_tm_collection_to_sdf(
             thing_model,
@@ -854,7 +854,7 @@ def convert_wot_tm_to_sdf(
         )
 
     sdf_model: Dict = {}
-    sdf_mapping_file: Dict = {}
+    sdf_mapping_file: Dict = {"map": {}}
 
     validate_thing_model(thing_model)
     thing_model = resolve_extension(thing_model, resolve_relative_pointers=False)
@@ -905,16 +905,13 @@ def convert_wot_tm_to_sdf(
 
     validate_sdf_model(sdf_model)
 
-    if sdf_mapping_file.get("map") is not None:
-        for field_name in ["info", "namespace", "defaultNamespace"]:
-            field = sdf_model.get(field_name)
-            if field is None:
-                continue
-            sdf_mapping_file[field_name] = copy.deepcopy(field)
+    for field_name in ["info", "namespace", "defaultNamespace"]:
+        field = sdf_model.get(field_name)
+        if field is None:
+            continue
+        sdf_mapping_file[field_name] = copy.deepcopy(field)
 
-        return sdf_model, sdf_mapping_file
-
-    return sdf_model
+    return sdf_model, sdf_mapping_file
 
 
 def _get_submodel_keys(thing_model: Dict):
@@ -940,7 +937,7 @@ def convert_wot_tm_collection_to_sdf(
     thing_model_collection: Dict,
     root_model_key=None,
     top_model_keys: Union[Set[str], None] = None,
-) -> Union[Dict, Tuple[Dict, Dict]]:
+) -> Tuple[Dict, Dict]:
 
     if top_model_keys is None:
         top_model_keys = detect_top_level_models(thing_model_collection)
