@@ -300,9 +300,7 @@ def map_data_qualities(
         data_qualities, data_schema, suppress_roundtripping, mapped_fields
     )
 
-    map_common_json_schema_fields(
-        data_qualities, data_schema, mapped_fields=mapped_fields
-    )
+    map_common_json_schema_fields(data_qualities, data_schema, mapped_fields)
     map_enum(data_qualities, data_schema, mapped_fields)
 
     map_unique_items(data_qualities, data_schema, suppress_roundtripping, mapped_fields)

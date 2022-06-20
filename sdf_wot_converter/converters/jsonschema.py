@@ -3,16 +3,13 @@ from .utility import map_common_field
 
 
 def map_common_json_schema_fields(
-    source_definition: dict, target_definition: dict, mapped_fields=None
+    source_definition: dict, target_definition: dict, mapped_fields: List[str]
 ):
     """Maps dataschema fields which are equal for both SDF and WoT.
 
     These definitions can simply be copied over, creating a deep copy for each field
     in the process.
     """
-
-    if mapped_fields is None:
-        mapped_fields = []
 
     map_jsonschema_type(source_definition, target_definition, mapped_fields)
     map_unit(source_definition, target_definition, mapped_fields)
