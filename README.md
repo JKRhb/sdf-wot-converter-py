@@ -5,7 +5,7 @@
 
 # SDF-WoT-Converter
 
-This repository provides a Python-based converter from [SDF](https://datatracker.ietf.org/doc/html/draft-ietf-asdf-sdf-05) to [WoT TD](https://www.w3.org/TR/wot-thing-description/) including Thing Models.
+This repository provides a Python-based converter from [SDF](https://datatracker.ietf.org/doc/html/draft-ietf-asdf-sdf) to [WoT TD](https://www.w3.org/TR/wot-thing-description/) including Thing Models.
 
 The converter is both usable as a library and a command line tool. It provides
 conversion functions between WoT Thing Descriptions, WoT Thing Models and SDF
