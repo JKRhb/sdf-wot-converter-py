@@ -1,6 +1,7 @@
 from jsonschema import ValidationError
 import pytest
 from sdf_wot_converter import convert_wot_tm_to_wot_td
+from sdf_wot_converter.converters.wot_common import PlaceholderException
 
 
 def perform_conversion_test(input, expected_result, **kwargs):
@@ -157,6 +158,19 @@ def test_tm_td_with_placeholder_conversion():
     }
 
     perform_conversion_test(input, expected_result, placeholder_map=placeholder_map)
+
+
+def test_tm_td_with_unreplaced_placeholders():
+    input = {
+        "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
+        "@type": "tm:ThingModel",
+        "id": "{{UNREPLACED_PLACEHOLDER}}",
+    }
+
+    placeholder_map = {}
+
+    with pytest.raises(PlaceholderException):
+        convert_wot_tm_to_wot_td(input, placeholder_map=placeholder_map)
 
 
 def test_tm_td_extension():
