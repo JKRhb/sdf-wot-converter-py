@@ -183,6 +183,43 @@ which is in turn converted to a TD.
 | &nbsp;&nbsp;`copyright`     | &nbsp;&nbsp;`sdf:copyright`                                                                |
 | &nbsp;&nbsp;`license`       | &nbsp;&nbsp;link with relation-type `license` (if license value is a URL) or `sdf:license` |
 
+### WoT to SDF
+
+Below you can find a mapping of some of the most important classes and keywords from WoT to SDF. Note that there are still
+some definitions missing in the table that are already covered by the converter implementation.
+
+WoT TD definitions which are not covered by the core SDF vocabulary are mapped to a so-called SDF mapping file
+(see [draft-bormann-asdf-sdf-mapping](https://datatracker.ietf.org/doc/html/draft-bormann-asdf-sdf-mapping)).
+
+| WoT Class/Keyword               | SDF Keyword                                                                          |
+| ------------------------------- | ------------------------------------------------------------------------------------ |
+| Thing                           | sdfThing (if TM has `tm:submodel` links), sdfObject                                  |
+| &nbsp;&nbsp;`title`             | &nbsp;&nbsp;`label`                                                                  |
+| &nbsp;&nbsp;`description`       | &nbsp;&nbsp;`description`                                                            |
+| &nbsp;&nbsp;`schemaDefinitions` | &nbsp;&nbsp;`sdfData`                                                                |
+| &nbsp;&nbsp;`@context`          | `namespaces` of the SDF model (with exceptions)                                      |
+| DataSchema                      | dataqualities                                                                        |
+| &nbsp;&nbsp;`readOnly`          | Mapping File                                                                         |
+| &nbsp;&nbsp;`writeOnly`         | Mapping File                                                                         |
+| InteractionAffordance           | (Common Qualities)                                                                   |
+| &nbsp;&nbsp;`title`             | &nbsp;&nbsp;`label`                                                                  |
+| &nbsp;&nbsp;`description`       | &nbsp;&nbsp;`description`                                                            |
+| PropertyAffordance              | sdfProperty                                                                          |
+| &nbsp;&nbsp;`readOnly`          | &nbsp;&nbsp;`writable` (negated)                                                     |
+| &nbsp;&nbsp;`writeOnly`         | &nbsp;&nbsp;`readable` (negated)                                                     |
+| &nbsp;&nbsp;`observable`        | &nbsp;&nbsp;`observable` (negated)                                                   |
+| ActionAffordance                | sdfAction                                                                            |
+| &nbsp;&nbsp;`input`             | &nbsp;&nbsp;`sdfInputData`                                                           |
+| &nbsp;&nbsp;`output`            | &nbsp;&nbsp;`sdfOutputData`                                                          |
+| EventAffordance                 | sdfEvent                                                                             |
+| &nbsp;&nbsp;`output`            | &nbsp;&nbsp;`sdfOutputData`                                                          |
+| &nbsp;&nbsp;`subscription`      | Mapping File                                                                         |
+| &nbsp;&nbsp;`cancellation`      | Mapping File                                                                         |
+| &nbsp;&nbsp;`dataResponse`      | Mapping File                                                                         |
+| `tm:ref`                        | `sdfRef`                                                                             |
+| `tm:required`                   | `sdfRequired`                                                                        |
+| Link                            | Mapping File, except for special link types (`license`, `tm:extends`, `tm:submodel`) |
+
 ## License
 
 This project is licensed under the MIT license.
