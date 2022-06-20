@@ -1,7 +1,10 @@
+from argparse import Namespace
+
+import pytest
 from sdf_wot_converter import parse_arguments, use_converter_cli
 import os
 
-from sdf_wot_converter.cli import _get_origin_url
+from sdf_wot_converter.cli import CommandException, _get_origin_url
 
 
 def test_parse_arguments():
@@ -258,3 +261,35 @@ def test_get_origin_url():
         _get_origin_url("http://hi.com", "http://example.com") == "http://example.com"
     )
     assert _get_origin_url("this/is/a/file/path", None) is None
+
+
+def test_invalid_cli_arguments():
+    with pytest.raises(CommandException):
+        parsed_args = Namespace(
+            command="td-to-td", indent=4, wot_tds=[], output_path=None
+        )
+        use_converter_cli(parsed_args)
+    with pytest.raises(CommandException):
+        parsed_args = Namespace(
+            command="tm-to-tm",
+            indent=4,
+            wot_tms=[],
+            output_path=None,
+            bindings=None,
+            meta_data=None,
+            placeholder_map=None,
+        )
+        use_converter_cli(parsed_args)
+    with pytest.raises(CommandException):
+        parsed_args = Namespace(
+            command="sdf-to-sdf",
+            indent=4,
+            output_path="None",
+            sdf_model="examples/sdf/example.sdf.json",
+            mapping_file_input_path=None,
+            origin_url=None,
+        )
+        use_converter_cli(parsed_args)
+    with pytest.raises(CommandException):
+        parsed_args = Namespace(command="unknown")
+        use_converter_cli(parsed_args)

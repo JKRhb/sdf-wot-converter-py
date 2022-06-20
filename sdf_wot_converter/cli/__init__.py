@@ -16,6 +16,13 @@ from ..converters import (
 )
 
 
+class CommandException(Exception):
+    """Is raised when an unknown command is passed to the CLI.
+    Should never be raised in practice."""
+
+    pass
+
+
 _sdf_input_help_text = (
     "The SDF model that is supposed to be converted. "
     "Can either be a file path or a URL."
@@ -302,6 +309,8 @@ def _handle_from_sdf(args):
         output = convert_sdf_to_wot_tm(
             sdf_model, sdf_mapping_files=sdf_mapping_files, origin_url=origin_url
         )
+    else:
+        raise CommandException()
 
     save_or_print_model(output_path, output, indent=indent)
 
@@ -345,6 +354,9 @@ def _handle_from_tm(args):
 
         save_or_print_model(output_path, output, indent=indent)
 
+    else:
+        raise CommandException()
+
 
 def _handle_from_td(args):
     indent = args.indent
@@ -366,6 +378,8 @@ def _handle_from_td(args):
             indent=indent,
             print_enabled=print_enabled,
         )
+    else:
+        raise CommandException()
 
 
 def _load_optional_json_file(path: Optional[str]) -> Optional[Dict]:
@@ -384,6 +398,8 @@ def use_converter_cli(args):
         _handle_from_tm(args)
     elif command.startswith("td-to"):
         _handle_from_td(args)
+    else:
+        raise CommandException()
 
 
 def main():  # pragma: no cover
