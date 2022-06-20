@@ -5,12 +5,13 @@
 
 # SDF-WoT-Converter
 
-This repository provides a Python-based converter from [SDF](https://datatracker.ietf.org/doc/html/draft-ietf-asdf-sdf-05) to [WoT TD](https://www.w3.org/TR/wot-thing-description/) including Thing Models.
+This repository provides a Python-based converter from [SDF](https://datatracker.ietf.org/doc/html/draft-ietf-asdf-sdf) to [WoT TD](https://www.w3.org/TR/wot-thing-description/) including Thing Models.
 
 The converter is both usable as a library and a command line tool. It provides
 conversion functions between WoT Thing Descriptions, WoT Thing Models and SDF
 Models (one for each combination). You can find a number of examples for the
-usage of the converter down below.
+usage of the converter down below as well as overviews for the conversion
+between SDF and WoT TMs.
 
 The CI pipeline is set up to automatically convert all (valid) models from the [oneDM playground](https://github.com/one-data-model/playground) to WoT Thing Models and upload to the results to [this repository](https://github.com/JKRhb/onedm-playground-wot-tm).
 
@@ -28,12 +29,12 @@ Afterwards, it can be used both as a command line tool and a library.
 
 After installing the libary you should be able to call the converter in your terminal using `sdf-wot-converter` and one of the six available subcommands:
 
-* `sdf-to-tm`
-* `sdf-to-td`
-* `td-to-tm`
-* `td-to-sdf`
-* `tm-to-td`
-* `tm-to-sdf`
+-   `sdf-to-tm`
+-   `sdf-to-td`
+-   `td-to-tm`
+-   `td-to-sdf`
+-   `tm-to-td`
+-   `tm-to-sdf`
 
 You can display available parameters by typing `sdf-wot-converter --help`.
 A usage example for each subcommand can be found below.
@@ -146,6 +147,78 @@ sdf_roundtrip_model = convert_wot_tm_to_sdf(thing_model)
 
 assert sdf_model == sdf_roundtrip_model
 ```
+
+## Mappings Overview
+
+### SDF to WoT
+
+Below you can find a mapping of the most important keywords of SDF to WoT.
+We use Thing Models (TMs) as a reference here, as they are most similar to SDF
+models.
+When converting from SDF to WoT TD, the SDF model (and a mapping file which must
+provide the necessary instance-specific information) is first converted to a TM,
+which is in turn converted to a TD.
+
+| SDF Keyword                 | WoT Class/Keyword                                                                          |
+| --------------------------- | ------------------------------------------------------------------------------------------ |
+| sdfThing                    | TM with `tm:submodel` links                                                                |
+| sdfObject                   | TM without `tm:submodel` links                                                             |
+| sdfProperty                 | PropertyAffordance                                                                         |
+| &nbsp;&nbsp;`writable`      | &nbsp;&nbsp;`readOnly` (negated)                                                           |
+| &nbsp;&nbsp;`readable`      | &nbsp;&nbsp;`writeOnly` (negated)                                                          |
+| sdfAction                   | ActionAffordance                                                                           |
+| &nbsp;&nbsp;`sdfInputData`  | `input`                                                                                    |
+| &nbsp;&nbsp;`sdfOutputData` | `output`                                                                                   |
+| sdfEvent                    | EventAffordance                                                                            |
+| &nbsp;&nbsp;`sdfOutputData` | `output`                                                                                   |
+| sdfData                     | schemaDefinitions (at the Thing level)                                                     |
+| `sdfRef`                    | `tm:ref`                                                                                   |
+| `sdfChoice`                 | Enum of JSON objects with an (additional) `sdf:choiceName`                                 |
+| `sdfRequired`               | `tm:required`                                                                              |
+| `namespaces`                | `@context`                                                                                 |
+| `defaultNamespace`          | `sdf:defaultNamespace`                                                                     |
+| Info Block                  | _Multiple targets_                                                                         |
+| &nbsp;&nbsp;`version`       | &nbsp;&nbsp;`model` field in the `Version` class                                           |
+| &nbsp;&nbsp;`title`         | &nbsp;&nbsp;`sdf:title`                                                                    |
+| &nbsp;&nbsp;`copyright`     | &nbsp;&nbsp;`sdf:copyright`                                                                |
+| &nbsp;&nbsp;`license`       | &nbsp;&nbsp;link with relation-type `license` (if license value is a URL) or `sdf:license` |
+
+### WoT to SDF
+
+Below you can find a mapping of some of the most important classes and keywords from WoT to SDF. Note that there are still
+some definitions missing in the table that are already covered by the converter implementation.
+
+WoT TD definitions which are not covered by the core SDF vocabulary are mapped to a so-called SDF mapping file
+(see [draft-bormann-asdf-sdf-mapping](https://datatracker.ietf.org/doc/html/draft-bormann-asdf-sdf-mapping)).
+
+| WoT Class/Keyword               | SDF Keyword                                                                          |
+| ------------------------------- | ------------------------------------------------------------------------------------ |
+| Thing                           | sdfThing (if TM has `tm:submodel` links), sdfObject                                  |
+| &nbsp;&nbsp;`title`             | &nbsp;&nbsp;`label`                                                                  |
+| &nbsp;&nbsp;`description`       | &nbsp;&nbsp;`description`                                                            |
+| &nbsp;&nbsp;`schemaDefinitions` | &nbsp;&nbsp;`sdfData`                                                                |
+| &nbsp;&nbsp;`@context`          | `namespaces` of the SDF model (with exceptions)                                      |
+| DataSchema                      | dataqualities                                                                        |
+| &nbsp;&nbsp;`readOnly`          | Mapping File                                                                         |
+| &nbsp;&nbsp;`writeOnly`         | Mapping File                                                                         |
+| InteractionAffordance           | (Common Qualities)                                                                   |
+| &nbsp;&nbsp;`title`             | &nbsp;&nbsp;`label`                                                                  |
+| &nbsp;&nbsp;`description`       | &nbsp;&nbsp;`description`                                                            |
+| PropertyAffordance              | sdfProperty                                                                          |
+| &nbsp;&nbsp;`readOnly`          | &nbsp;&nbsp;`writable` (negated)                                                     |
+| &nbsp;&nbsp;`writeOnly`         | &nbsp;&nbsp;`readable` (negated)                                                     |
+| &nbsp;&nbsp;`observable`        | &nbsp;&nbsp;`observable` (negated)                                                   |
+| ActionAffordance                | sdfAction                                                                            |
+| &nbsp;&nbsp;`input`             | &nbsp;&nbsp;`sdfInputData`                                                           |
+| &nbsp;&nbsp;`output`            | &nbsp;&nbsp;`sdfOutputData`                                                          |
+| EventAffordance                 | sdfEvent                                                                             |
+| &nbsp;&nbsp;`output`            | &nbsp;&nbsp;`sdfOutputData`                                                          |
+| &nbsp;&nbsp;`subscription`      | Mapping File                                                                         |
+| &nbsp;&nbsp;`cancellation`      | Mapping File                                                                         |
+| &nbsp;&nbsp;`dataResponse`      | Mapping File                                                                         |
+| `tm:ref`                        | `sdfRef`                                                                             |
+| `tm:required`                   | `sdfRequired`                                                                        |
+| Link                            | Mapping File, except for special link types (`license`, `tm:extends`, `tm:submodel`) |
 
 ## License
 
