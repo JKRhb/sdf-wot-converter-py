@@ -1,4 +1,3 @@
-import copy
 from typing import Dict
 
 
@@ -37,20 +36,20 @@ def map_field(
     conversion_function=None,
     mapped_fields=None,
 ):
-    """Maps a field from a source defiinition to a target definition, making a deep
-    copy in the process."""
-    if source_key not in source_definition:
+    """Maps a field from a source definition to a target definition, applying a
+    conversion function if given."""
+    source_value = source_definition.get(source_key)
+
+    if source_value is None:
         return
 
-    value = copy.deepcopy(source_definition[source_key])
-
     if conversion_function is not None:
-        value = conversion_function(value)
+        source_value = conversion_function(source_value)
 
     if mapped_fields is not None:
         mapped_fields.append(source_key)
 
-    target_definition[target_key] = value
+    target_definition[target_key] = source_value
 
 
 def map_common_field(
