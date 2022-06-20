@@ -750,11 +750,8 @@ def map_sdf_event(
 
 
 def map_sdf_required(thing_model: Dict, mapped_fields: List[str]):
-    tm_required = thing_model.get("tm:required")
+    tm_required = initialize_list_field(thing_model, "tm:required")
     mapped_fields.extend(["tm:required", "mappings"])
-
-    if tm_required is None:
-        return
 
     thing_model["tm:required"] = [
         thing_model["mappings"][pointer] for pointer in tm_required
