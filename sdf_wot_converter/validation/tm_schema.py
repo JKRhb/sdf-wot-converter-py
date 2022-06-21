@@ -1,6 +1,6 @@
 tm_schema = {
     "title": "Thing Model",
-    "version": "1.1-28-January-2022",
+    "version": "1.1-10-June-2022",
     "description": "JSON Schema for validating Thing Models. This is automatically generated from the WoT TD Schema.",
     "$schema ": "http://json-schema.org/draft-07/schema#",
     "$id": "https://raw.githubusercontent.com/w3c/wot-thing-description/main/validation/tm-json-schema-validation.json",
@@ -71,6 +71,20 @@ tm_schema = {
                         "anyOf": [{"$ref": "#/definitions/anyUri"}, {"type": "object"}]
                     },
                 },
+                {
+                    "$comment": "Old context URI, followed by possibly other vocabularies. minItems and contains are required since prefixItems does not say all items should be provided",
+                    "type": "array",
+                    "prefixItems": [{"$ref": "#/definitions/thing-context-td-uri-v1"}],
+                    "minItems": 1,
+                    "contains": {"$ref": "#/definitions/thing-context-td-uri-v1"},
+                    "additionalItems": {
+                        "anyOf": [{"$ref": "#/definitions/anyUri"}, {"type": "object"}]
+                    },
+                },
+                {
+                    "$comment": "Only the new context URI",
+                    "$ref": "#/definitions/thing-context-td-uri-v1",
+                },
             ]
         },
         "type_declaration": {
@@ -121,7 +135,12 @@ tm_schema = {
                     "items": {"$ref": "#/definitions/dataSchema"},
                 },
                 "unit": {"type": "string"},
-                "enum": {"type": "array", "minItems": 1, "uniqueItems": True},
+                "enum": {
+                    "anyOf": [
+                        {"type": "array", "minItems": 1, "uniqueItems": True},
+                        {"$ref": "#/definitions/placeholder-pattern"},
+                    ]
+                },
                 "format": {"type": "string"},
                 "const": {},
                 "default": {},
@@ -179,7 +198,12 @@ tm_schema = {
                 "properties": {
                     "additionalProperties": {"$ref": "#/definitions/dataSchema"}
                 },
-                "required": {"type": "array", "items": {"type": "string"}},
+                "required": {
+                    "anyOf": [
+                        {"type": "array", "items": {"type": "string"}},
+                        {"$ref": "#/definitions/placeholder-pattern"},
+                    ]
+                },
                 "tm:ref": {"$ref": "#/definitions/tm_ref"},
             },
             "propertyNames": {"not": {"$ref": "#/definitions/placeholder-pattern"}},
@@ -451,7 +475,12 @@ tm_schema = {
                     "items": {"$ref": "#/definitions/dataSchema"},
                 },
                 "unit": {"type": "string"},
-                "enum": {"type": "array", "minItems": 1, "uniqueItems": True},
+                "enum": {
+                    "anyOf": [
+                        {"type": "array", "minItems": 1, "uniqueItems": True},
+                        {"$ref": "#/definitions/placeholder-pattern"},
+                    ]
+                },
                 "format": {"type": "string"},
                 "const": {},
                 "default": {},
@@ -507,7 +536,12 @@ tm_schema = {
                 "properties": {
                     "additionalProperties": {"$ref": "#/definitions/dataSchema"}
                 },
-                "required": {"type": "array", "items": {"type": "string"}},
+                "required": {
+                    "anyOf": [
+                        {"type": "array", "items": {"type": "string"}},
+                        {"$ref": "#/definitions/placeholder-pattern"},
+                    ]
+                },
                 "tm:ref": {"$ref": "#/definitions/tm_ref"},
             },
             "additionalProperties": True,
@@ -542,6 +576,12 @@ tm_schema = {
                     ]
                 },
                 "idempotent": {
+                    "anyOf": [
+                        {"type": "boolean"},
+                        {"$ref": "#/definitions/placeholder-pattern"},
+                    ]
+                },
+                "synchronous": {
                     "anyOf": [
                         {"type": "boolean"},
                         {"$ref": "#/definitions/placeholder-pattern"},
@@ -630,6 +670,28 @@ tm_schema = {
                     "required": ["rel"],
                 },
             ]
+        },
+        "additionalSecurityScheme": {
+            "description": "Applies to additional SecuritySchemes not defined in the WoT TD specification.",
+            "$comment": "Additional SecuritySchemes should always be defined via a context extension, using a prefixed value for the scheme. This prefix (e.g. 'ace', see the example below) must contain at least one character in order to reference a valid JSON-LD context extension.",
+            "examples": [
+                {
+                    "scheme": "ace:ACESecurityScheme",
+                    "ace:as": "coaps://as.example.com/token",
+                    "ace:audience": "coaps://rs.example.com",
+                    "ace:scopes": ["limited", "special"],
+                    "ace:cnonce": True,
+                }
+            ],
+            "type": "object",
+            "properties": {
+                "@type": {"$ref": "#/definitions/type_declaration"},
+                "description": {"$ref": "#/definitions/description"},
+                "descriptions": {"$ref": "#/definitions/descriptions"},
+                "proxy": {"$ref": "#/definitions/anyUri"},
+                "scheme": {"type": "string", "pattern": ".+:.*"},
+            },
+            "propertyNames": {"not": {"$ref": "#/definitions/placeholder-pattern"}},
         },
         "noSecurityScheme": {
             "type": "object",
@@ -897,6 +959,7 @@ tm_schema = {
                 {"$ref": "#/definitions/bearerSecurityScheme"},
                 {"$ref": "#/definitions/pskSecurityScheme"},
                 {"$ref": "#/definitions/oAuth2SecurityScheme"},
+                {"$ref": "#/definitions/additionalSecurityScheme"},
             ]
         },
         "tm_type_declaration": {

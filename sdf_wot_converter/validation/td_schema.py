@@ -1,11 +1,11 @@
 td_schema = {
     "title": "Thing Description",
-    "version": "1.1-28-January-2022",
+    "version": "1.1-10-June-2022",
     "description": "JSON Schema for validating TD instances against the TD information model. TD instances can be with or without terms that have default values",
     "$schema ": "http://json-schema.org/draft-07/schema#",
     "$id": "https://raw.githubusercontent.com/w3c/wot-thing-description/main/validation/td-json-schema-validation.json",
     "definitions": {
-        "anyUri": {"type": "string", "format": "iri-reference"},
+        "anyUri": {"type": "string"},
         "description": {"type": "string"},
         "descriptions": {"type": "object", "additionalProperties": {"type": "string"}},
         "title": {"type": "string"},
@@ -62,6 +62,20 @@ td_schema = {
                     "additionalItems": {
                         "anyOf": [{"$ref": "#/definitions/anyUri"}, {"type": "object"}]
                     },
+                },
+                {
+                    "$comment": "Old context URI, followed by possibly other vocabularies. minItems and contains are required since prefixItems does not say all items should be provided",
+                    "type": "array",
+                    "prefixItems": [{"$ref": "#/definitions/thing-context-td-uri-v1"}],
+                    "minItems": 1,
+                    "contains": {"$ref": "#/definitions/thing-context-td-uri-v1"},
+                    "additionalItems": {
+                        "anyOf": [{"$ref": "#/definitions/anyUri"}, {"type": "object"}]
+                    },
+                },
+                {
+                    "$comment": "Only the new context URI",
+                    "$ref": "#/definitions/thing-context-td-uri-v1",
                 },
             ]
         },
@@ -375,6 +389,7 @@ td_schema = {
                 "output": {"$ref": "#/definitions/dataSchema"},
                 "safe": {"type": "boolean"},
                 "idempotent": {"type": "boolean"},
+                "synchronous": {"type": "boolean"},
             },
             "required": ["forms"],
             "additionalProperties": True,
@@ -446,6 +461,28 @@ td_schema = {
                     "required": ["rel"],
                 },
             ]
+        },
+        "additionalSecurityScheme": {
+            "description": "Applies to additional SecuritySchemes not defined in the WoT TD specification.",
+            "$comment": "Additional SecuritySchemes should always be defined via a context extension, using a prefixed value for the scheme. This prefix (e.g. 'ace', see the example below) must contain at least one character in order to reference a valid JSON-LD context extension.",
+            "examples": [
+                {
+                    "scheme": "ace:ACESecurityScheme",
+                    "ace:as": "coaps://as.example.com/token",
+                    "ace:audience": "coaps://rs.example.com",
+                    "ace:scopes": ["limited", "special"],
+                    "ace:cnonce": True,
+                }
+            ],
+            "type": "object",
+            "properties": {
+                "@type": {"$ref": "#/definitions/type_declaration"},
+                "description": {"$ref": "#/definitions/description"},
+                "descriptions": {"$ref": "#/definitions/descriptions"},
+                "proxy": {"$ref": "#/definitions/anyUri"},
+                "scheme": {"type": "string", "pattern": ".+:.*"},
+            },
+            "required": ["scheme"],
         },
         "noSecurityScheme": {
             "type": "object",
@@ -619,6 +656,7 @@ td_schema = {
                 {"$ref": "#/definitions/bearerSecurityScheme"},
                 {"$ref": "#/definitions/pskSecurityScheme"},
                 {"$ref": "#/definitions/oAuth2SecurityScheme"},
+                {"$ref": "#/definitions/additionalSecurityScheme"},
             ]
         },
     },
