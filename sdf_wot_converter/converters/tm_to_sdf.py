@@ -480,8 +480,17 @@ def map_version(
         del wot_definition["version"]
 
 
-def map_context_to_namespaces(wot_definition: Dict, sdf_model: Dict):
+def map_context_to_namespaces(
+    wot_definition: Dict,
+    sdf_model: Dict,
+    suppress_roundtripping: bool,
+    mapped_fields: List[str],
+):
     context = wot_definition["@context"]
+
+    if suppress_roundtripping:
+        mapped_fields.append("@context")
+
     if isinstance(context, str):
         return
     else:
@@ -585,6 +594,7 @@ def map_thing_model_to_sdf_object(
     sdf_mapping_file,
     current_path: str,
     placeholder_map=None,
+    suppress_roundtripping=False,
 ):
     thing_model = copy.deepcopy(thing_model)
     mapped_fields: List[str] = [
@@ -600,7 +610,9 @@ def map_thing_model_to_sdf_object(
     sdf_object_path = f"{current_path}/sdfObject/{sdf_object_key}"
     sdf_object = initialize_object_field(sdf_definition, sdf_object_key)
 
-    map_context_to_namespaces(thing_model, sdf_model)
+    map_context_to_namespaces(
+        thing_model, sdf_model, suppress_roundtripping, mapped_fields
+    )
     filter_at_type(thing_model)
 
     map_title(thing_model, sdf_object, mapped_fields)
@@ -681,6 +693,7 @@ def map_thing_model_to_sdf_thing(
     current_path,
     placeholder_map=None,
     thing_model_collection=None,
+    suppress_roundtripping=False,
 ):
     thing_model = copy.deepcopy(thing_model)
     mapped_fields: List[str] = [
@@ -695,7 +708,9 @@ def map_thing_model_to_sdf_thing(
     )
 
     sdf_thing = initialize_object_field(sdf_definition, thing_model_key)
-    map_context_to_namespaces(thing_model, sdf_model)
+    map_context_to_namespaces(
+        thing_model, sdf_model, suppress_roundtripping, mapped_fields
+    )
     filter_at_type(thing_model)
 
     sdf_thing_path = f"{current_path}/sdfThing/{thing_model_key}"
@@ -736,6 +751,7 @@ def map_thing_model_to_sdf_thing(
             sdf_thing_path,
             placeholder_map=placeholder_map,
             thing_model_collection=thing_model_collection,
+            suppress_roundtripping=suppress_roundtripping,
         )
 
 
@@ -749,6 +765,7 @@ def map_thing_model(
     current_path: str,
     placeholder_map=None,
     thing_model_collection=None,
+    suppress_roundtripping=False,
 ):
     if len(sub_models) > 0 or "sdf:thingKey" in thing_model:
         sdf_things = initialize_object_field(sdf_definition, "sdfThing")
@@ -763,6 +780,7 @@ def map_thing_model(
             current_path,
             placeholder_map=placeholder_map,
             thing_model_collection=thing_model_collection,
+            suppress_roundtripping=suppress_roundtripping,
         )
     else:
         sdf_objects = initialize_object_field(sdf_definition, "sdfObject")
@@ -775,6 +793,7 @@ def map_thing_model(
             sdf_mapping_file,
             current_path,
             placeholder_map=placeholder_map,
+            suppress_roundtripping=suppress_roundtripping,
         )
 
 
@@ -843,11 +862,13 @@ def convert_wot_tm_to_sdf(
     placeholder_map=None,
     thing_model_collection=None,
     top_model_keys: Union[Set[str], None] = None,
-) -> Tuple[Dict, Dict]:
+    suppress_roundtripping=False,
+) -> Union[Dict, Tuple[Dict, Dict]]:
     if is_thing_collection(thing_model):
         return convert_wot_tm_collection_to_sdf(
             thing_model,
             top_model_keys=top_model_keys,
+            suppress_roundtripping=suppress_roundtripping,
         )
 
     sdf_model: Dict = {}
@@ -878,6 +899,7 @@ def convert_wot_tm_to_sdf(
             "#",
             placeholder_map=placeholder_map,
             thing_model_collection=thing_model_collection,
+            suppress_roundtripping=suppress_roundtripping,
         )
     else:
         top_level_models = [thing_model_collection[x] for x in top_model_keys]
@@ -901,6 +923,9 @@ def convert_wot_tm_to_sdf(
             )
 
     validate_sdf_model(sdf_model)
+
+    if len(sdf_mapping_file["map"]) == 0:
+        return sdf_model
 
     for field_name in ["info", "namespace", "defaultNamespace"]:
         field = sdf_model.get(field_name)
@@ -934,7 +959,8 @@ def convert_wot_tm_collection_to_sdf(
     thing_model_collection: Dict,
     root_model_key=None,
     top_model_keys: Union[Set[str], None] = None,
-) -> Tuple[Dict, Dict]:
+    suppress_roundtripping=False,
+) -> Union[Dict, Tuple[Dict, Dict]]:
 
     if top_model_keys is None:
         top_model_keys = detect_top_level_models(thing_model_collection)
@@ -952,4 +978,5 @@ def convert_wot_tm_collection_to_sdf(
         thing_model_key=root_model_key,
         thing_model_collection=thing_model_collection,
         top_model_keys=top_model_keys,
+        suppress_roundtripping=suppress_roundtripping,
     )

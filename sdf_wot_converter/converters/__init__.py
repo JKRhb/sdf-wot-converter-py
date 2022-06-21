@@ -12,9 +12,13 @@ def convert_wot_td_to_wot_tm(input: Union[Dict, ThingCollection]):
     return _convert_td_to_tm(input)
 
 
-def convert_wot_td_to_sdf(input: Union[Dict, ThingCollection]):
+def convert_wot_td_to_sdf(
+    input: Union[Dict, ThingCollection], suppress_roundtripping=False
+):
     thing_model = convert_wot_td_to_wot_tm(input)
-    return convert_wot_tm_to_sdf(thing_model)
+    return convert_wot_tm_to_sdf(
+        thing_model, suppress_roundtripping=suppress_roundtripping
+    )
 
 
 def convert_sdf_to_wot_tm(
@@ -66,12 +70,14 @@ def convert_sdf_to_wot_td(
 def convert_wot_tm_to_sdf(
     thing_models: Union[Dict, ThingCollection],
     placeholder_map: Optional[Dict] = None,
+    suppress_roundtripping=False,
 ) -> Union[Dict, Tuple[Dict, Dict]]:
     # TODO: Also deal with bindings and metadata
 
     return _convert_wot_tm_to_sdf(
         thing_models,
         placeholder_map=placeholder_map,
+        suppress_roundtripping=suppress_roundtripping,
     )
 
 
