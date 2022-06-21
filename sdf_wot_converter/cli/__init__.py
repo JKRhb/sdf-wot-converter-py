@@ -157,11 +157,12 @@ def _add_origin_url(parser):
 
 def _add_sdf_arguments(subparser):
     sdf_to_wot_tm = subparser.add_parser(
-        "sdf-to-tm", help="Converts an SDF model and mapping files to a WoT Thing Model"
+        "sdf-to-tm",
+        help="Converts an SDF model and mapping files to one or WoT Thing Models.",
     )
     sdf_to_wot_td = subparser.add_parser(
         "sdf-to-td",
-        help="Converts an SDF model and mapping files to a WoT Thing Description",
+        help="Converts an SDF model and mapping files to one or more WoT Thing Descriptions.",
     )
 
     _add_output_argument(
@@ -182,7 +183,7 @@ def _add_sdf_arguments(subparser):
 def _add_tm_arguments(subparser):
     wot_tm_to_sdf = subparser.add_parser(
         "tm-to-sdf",
-        help="Converts a WoT Thing Description to an SDF model and mapping files",
+        help="Converts a WoT Thing Model to an SDF model and zero or more mapping files.",
     )
     wot_tm_to_wot_td = subparser.add_parser(
         "tm-to-td",
@@ -228,10 +229,12 @@ def _add_tm_arguments(subparser):
 
 def _add_td_arguments(subparser):
     wot_td_to_sdf = subparser.add_parser(
-        "td-to-sdf", help="Converts a WoT Thing Model to an SDF model and mapping files"
+        "td-to-sdf",
+        help="Converts one or more WoT Thing Models to an SDF model and zero or more mapping files.",
     )
     wot_td_to_wot_tm = subparser.add_parser(
-        "td-to-tm", help="Converts a WoT Thing Description to a WoT Thing Model"
+        "td-to-tm",
+        help="Converts one or more WoT Thing Descriptions to one or more WoT Thing Models.",
     )
 
     _add_mapping_file_output_argument(wot_td_to_sdf)
