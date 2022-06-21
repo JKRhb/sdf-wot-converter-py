@@ -278,10 +278,12 @@ def parse_arguments(args):
     return parser.parse_args(args)
 
 
-def _get_origin_url(path: str, url: str):
-    if url:
+def _get_origin_url(path: str, url: Optional[str]):
+    if url is not None:
         return url
-    elif path and (path.startswith("http://") or path.startswith("https://")):
+    elif path is not None and (
+        path.startswith("http://") or path.startswith("https://")
+    ):
         return path
     else:
         return None
