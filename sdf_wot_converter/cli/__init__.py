@@ -86,10 +86,13 @@ def save_model(output_path: str, model: Dict, indent=4):
 
 def save_or_print_model(
     output_path: Optional[str],
-    model: Dict,
+    model: Optional[Dict],
     indent=4,
     print_enabled=True,
 ):
+    if model is None:
+        return
+
     if output_path is not None:
         save_model(output_path, model, indent=indent)
     elif print_enabled:
@@ -295,6 +298,7 @@ def _handle_from_sdf(args):
     output_path = args.output_path
     mapping_file_input_path = args.mapping_file_input_path
     command = args.command
+    suppress_roundtripping = args.suppress_roundtripping
 
     origin_url = _get_origin_url(input_path, args.origin_url)
     sdf_model = _load_model(input_path)
@@ -306,10 +310,14 @@ def _handle_from_sdf(args):
             sdf_model,
             origin_url=origin_url,
             sdf_mapping_files=sdf_mapping_files,
+            suppress_roundtripping=suppress_roundtripping,
         )
     elif command == "sdf-to-tm":
         output = convert_sdf_to_wot_tm(
-            sdf_model, sdf_mapping_files=sdf_mapping_files, origin_url=origin_url
+            sdf_model,
+            sdf_mapping_files=sdf_mapping_files,
+            origin_url=origin_url,
+            suppress_roundtripping=suppress_roundtripping,
         )
     else:
         raise CommandException()
@@ -323,6 +331,7 @@ def _handle_from_tm(args):
     command = args.command
     input_path = args.wot_tms
     output_path = args.output_path
+    suppress_roundtripping = args.suppress_roundtripping
 
     thing_models = _load_model_or_collection(input_path, "ThingModel")
     bindings = _load_optional_json_file(args.bindings)
@@ -332,9 +341,13 @@ def _handle_from_tm(args):
         output = convert_wot_tm_to_sdf(
             thing_models,
             placeholder_map=placeholder_map,
+            suppress_roundtripping=suppress_roundtripping,
         )
         mapping_file_output_path = args.mapping_file_output_path
-        sdf_model, sdf_mapping_file = output
+        if isinstance(output, dict):
+            sdf_model, sdf_mapping_file = output, None
+        else:
+            sdf_model, sdf_mapping_file = output
 
         save_or_print_model(output_path, sdf_model, indent=indent)
 
@@ -363,6 +376,7 @@ def _handle_from_tm(args):
 def _handle_from_td(args):
     indent = args.indent
     command = args.command
+    suppress_roundtripping = args.suppress_roundtripping
 
     thing_description = _load_model_or_collection(args.wot_tds, "ThingDescription")
     output_path = args.output_path
@@ -370,7 +384,9 @@ def _handle_from_td(args):
         thing_model = convert_wot_td_to_wot_tm(thing_description)
         save_or_print_model(output_path, thing_model, indent=indent)
     elif command == "td-to-sdf":
-        sdf_model, mapping_file = convert_wot_td_to_sdf(thing_description)
+        sdf_model, mapping_file = convert_wot_td_to_sdf(
+            thing_description, suppress_roundtripping=suppress_roundtripping
+        )
         save_or_print_model(output_path, sdf_model, indent=indent)
 
         print_enabled = output_path is None

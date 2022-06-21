@@ -4,8 +4,8 @@ from sdf_wot_converter import convert_wot_tm_to_sdf
 from sdf_wot_converter.converters.tm_to_sdf import convert_wot_tm_collection_to_sdf
 
 
-def perform_conversion_test(input, expected_result):
-    actual_result = convert_wot_tm_to_sdf(input)
+def perform_conversion_test(input, expected_result, **kwargs):
+    actual_result = convert_wot_tm_to_sdf(input, **kwargs)
 
     assert actual_result == expected_result
 
@@ -666,3 +666,18 @@ def test_tm_to_sdf_context_conversion():
     }
 
     perform_conversion_test(input, expected_result)
+
+
+def test_tm_to_sdf_suppressed_context_conversion():
+    input = {
+        "@context": [
+            "https://www.w3.org/2022/wot/td/v1.1",
+            "https://example.org",
+            {"sdf": "https://example.com/sdf"},
+        ],
+        "@type": "tm:ThingModel",
+    }
+
+    expected_result = {"sdfObject": {"sdfObject0": {}}}
+
+    perform_conversion_test(input, expected_result, suppress_roundtripping=True)

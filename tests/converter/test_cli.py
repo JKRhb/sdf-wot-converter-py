@@ -133,6 +133,18 @@ def test_wot_example_conversion():
     use_converter_cli(parsed_args)
 
 
+def test_tm_sdf_conversion_without_roundtripping():
+    make_test_output_dir()
+    args = [
+        "--suppress-roundtripping",
+        "tm-to-sdf",
+        "-i",
+        "examples/wot/minimal-example.tm.jsonld",
+    ]
+    parsed_args = parse_arguments(args)
+    use_converter_cli(parsed_args)
+
+
 def test_multiple_tms_to_sdf_conversion():
     make_test_output_dir()
     args = [
@@ -266,7 +278,11 @@ def test_get_origin_url():
 def test_invalid_cli_arguments():
     with pytest.raises(CommandException):
         parsed_args = Namespace(
-            command="td-to-td", indent=4, wot_tds=[], output_path=None
+            command="td-to-td",
+            indent=4,
+            wot_tds=[],
+            output_path=None,
+            suppress_roundtripping=False,
         )
         use_converter_cli(parsed_args)
     with pytest.raises(CommandException):
@@ -278,6 +294,7 @@ def test_invalid_cli_arguments():
             bindings=None,
             meta_data=None,
             placeholder_map=None,
+            suppress_roundtripping=False,
         )
         use_converter_cli(parsed_args)
     with pytest.raises(CommandException):
@@ -288,6 +305,7 @@ def test_invalid_cli_arguments():
             sdf_model="examples/sdf/example.sdf.json",
             mapping_file_input_path=None,
             origin_url=None,
+            suppress_roundtripping=False,
         )
         use_converter_cli(parsed_args)
     with pytest.raises(CommandException):
