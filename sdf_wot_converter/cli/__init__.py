@@ -385,11 +385,10 @@ def _handle_from_td(args):
 
 
 def _load_optional_json_file(path: Optional[str]) -> Optional[Dict]:
-    json_data = None
-    if path:
-        json_data = _load_model(path)
+    if path is None:
+        return None
 
-    return json_data
+    return _load_model(path)
 
 
 def use_converter_cli(args):
