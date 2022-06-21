@@ -1020,6 +1020,13 @@ def consolidate_sdf_model(sdf_model: Dict, sdf_mapping_files: List[Dict]):
     validate_sdf_model(sdf_model, framework=True)
 
 
+def _fix_thing_model_json_ld_types(thing_models: Dict):
+    for thing_model in thing_models.values():
+        json_ld_type = initialize_list_field(thing_model, "@type")
+        if "tm:ThingModel" not in json_ld_type:
+            json_ld_type.append("tm:ThingModel")
+
+
 def convert_sdf_to_wot_tm(
     sdf_model: Dict,
     sdf_mapping_files: Optional[List[Dict]] = None,
@@ -1055,6 +1062,7 @@ def convert_sdf_to_wot_tm(
         suppress_roundtripping=suppress_roundtripping,
     )
 
+    _fix_thing_model_json_ld_types(thing_models)
     # TODO: Find a better solution for this
     if len(thing_models) == 1:
         thing_models = list(thing_models.values())[0]
