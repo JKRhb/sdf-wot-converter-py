@@ -178,7 +178,6 @@ def _resolve_tm_ref(
             del result["tm:ref"]
             result = json_merge_patch.merge(original, result)
 
-            # TODO: Check if this is actually working
             if "tm:ref" in result:
                 if root:
                     result = _resolve_tm_ref(

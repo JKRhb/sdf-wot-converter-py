@@ -772,7 +772,7 @@ def add_origin_link(thing_model: Dict, origin_url: str):
     if origin_url:
         origin_link = {
             "href": origin_url,
-            "rel": "alternate",  # TODO: Which kind of link relation should be used?
+            "rel": "alternate",
         }
         if "links" in thing_model:
             thing_model["links"].append(origin_link)
@@ -811,7 +811,6 @@ def map_sdf_objects(
         if not suppress_roundtripping:
             thing_model["sdf:objectKey"] = object_key
         collect_sdf_required(thing_model, sdf_object, mapped_fields)
-        # collect_mapping(thing_model, json_pointer, "events", affordance_key)
         map_infoblock(
             sdf_model,
             thing_model,
