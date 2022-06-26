@@ -165,7 +165,25 @@ def test_sdf_tm_multiple_objects_and_things():
     }
 
     expected_result = {
-        "Test1": {
+        "sdfThing/testThing1": {
+            "@context": [
+                "https://www.w3.org/2022/wot/td/v1.1",
+                {"sdf": "https://example.com/sdf"},
+            ],
+            "@type": "tm:ThingModel",
+            "sdf:thingKey": "testThing1",
+            "links": [
+                {
+                    "href": "#/sdfThing~1testThing1~1sdfObject~1Test1",
+                    "rel": "tm:submodel",
+                },
+                {
+                    "href": "#/sdfThing~1testThing1~1sdfObject~1Test2",
+                    "rel": "tm:submodel",
+                },
+            ],
+        },
+        "sdfThing/testThing1/sdfObject/Test1": {
             "@context": [
                 "https://www.w3.org/2022/wot/td/v1.1",
                 {"sdf": "https://example.com/sdf"},
@@ -173,7 +191,7 @@ def test_sdf_tm_multiple_objects_and_things():
             "@type": "tm:ThingModel",
             "sdf:objectKey": "Test1",
         },
-        "Test2": {
+        "sdfThing/testThing1/sdfObject/Test2": {
             "@context": [
                 "https://www.w3.org/2022/wot/td/v1.1",
                 {"sdf": "https://example.com/sdf"},
@@ -181,7 +199,25 @@ def test_sdf_tm_multiple_objects_and_things():
             "@type": "tm:ThingModel",
             "sdf:objectKey": "Test2",
         },
-        "Test3": {
+        "sdfThing/testThing2": {
+            "@context": [
+                "https://www.w3.org/2022/wot/td/v1.1",
+                {"sdf": "https://example.com/sdf"},
+            ],
+            "@type": "tm:ThingModel",
+            "sdf:thingKey": "testThing2",
+            "links": [
+                {
+                    "href": "#/sdfThing~1testThing2~1sdfObject~1Test3",
+                    "rel": "tm:submodel",
+                },
+                {
+                    "href": "#/sdfThing~1testThing2~1sdfObject~1Test2",
+                    "rel": "tm:submodel",
+                },
+            ],
+        },
+        "sdfThing/testThing2/sdfObject/Test3": {
             "@context": [
                 "https://www.w3.org/2022/wot/td/v1.1",
                 {"sdf": "https://example.com/sdf"},
@@ -189,35 +225,21 @@ def test_sdf_tm_multiple_objects_and_things():
             "@type": "tm:ThingModel",
             "sdf:objectKey": "Test3",
         },
-        "testThing1": {
+        "sdfThing/testThing2/sdfObject/Test2": {
             "@context": [
                 "https://www.w3.org/2022/wot/td/v1.1",
                 {"sdf": "https://example.com/sdf"},
             ],
             "@type": "tm:ThingModel",
-            "links": [
-                {"href": "#/Test1", "rel": "tm:submodel"},
-                {"href": "#/Test2", "rel": "tm:submodel"},
-            ],
-            "sdf:thingKey": "testThing1",
-        },
-        "testThing2": {
-            "@context": [
-                "https://www.w3.org/2022/wot/td/v1.1",
-                {"sdf": "https://example.com/sdf"},
-            ],
-            "@type": "tm:ThingModel",
-            "links": [
-                {"href": "#/Test3", "rel": "tm:submodel"},
-                {"href": "#/Test2", "rel": "tm:submodel"},
-            ],
-            "sdf:thingKey": "testThing2",
+            "sdf:objectKey": "Test2",
         },
     }
 
     perform_conversion_test(input, expected_result)
     perform_sdf_thing_collection_roundtrip_test(
-        input, root_model_key="testThing1", top_model_keys={"testThing1", "testThing2"}
+        input,
+        root_model_key="sdfThing/testThing1",
+        top_model_keys={"sdfThing/testThing1", "sdfThing/testThing2"},
     )
 
 
@@ -544,62 +566,60 @@ def test_sdf_tm_nested_model():
     }
 
     expected_result = {
-        "bar": {
+        "sdfThing/blah": {
             "@context": [
                 "https://www.w3.org/2022/wot/td/v1.1",
                 {"sdf": "https://example.com/sdf"},
             ],
             "@type": "tm:ThingModel",
-            "links": [{"href": "#/baz", "rel": "tm:submodel"}],
-            "sdf:thingKey": "bar",
+            "sdf:thingKey": "blah",
+            "links": [
+                {"href": "#/sdfThing~1blah~1sdfThing~1foo", "rel": "tm:submodel"}
+            ],
         },
-        "baz": {
+        "sdfThing/blah/sdfThing/foo": {
             "@context": [
                 "https://www.w3.org/2022/wot/td/v1.1",
                 {"sdf": "https://example.com/sdf"},
             ],
             "@type": "tm:ThingModel",
-            "actions": {
-                "foobar": {
-                    "title": "hi",
+            "sdf:thingKey": "foo",
+            "links": [
+                {
+                    "href": "#/sdfThing~1blah~1sdfThing~1foo~1sdfThing~1bar",
+                    "rel": "tm:submodel",
                 }
-            },
-            "events": {
-                "foobar": {
-                    "title": "hi",
+            ],
+        },
+        "sdfThing/blah/sdfThing/foo/sdfThing/bar": {
+            "@context": [
+                "https://www.w3.org/2022/wot/td/v1.1",
+                {"sdf": "https://example.com/sdf"},
+            ],
+            "@type": "tm:ThingModel",
+            "sdf:thingKey": "bar",
+            "links": [
+                {
+                    "href": "#/sdfThing~1blah~1sdfThing~1foo~1sdfThing~1bar~1sdfObject~1baz",
+                    "rel": "tm:submodel",
                 }
-            },
-            "properties": {
-                "foobar": {
-                    "title": "hi",
-                    "observable": True,
-                }
-            },
+            ],
+        },
+        "sdfThing/blah/sdfThing/foo/sdfThing/bar/sdfObject/baz": {
+            "@context": [
+                "https://www.w3.org/2022/wot/td/v1.1",
+                {"sdf": "https://example.com/sdf"},
+            ],
+            "@type": "tm:ThingModel",
             "sdf:objectKey": "baz",
             "tm:required": [
-                # TODO: These pointers should probably be corrected
                 "#/properties/foobar",
                 "#/actions/foobar",
                 "#/events/foobar",
             ],
-        },
-        "blah": {
-            "@context": [
-                "https://www.w3.org/2022/wot/td/v1.1",
-                {"sdf": "https://example.com/sdf"},
-            ],
-            "@type": "tm:ThingModel",
-            "links": [{"href": "#/foo", "rel": "tm:submodel"}],
-            "sdf:thingKey": "blah",
-        },
-        "foo": {
-            "@context": [
-                "https://www.w3.org/2022/wot/td/v1.1",
-                {"sdf": "https://example.com/sdf"},
-            ],
-            "@type": "tm:ThingModel",
-            "links": [{"href": "#/bar", "rel": "tm:submodel"}],
-            "sdf:thingKey": "foo",
+            "actions": {"foobar": {"title": "hi"}},
+            "properties": {"foobar": {"title": "hi", "observable": True}},
+            "events": {"foobar": {"title": "hi"}},
         },
     }
 
@@ -904,16 +924,7 @@ def test_sdf_tm_nested_sdf_conversion():
     }
 
     expected_result = {
-        "bar": {
-            "@context": [
-                "https://www.w3.org/2022/wot/td/v1.1",
-                {"sdf": "https://example.com/sdf"},
-            ],
-            "@type": "tm:ThingModel",
-            "actions": {"toggle": {}},
-            "sdf:objectKey": "bar",
-        },
-        "baz": {
+        "sdfObject/baz": {
             "@context": [
                 "https://www.w3.org/2022/wot/td/v1.1",
                 {"sdf": "https://example.com/sdf"},
@@ -921,19 +932,26 @@ def test_sdf_tm_nested_sdf_conversion():
             "@type": "tm:ThingModel",
             "sdf:objectKey": "baz",
         },
-        "foo": {
+        "sdfThing/foo": {
             "@context": [
                 "https://www.w3.org/2022/wot/td/v1.1",
                 {"sdf": "https://example.com/sdf"},
             ],
             "@type": "tm:ThingModel",
-            "links": [{"href": "#/bar", "rel": "tm:submodel"}],
-            "properties": {
-                "status": {
-                    "observable": True,
-                }
-            },
             "sdf:thingKey": "foo",
+            "properties": {"status": {"observable": True}},
+            "links": [
+                {"href": "#/sdfThing~1foo~1sdfObject~1bar", "rel": "tm:submodel"}
+            ],
+        },
+        "sdfThing/foo/sdfObject/bar": {
+            "@context": [
+                "https://www.w3.org/2022/wot/td/v1.1",
+                {"sdf": "https://example.com/sdf"},
+            ],
+            "@type": "tm:ThingModel",
+            "sdf:objectKey": "bar",
+            "actions": {"toggle": {}},
         },
     }
 
@@ -963,31 +981,24 @@ def test_sdf_tm_suppress_roundtripping_fields():
     }
 
     expected_result = {
-        "bar": {
-            "@context": [
-                "https://www.w3.org/2022/wot/td/v1.1",
+        "sdfObject/baz": {
+            "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
+            "@type": "tm:ThingModel",
+        },
+        "sdfThing/foo": {
+            "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
+            "@type": "tm:ThingModel",
+            "properties": {
+                "status": {"enum": [{"type": "string"}], "observable": True}
+            },
+            "links": [
+                {"href": "#/sdfThing~1foo~1sdfObject~1bar", "rel": "tm:submodel"}
             ],
+        },
+        "sdfThing/foo/sdfObject/bar": {
+            "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
             "@type": "tm:ThingModel",
             "actions": {"toggle": {}},
-        },
-        "baz": {
-            "@context": [
-                "https://www.w3.org/2022/wot/td/v1.1",
-            ],
-            "@type": "tm:ThingModel",
-        },
-        "foo": {
-            "@context": [
-                "https://www.w3.org/2022/wot/td/v1.1",
-            ],
-            "@type": "tm:ThingModel",
-            "links": [{"href": "#/bar", "rel": "tm:submodel"}],
-            "properties": {
-                "status": {
-                    "observable": True,
-                    "enum": [{"type": "string"}],
-                }
-            },
         },
     }
 
@@ -999,3 +1010,128 @@ def test_td_tm_illegal_input():
 
     with pytest.raises(ValidationError):
         convert_sdf_to_wot_tm(input)
+
+
+def test_sdf_tm_duplicate_keys():
+
+    input = {
+        "info": {
+            "title": "Example file for OneDM Semantic Definition Format",
+            "version": "2019-04-24",
+            "copyright": "Copyright 2019 Example Corp. All rights reserved.",
+            "license": "https://example.com/license",
+        },
+        "namespace": {"cap": "https://example.com/capability/cap"},
+        "defaultNamespace": "cap",
+        "sdfThing": {
+            "Switch": {
+                "sdfThing": {
+                    "Switch": {
+                        "sdfObject": {
+                            "Switch": {
+                                "sdfProperty": {
+                                    "value": {
+                                        "description": "The state of the switch; false for off and true for on.",
+                                        "type": "boolean",
+                                        "observable": True,
+                                    }
+                                },
+                                "sdfAction": {
+                                    "on": {
+                                        "description": "Turn the switch on; equivalent to setting value to true."
+                                    },
+                                    "off": {
+                                        "description": "Turn the switch off; equivalent to setting value to false."
+                                    },
+                                    "toggle": {
+                                        "description": "Toggle the switch; equivalent to setting value to its complement."
+                                    },
+                                },
+                            }
+                        }
+                    }
+                }
+            }
+        },
+    }
+
+    expected_result = {
+        "sdfThing/Switch": {
+            "@context": [
+                "https://www.w3.org/2022/wot/td/v1.1",
+                {
+                    "cap": "https://example.com/capability/cap",
+                    "sdf": "https://example.com/sdf",
+                },
+            ],
+            "@type": "tm:ThingModel",
+            "sdf:thingKey": "Switch",
+            "sdf:title": "Example file for OneDM Semantic Definition Format",
+            "sdf:copyright": "Copyright 2019 Example Corp. All rights reserved.",
+            "links": [
+                {"href": "https://example.com/license", "rel": "license"},
+                {"href": "#/sdfThing~1Switch~1sdfThing~1Switch", "rel": "tm:submodel"},
+            ],
+            "version": {"model": "2019-04-24"},
+            "sdf:defaultNamespace": "cap",
+        },
+        "sdfThing/Switch/sdfThing/Switch": {
+            "@context": [
+                "https://www.w3.org/2022/wot/td/v1.1",
+                {
+                    "cap": "https://example.com/capability/cap",
+                    "sdf": "https://example.com/sdf",
+                },
+            ],
+            "@type": "tm:ThingModel",
+            "sdf:thingKey": "Switch",
+            "sdf:title": "Example file for OneDM Semantic Definition Format",
+            "sdf:copyright": "Copyright 2019 Example Corp. All rights reserved.",
+            "links": [
+                {"href": "https://example.com/license", "rel": "license"},
+                {
+                    "href": "#/sdfThing~1Switch~1sdfThing~1Switch~1sdfObject~1Switch",
+                    "rel": "tm:submodel",
+                },
+            ],
+            "version": {"model": "2019-04-24"},
+            "sdf:defaultNamespace": "cap",
+        },
+        "sdfThing/Switch/sdfThing/Switch/sdfObject/Switch": {
+            "@context": [
+                "https://www.w3.org/2022/wot/td/v1.1",
+                {
+                    "cap": "https://example.com/capability/cap",
+                    "sdf": "https://example.com/sdf",
+                },
+            ],
+            "@type": "tm:ThingModel",
+            "sdf:objectKey": "Switch",
+            "sdf:title": "Example file for OneDM Semantic Definition Format",
+            "sdf:copyright": "Copyright 2019 Example Corp. All rights reserved.",
+            "links": [{"href": "https://example.com/license", "rel": "license"}],
+            "version": {"model": "2019-04-24"},
+            "sdf:defaultNamespace": "cap",
+            "actions": {
+                "on": {
+                    "description": "Turn the switch on; equivalent to setting value to true."
+                },
+                "off": {
+                    "description": "Turn the switch off; equivalent to setting value to false."
+                },
+                "toggle": {
+                    "description": "Toggle the switch; equivalent to setting value to its complement."
+                },
+            },
+            "properties": {
+                "value": {
+                    "description": "The state of the switch; false for off and true for on.",
+                    "type": "boolean",
+                    "observable": True,
+                }
+            },
+        },
+    }
+
+    perform_conversion_test(input, expected_result)
+    perform_sdf_roundtrip_test(input)

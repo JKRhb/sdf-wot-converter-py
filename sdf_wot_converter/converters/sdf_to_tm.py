@@ -870,9 +870,9 @@ def map_sdf_objects(
         map_additional_fields(thing_model, sdf_object, mapped_fields)
 
         add_origin_link(thing_model, origin_url)
-        add_link_to_parent(parent, object_key)
+        add_link_to_parent(parent, json_pointer)
 
-        thing_models[object_key] = thing_model
+        thing_models[json_pointer[2:]] = thing_model
 
 
 def map_additional_fields(
@@ -887,14 +887,13 @@ def map_additional_fields(
 
 def add_link_to_parent(parent: dict, json_pointer: str):
     if parent:
+        links = initialize_list_field(parent, "links")
+        href = json_pointer[2:].replace("/", "~1")
         parent_link = {
-            "href": f"#/{json_pointer}",
-            "rel": "tm:submodel",  # TODO: Which kind of link relation should be used?
+            "href": f"#/{href}",
+            "rel": "tm:submodel",
         }
-        if "links" in parent:
-            parent["links"].append(parent_link)
-        else:
-            parent["links"] = [parent_link]
+        links.append(parent_link)
 
 
 def map_sdf_things(
@@ -976,9 +975,9 @@ def map_sdf_things(
         del thing_model["mappings"]
 
         add_origin_link(thing_model, origin_url)
-        add_link_to_parent(parent, thing_key)
+        add_link_to_parent(parent, thing_prefix)
 
-        thing_models[thing_key] = thing_model
+        thing_models[thing_prefix[2:]] = thing_model
 
         map_sdf_things(
             thing_models,
@@ -1070,7 +1069,6 @@ def convert_sdf_to_wot_tm(
     _fix_thing_model_json_ld_types(thing_models)
     _validate_thing_models(thing_models)
 
-    # TODO: Find a better solution for this
     if len(thing_models) == 1:
         thing_models = list(thing_models.values())[0]
 

@@ -942,7 +942,7 @@ def _get_submodel_keys(thing_model: Dict):
         link["href"] for link in links if link.get("rel") == "tm:submodel"
     ]
     submodel_keys = [link[2:] for link in submodel_links if link.startswith("#/")]
-    return submodel_keys
+    return [submodel_key.replace("~1", "/") for submodel_key in submodel_keys]
 
 
 def detect_top_level_models(thing_model_collection: Dict):
