@@ -1,4 +1,6 @@
+import os
 from typing import Any, Dict, List, Optional
+import urllib.parse
 import urllib.request
 import json_merge_patch
 import json
@@ -209,3 +211,36 @@ def is_thing_collection(thing_collection: Optional[Dict]) -> bool:
     reworked.
     """
     return thing_collection is not None and "@context" not in thing_collection
+
+
+def resolve_sub_things(
+    thing_model: Dict, thing_collection=None, placeholder_map=None, replace_href=False
+):
+    sub_models: Dict = {}
+
+    for link in thing_model.get("links", []):
+        if link.get("rel") == "tm:submodel":
+            sub_model = retrieve_thing_model(
+                link["href"], thing_collection=thing_collection
+            )
+            replace_placeholders(sub_model, placeholder_map)
+            key = _get_submodel_key_from_link(link)
+            sub_models[key] = sub_model
+            if replace_href:
+                link["href"] = f"#/{key}"
+
+    return sub_models
+
+
+def _get_submodel_key_from_link(link: Dict) -> str:
+    key = link.get("instanceName")
+    if key is None:
+        href: str = link["href"]
+        if href.startswith("#/"):
+            href = href[1:]
+        parsed_href = urllib.parse.urlparse(href)
+        key = parsed_href.path
+        key = os.path.split(key)[1]
+        for file_extension in ["jsonld", "json", "tm", "td"]:
+            key = key.replace(f".{file_extension}", "")
+    return key
