@@ -313,7 +313,7 @@ def parse_arguments(args):
         description="Convert from SDF to WoT and vice versa."
     )
 
-    subparser = parser.add_subparsers(dest="command")
+    subparser = parser.add_subparsers(dest="command", required=True)
     _add_sdf_arguments(subparser)
     _add_tm_arguments(subparser)
     _add_td_arguments(subparser)
