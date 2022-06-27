@@ -3,6 +3,7 @@ import os
 from typing import (
     Dict,
     List,
+    Optional,
     Set,
     Tuple,
     Union,
@@ -805,9 +806,8 @@ def get_license_link(thing_model: Dict):
     return None
 
 
-def map_infoblock_fields(thing_model, sdf_model):
-    # TODO: How to deal with infoblock information in submodels?
-    infoblock = {}
+def map_infoblock_fields(thing_model, sdf_model, custom_infoblock: Optional[Dict]):
+    infoblock: Dict[str, str] = {}
 
     map_field(thing_model, infoblock, "sdf:copyright", "copyright")
 
@@ -821,6 +821,9 @@ def map_infoblock_fields(thing_model, sdf_model):
 
     if "model" in thing_model.get("version", {}):
         infoblock["version"] = thing_model["version"]["model"]
+
+    if custom_infoblock is not None:
+        infoblock = {**infoblock, **custom_infoblock}
 
     if len(infoblock) > 0:
         sdf_model["info"] = infoblock
@@ -863,12 +866,14 @@ def convert_wot_tm_to_sdf(
     thing_model_collection=None,
     top_model_keys: Union[Set[str], None] = None,
     suppress_roundtripping=False,
+    infoblock: Optional[Dict] = None,
 ) -> Union[Dict, Tuple[Dict, Dict]]:
     if is_thing_collection(thing_model):
         return convert_wot_tm_collection_to_sdf(
             thing_model,
             top_model_keys=top_model_keys,
             suppress_roundtripping=suppress_roundtripping,
+            infoblock=infoblock,
         )
 
     sdf_model: Dict = {}
@@ -880,7 +885,7 @@ def convert_wot_tm_to_sdf(
     validate_thing_model(thing_model)
 
     map_default_namespace(thing_model, sdf_model)
-    map_infoblock_fields(thing_model, sdf_model)
+    map_infoblock_fields(thing_model, sdf_model, infoblock)
 
     # TODO: This distinction needs to be revisited
     if top_model_keys is None or len(top_model_keys) == 0:
@@ -960,6 +965,7 @@ def convert_wot_tm_collection_to_sdf(
     root_model_key=None,
     top_model_keys: Union[Set[str], None] = None,
     suppress_roundtripping=False,
+    infoblock: Optional[Dict] = None,
 ) -> Union[Dict, Tuple[Dict, Dict]]:
 
     if top_model_keys is None:
@@ -979,4 +985,5 @@ def convert_wot_tm_collection_to_sdf(
         thing_model_collection=thing_model_collection,
         top_model_keys=top_model_keys,
         suppress_roundtripping=suppress_roundtripping,
+        infoblock=infoblock,
     )

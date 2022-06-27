@@ -311,3 +311,23 @@ def test_invalid_cli_arguments():
     with pytest.raises(CommandException):
         parsed_args = Namespace(command="unknown")
         use_converter_cli(parsed_args)
+
+
+def test_wot_td_sdf_custom_infoblock():
+    make_test_output_dir()
+
+    args = [
+        "td-to-sdf",
+        "-i",
+        "https://raw.githubusercontent.com/JKRhb/sdf-wot-converter-py/main/examples/wot/example.td.jsonld",
+        "--title",
+        "Test",
+        "--version",
+        "1.0.0",
+        "--copyright",
+        "2022 Example Corp",
+        "--license",
+        "MIT",
+    ]
+    parsed_args = parse_arguments(args)
+    use_converter_cli(parsed_args)
