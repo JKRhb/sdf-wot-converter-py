@@ -191,6 +191,7 @@ def _add_tm_arguments(subparser):
     )
 
     _add_mapping_file_output_argument(wot_tm_to_sdf)
+    _add_sdf_infoblock_arguments(wot_tm_to_sdf)
     _add_output_argument(
         wot_tm_to_sdf,
         f"Output path for the converted SDF model and mapping files. {_output_path_help_text_suffix}",
@@ -238,6 +239,7 @@ def _add_td_arguments(subparser):
     )
 
     _add_mapping_file_output_argument(wot_td_to_sdf)
+    _add_sdf_infoblock_arguments(wot_td_to_sdf)
     _add_output_argument(
         wot_td_to_sdf,
         f"Output path for the converted SDF model and mapping files. {_output_path_help_text_suffix}",
@@ -255,6 +257,55 @@ def _add_td_arguments(subparser):
             "wot_tds",
             single_input=False,
         )
+
+
+def _add_sdf_infoblock_arguments(parser):
+    parser.add_argument(
+        "--title",
+        dest="sdf_title",
+        help="Set the title for the  resulting SDF definitions.",
+    )
+
+    parser.add_argument(
+        "--version",
+        dest="sdf_version",
+        help="Set the version for the  resulting SDF definitions.",
+    )
+
+    parser.add_argument(
+        "--copyright",
+        dest="sdf_copyright",
+        help="Set the copyright for the resulting SDF definitions.",
+    )
+
+    parser.add_argument(
+        "--license",
+        dest="sdf_license",
+        help="Set the license for the resulting SDF definitions.",
+    )
+
+
+def _get_sdf_infoblock(args) -> Optional[Dict]:
+    title = args.sdf_title
+    license = args.sdf_license
+    version = args.sdf_version
+    copyright = args.sdf_copyright
+
+    infoblock = {}
+
+    for key, value in [
+        ("title", title),
+        ("version", version),
+        ("copyright", copyright),
+        ("license", license),
+    ]:
+        if value is not None:
+            infoblock[key] = value
+
+    if len(infoblock) == 0:
+        return None
+
+    return infoblock
 
 
 def parse_arguments(args):
@@ -341,10 +392,12 @@ def _handle_from_tm(args):
     meta_data = _load_optional_json_file(args.meta_data)
     placeholder_map = _load_optional_json_file(args.placeholder_map)
     if command == "tm-to-sdf":
+        infoblock = _get_sdf_infoblock(args)
         output = convert_wot_tm_to_sdf(
             thing_models,
             placeholder_map=placeholder_map,
             suppress_roundtripping=suppress_roundtripping,
+            infoblock=infoblock,
         )
         mapping_file_output_path = args.mapping_file_output_path
         if isinstance(output, dict):
@@ -387,8 +440,11 @@ def _handle_from_td(args):
         thing_model = convert_wot_td_to_wot_tm(thing_description)
         save_or_print_model(output_path, thing_model, indent=indent)
     elif command == "td-to-sdf":
+        infoblock = _get_sdf_infoblock(args)
         sdf_model, mapping_file = convert_wot_td_to_sdf(
-            thing_description, suppress_roundtripping=suppress_roundtripping
+            thing_description,
+            suppress_roundtripping=suppress_roundtripping,
+            infoblock=infoblock,
         )
         save_or_print_model(output_path, sdf_model, indent=indent)
 
