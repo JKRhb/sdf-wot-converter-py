@@ -90,6 +90,7 @@ def convert_wot_tm_to_wot_td(
     placeholder_map: Optional[Dict] = None,
     meta_data: Optional[Dict] = None,
     bindings: Optional[Dict] = None,
+    remove_not_required_affordances=False,
 ):
     # TODO: Also deal with extensions
 
@@ -98,4 +99,5 @@ def convert_wot_tm_to_wot_td(
         placeholder_map=placeholder_map,
         meta_data=meta_data,
         bindings=bindings,
+        remove_not_required_affordances=remove_not_required_affordances,
     )
