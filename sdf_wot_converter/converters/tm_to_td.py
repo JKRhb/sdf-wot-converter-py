@@ -35,13 +35,14 @@ def _replace_version(partial_td):
         version["instance"] = version["model"]
 
 
-def assert_tm_required(partial_td):
+def _assert_tm_required(partial_td: Dict):
     if "tm:required" not in partial_td:
         return
 
+    # TODO: Add option for removing those affordances which are not required
     for required_affordance_pointer in partial_td["tm:required"]:
-        root, pointer = tuple(required_affordance_pointer.split("#", 1))
-        assert root == ""
+        assert required_affordance_pointer.startswith("#/")
+        pointer = required_affordance_pointer[1:]
         assert resolve_pointer(partial_td, pointer, None) is not None
 
     del partial_td["tm:required"]
@@ -113,7 +114,7 @@ def convert_tm_to_td(
 
     _replace_version(partial_td)
 
-    assert_tm_required(partial_td)
+    _assert_tm_required(partial_td)
 
     validate_thing_description(partial_td)
 
