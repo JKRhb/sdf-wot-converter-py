@@ -1,0 +1,30 @@
+name: Performance Evaluation and Comparison with SDF-Yang-Converter
+
+on:
+    push:
+        branches: [main]
+
+jobs:
+    evaluate:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v2
+            - name: Set up Python 3.9
+              uses: actions/setup-python@v2
+              with:
+                  python-version: 3.9
+            - name: Set up SDF WoT Converter
+              run: |
+                  python -m pip install --upgrade pip
+                  pip install -q build
+                  python -m build
+                  pip install jsonschema jsonpointer json-merge-patch validators
+                  pip install --no-index --find-links dist/ sdf-wot-converter
+            - name: Set up SDF YANG Converter and perform evaluation
+              run: ./evaluate.sh
+            - name: Export evaluation results
+              uses: actions/upload-artifact@v2
+              with:
+                  name: Results
+                  path: results.csv
