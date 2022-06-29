@@ -69,7 +69,7 @@ for filename in playground/sdfObject/sdfobject*.sdf.json; do
     ./converter -f ../$filename -o $yang_file_name  -c ../yang
     end="$(date -u +%s.%N)"
     yang_duration="$(bc <<<"$end-$start")"
-    if [ -e "$wot_file_name" ]; then
+    if [ -e "$yang_file_name" ]; then
         echo YANG conversion took $yang_duration seconds
     else
         echo YANG conversion failed
