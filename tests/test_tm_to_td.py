@@ -645,3 +645,38 @@ def test_tm_td_with_nesting():
     }
 
     perform_conversion_test(input, expected_result)
+
+
+def test_tm_td_tm_required_removal():
+    input = {
+        "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
+        "@type": "tm:ThingModel",
+        "title": "Thing Title",
+        "security": ["nosec_sc"],
+        "securityDefinitions": {"nosec_sc": {"scheme": "nosec"}},
+        "properties": {
+            "status": {
+                "type": "string",
+                "forms": [{"href": "https://mylamp.example.com/status"}],
+            },
+            "removedStatus": {"type": "string"},
+        },
+        "tm:required": ["#/properties/status"],
+    }
+
+    expected_result = {
+        "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
+        "title": "Thing Title",
+        "securityDefinitions": {
+            "nosec_sc": {"scheme": "nosec"},
+        },
+        "security": ["nosec_sc"],
+        "properties": {
+            "status": {
+                "type": "string",
+                "forms": [{"href": "https://mylamp.example.com/status"}],
+            }
+        },
+    }
+
+    perform_conversion_test(input, expected_result, remove_not_required_affordances=True)

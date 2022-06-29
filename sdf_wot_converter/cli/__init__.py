@@ -201,6 +201,12 @@ def _add_tm_arguments(subparser):
         f"Output path for the converted WoT Thing Description. {_output_path_help_text_suffix}",
     )
 
+    wot_tm_to_wot_td.add_argument(
+        "--remove-not-required-affordances",
+        action="store_true",
+        help="Lets the converter remove all affordances which do not appear in a tm:required array.",
+    )
+
     for parser in [wot_tm_to_sdf, wot_tm_to_wot_td]:
         _add_input_argument(
             parser,
@@ -416,11 +422,13 @@ def _handle_from_tm(args):
         )
 
     elif command == "tm-to-td":
+        remove_not_required_affordances = args.remove_not_required_affordances
         output = convert_wot_tm_to_wot_td(
             thing_models,
             placeholder_map=placeholder_map,
             meta_data=meta_data,
             bindings=bindings,
+            remove_not_required_affordances=remove_not_required_affordances,
         )
 
         save_or_print_model(output_path, output, indent=indent)
