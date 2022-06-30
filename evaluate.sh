@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Install libyang
 git clone https://github.com/CESNET/libyang.git
 cd libyang
