@@ -7,8 +7,10 @@ def map_common_json_schema_fields(
 ):
     """Maps dataschema fields which are equal for both SDF and WoT.
 
-    These definitions can simply be copied over, creating a deep copy for each field
-    in the process.
+    As the fields which are being mapped here have the same format, they can be
+    mapped by by simply copying them from the source to the target definition.
+    The definition's key is added to a list of mapped_fields in order to exclude
+    it from mappings of additional properties.
     """
 
     map_jsonschema_type(source_definition, target_definition, mapped_fields)
