@@ -400,6 +400,52 @@ def test_sdf_tm_type_conversion():
     perform_sdf_roundtrip_test(input)
 
 
+def test_sdf_tm_exclusive_min_max_boolean_conversion():
+    input = {
+        "sdfObject": {
+            "Test": {
+                "sdfProperty": {
+                    "bar": {
+                        "minimum": 0.0,
+                        "maximum": 9002.0,
+                        "exclusiveMinimum": True,
+                        "exclusiveMaximum": True,
+                    },
+                    "baz": {
+                        "minimum": 0.0,
+                        "maximum": 9002.0,
+                        "exclusiveMinimum": False,
+                        "exclusiveMaximum": False,
+                    },
+                },
+            }
+        }
+    }
+
+    expected_result = {
+        "@context": [
+            "https://www.w3.org/2022/wot/td/v1.1",
+            {"sdf": "https://example.com/sdf"},
+        ],
+        "@type": "tm:ThingModel",
+        "properties": {
+            "bar": {
+                "exclusiveMinimum": 0.0,
+                "exclusiveMaximum": 9002.0,
+                "observable": True,
+            },
+            "baz": {
+                "minimum": 0.0,
+                "maximum": 9002.0,
+                "observable": True,
+            },
+        },
+        "sdf:objectKey": "Test",
+    }
+
+    perform_conversion_test(input, expected_result)
+
+
 def test_sdf_tm_action_conversion():
     input = {
         "sdfObject": {
