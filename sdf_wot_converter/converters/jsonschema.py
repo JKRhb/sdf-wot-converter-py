@@ -27,30 +27,6 @@ def map_common_json_schema_fields(
     map_required(source_definition, target_definition, mapped_fields)
     map_format(source_definition, target_definition, mapped_fields)
     map_pattern(source_definition, target_definition, mapped_fields)
-    map_exclusive_minimum(source_definition, target_definition, mapped_fields)
-    map_exclusive_maximum(source_definition, target_definition, mapped_fields)
-
-
-def map_exclusive_maximum(
-    source_definition, target_definition, mapped_fields: List[str]
-):
-    map_common_field(
-        source_definition,
-        target_definition,
-        "exclusiveMaximum",
-        mapped_fields=mapped_fields,
-    )
-
-
-def map_exclusive_minimum(
-    source_definition, target_definition, mapped_fields: List[str]
-):
-    map_common_field(
-        source_definition,
-        target_definition,
-        "exclusiveMinimum",
-        mapped_fields=mapped_fields,
-    )
 
 
 def map_pattern(source_definition, target_definition, mapped_fields: List[str]):
