@@ -52,8 +52,6 @@ def resolve_sdf_ref(
     namespace: Optional[str],
     sdf_ref_list: List[str],
 ):
-    # TODO: This function should be reworked
-
     if "sdfRef" in sdf_definition:
         sdf_ref = sdf_definition["sdfRef"]
         root, pointer = tuple(sdf_ref.split("/", 1))
@@ -508,14 +506,13 @@ def map_action_qualities(
     sdf_model: Dict,
     thing_model: Dict,
     sdf_action: Dict,
-    prefix_list: List[str],
+    action_key: str,
     json_pointer: str,
     suppress_roundtripping: bool,
 ):
     sdf_action = resolve_sdf_ref(sdf_model, sdf_action, None, [])
 
     wot_actions = initialize_object_field(thing_model, "actions")
-    action_key = "_".join(prefix_list)
     wot_action = initialize_object_field(wot_actions, action_key)
     mapped_fields: List[str] = []
 
@@ -544,11 +541,9 @@ def map_action_qualities(
         sdf_model,
         sdf_action,
         thing_model,
-        prefix_list,
         json_pointer,
         suppress_roundtripping,
         mapped_fields,
-        suffix="action",
     )
 
     map_additional_fields(wot_action, sdf_action, mapped_fields)
@@ -581,16 +576,15 @@ def map_property_qualities(
     map_additional_fields(wot_property, sdf_property, mapped_fields)
 
 
-# TODO: Find a better name for this function
 def map_sdf_data_qualities(
     sdf_model: Dict,
     thing_model: Dict,
     sdf_data: Dict,
-    schema_definition_key: str,
     json_pointer: str,
     suppress_roundtripping: bool,
 ):
     schema_definitions = initialize_object_field(thing_model, "schemaDefinitions")
+    schema_definition_key = json_pointer[2:].replace("/", "~1")
     wot_schema_definition = initialize_object_field(
         schema_definitions, schema_definition_key
     )
@@ -621,11 +615,9 @@ def map_sdf_data(
     sdf_model: Dict,
     sdf_definition: Dict,
     thing_model: Dict,
-    prefix_list: List[str],
     json_pointer_prefix: str,
     suppress_roundtripping: bool,
     mapped_fields: List[str],
-    suffix="",
 ):
     sdf_data = sdf_definition.get("sdfData")
 
@@ -635,16 +627,11 @@ def map_sdf_data(
     mapped_fields.append("sdfData")
 
     for key, sdf_property in sdf_data.items():
-        name_list = prefix_list + [key]
-        if suffix:
-            name_list.append(suffix)
-        affordance_key = "_".join(name_list)
         json_pointer = get_json_pointer(json_pointer_prefix, "sdfData", key)
         map_sdf_data_qualities(
             sdf_model,
             thing_model,
             sdf_property,
-            affordance_key,
             json_pointer,
             suppress_roundtripping,
         )
@@ -654,7 +641,6 @@ def map_sdf_action(
     sdf_model: Dict,
     sdf_definition: Dict,
     thing_model: Dict,
-    prefix_list: List[str],
     json_pointer_prefix: str,
     suppress_roundtripping: bool,
     mapped_fields: List[str],
@@ -672,7 +658,7 @@ def map_sdf_action(
             sdf_model,
             thing_model,
             sdf_action,
-            prefix_list + [key],
+            key,
             json_pointer,
             suppress_roundtripping,
         )
@@ -687,7 +673,6 @@ def map_sdf_property(
     sdf_model: Dict,
     sdf_definition: Dict,
     thing_model: Dict,
-    prefix_list: List[str],
     json_pointer_prefix: str,
     suppress_roundtripping: bool,
     mapped_fields: List[str],
@@ -700,13 +685,12 @@ def map_sdf_property(
     mapped_fields.append("sdfProperty")
 
     for key, sdf_property in sdf_properties.items():
-        affordance_key = "_".join(prefix_list + [key])
         json_pointer = get_json_pointer(json_pointer_prefix, "sdfProperty", key)
         map_property_qualities(
             sdf_model,
             thing_model,
             sdf_property,
-            affordance_key,
+            key,
             json_pointer,
             suppress_roundtripping,
         )
@@ -716,12 +700,11 @@ def map_event_qualities(
     sdf_model: Dict,
     thing_model: Dict,
     sdf_event: Dict,
-    prefix_list: List[str],
+    event_key: str,
     json_pointer: str,
     suppress_roundtripping: bool,
 ):
     wot_events = initialize_object_field(thing_model, "events")
-    event_key = "_".join(prefix_list)
     wot_event = initialize_object_field(wot_events, event_key)
 
     mapped_fields: List[str] = []
@@ -747,11 +730,9 @@ def map_event_qualities(
         sdf_model,
         sdf_event,
         thing_model,
-        prefix_list,
         json_pointer,
         suppress_roundtripping,
         mapped_fields,
-        suffix="event",
     )
 
     map_additional_fields(wot_event, sdf_event, mapped_fields)
@@ -773,7 +754,6 @@ def map_sdf_event(
     sdf_model: Dict,
     sdf_definition: Dict,
     thing_model: Dict,
-    prefix_list: List[str],
     json_pointer_prefix: str,
     suppress_roundtripping: bool,
     mapped_fields: List[str],
@@ -791,7 +771,7 @@ def map_sdf_event(
             sdf_model,
             thing_model,
             sdf_event,
-            prefix_list + [key],
+            key,
             json_pointer,
             suppress_roundtripping,
         )
@@ -879,7 +859,6 @@ def map_sdf_objects(
             sdf_model,
             sdf_object,
             thing_model,
-            [],
             json_pointer,
             suppress_roundtripping,
             mapped_fields,
@@ -888,7 +867,6 @@ def map_sdf_objects(
             sdf_model,
             sdf_object,
             thing_model,
-            [],
             json_pointer,
             suppress_roundtripping,
             mapped_fields,
@@ -897,7 +875,6 @@ def map_sdf_objects(
             sdf_model,
             sdf_object,
             thing_model,
-            [],
             json_pointer,
             suppress_roundtripping,
             mapped_fields,
@@ -906,7 +883,6 @@ def map_sdf_objects(
             sdf_model,
             sdf_object,
             thing_model,
-            [],
             json_pointer,
             suppress_roundtripping,
             mapped_fields,
@@ -986,7 +962,6 @@ def map_sdf_things(
             sdf_model,
             sdf_thing,
             thing_model,
-            [],
             thing_prefix,
             suppress_roundtripping,
             mapped_fields,
@@ -995,7 +970,6 @@ def map_sdf_things(
             sdf_model,
             sdf_thing,
             thing_model,
-            [],
             thing_prefix,
             suppress_roundtripping,
             mapped_fields,
@@ -1004,7 +978,6 @@ def map_sdf_things(
             sdf_model,
             sdf_thing,
             thing_model,
-            [],
             thing_prefix,
             suppress_roundtripping,
             mapped_fields,
@@ -1013,7 +986,6 @@ def map_sdf_things(
             sdf_model,
             sdf_thing,
             thing_model,
-            [],
             thing_prefix,
             suppress_roundtripping,
             mapped_fields,
