@@ -877,38 +877,44 @@ def test_sdf_tm_sdf_data_conversion():
             {"sdf": "https://example.com/sdf"},
         ],
         "@type": "tm:ThingModel",
+        "sdf:objectKey": "Test",
         "schemaDefinitions": {
-            "fizz": {
-                "type": "string",
+            "sdfObject~1Test~1sdfData~1fizz": {"type": "string"},
+            "sdfObject~1Test~1sdfAction~1foobaz~1sdfData~1barfoo": {
+                "tm:ref": "#/schemaDefinitions/sdfObject~1Test~1sdfData~1fizz"
             },
-            "foobaz_barfoo_action": {
-                "tm:ref": "#/schemaDefinitions/fizz",
-            },
-            "foobaz_barfoo_event": {
-                "tm:ref": "#/schemaDefinitions/fizz",
+            "sdfObject~1Test~1sdfEvent~1foobaz~1sdfData~1barfoo": {
+                "tm:ref": "#/schemaDefinitions/sdfObject~1Test~1sdfData~1fizz"
             },
         },
         "actions": {
             "foobar": {
-                "input": {"tm:ref": "#/schemaDefinitions/fizz"},
                 "title": "hi",
+                "input": {
+                    "tm:ref": "#/schemaDefinitions/sdfObject~1Test~1sdfData~1fizz"
+                },
             },
             "foobaz": {
                 "title": "hi",
-                "input": {"tm:ref": "#/schemaDefinitions/foobaz_barfoo_action"},
+                "input": {
+                    "tm:ref": "#/schemaDefinitions/sdfObject~1Test~1sdfAction~1foobaz~1sdfData~1barfoo"
+                },
             },
         },
         "events": {
             "foobar": {
-                "data": {"tm:ref": "#/schemaDefinitions/fizz"},
                 "title": "hi",
+                "data": {
+                    "tm:ref": "#/schemaDefinitions/sdfObject~1Test~1sdfData~1fizz"
+                },
             },
             "foobaz": {
                 "title": "hi",
-                "data": {"tm:ref": "#/schemaDefinitions/foobaz_barfoo_event"},
+                "data": {
+                    "tm:ref": "#/schemaDefinitions/sdfObject~1Test~1sdfEvent~1foobaz~1sdfData~1barfoo"
+                },
             },
         },
-        "sdf:objectKey": "Test",
     }
 
     perform_conversion_test(input, expected_result)
