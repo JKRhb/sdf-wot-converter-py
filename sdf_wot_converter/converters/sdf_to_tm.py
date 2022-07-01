@@ -52,8 +52,6 @@ def resolve_sdf_ref(
     namespace: Optional[str],
     sdf_ref_list: List[str],
 ):
-    # TODO: This function should be reworked
-
     if "sdfRef" in sdf_definition:
         sdf_ref = sdf_definition["sdfRef"]
         root, pointer = tuple(sdf_ref.split("/", 1))
@@ -578,7 +576,6 @@ def map_property_qualities(
     map_additional_fields(wot_property, sdf_property, mapped_fields)
 
 
-# TODO: Find a better name for this function
 def map_sdf_data_qualities(
     sdf_model: Dict,
     thing_model: Dict,
