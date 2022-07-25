@@ -659,9 +659,9 @@ def test_sdf_tm_nested_model():
             "@type": "tm:ThingModel",
             "sdf:objectKey": "baz",
             "tm:required": [
-                "#/properties/foobar",
-                "#/actions/foobar",
-                "#/events/foobar",
+                "/properties/foobar",
+                "/actions/foobar",
+                "/events/foobar",
             ],
             "actions": {"foobar": {"title": "hi"}},
             "properties": {"foobar": {"title": "hi", "observable": True}},

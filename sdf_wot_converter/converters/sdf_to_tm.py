@@ -778,11 +778,13 @@ def map_sdf_event(
 
 
 def map_sdf_required(thing_model: Dict):
-    tm_required = initialize_list_field(thing_model, "tm:required")
+    # TODO: This can probably be refactored
+    mappings = thing_model["mappings"]
 
-    thing_model["tm:required"] = [
-        thing_model["mappings"][pointer] for pointer in tm_required
-    ]
+    tm_required = initialize_list_field(thing_model, "tm:required")
+    tm_required = [mappings[pointer][1:] for pointer in tm_required]
+
+    thing_model["tm:required"] = tm_required
 
     if len(thing_model["tm:required"]) == 0:
         del thing_model["tm:required"]

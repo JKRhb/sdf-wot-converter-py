@@ -605,6 +605,8 @@ def map_tm_required(
     if pointers is None:
         return
 
+    pointers = ["#" + pointer for pointer in pointers]
+
     mapped_fields.append("tm:required")
     converted_pointers = [convert_pointer(x, current_path) for x in pointers]
     sdf_definition["sdfRequired"] = converted_pointers
