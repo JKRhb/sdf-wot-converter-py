@@ -765,14 +765,6 @@ def test_sdf_tm_sdf_choice():
                             }
                         },
                     },
-                    "foobaz": {
-                        "observable": True,
-                        "enum": ["blargh"],
-                        "sdfChoice": {
-                            "blah": {"type": "string"},
-                            "foo": {"type": "number"},
-                        },
-                    },
                 }
             }
         }
@@ -789,20 +781,40 @@ def test_sdf_tm_sdf_choice():
                 "observable": True,
                 "enum": [{"sdf:choiceName": "blah", "type": "string"}],
             },
-            "foobaz": {
-                "observable": True,
-                "enum": [
-                    "blargh",
-                    {"sdf:choiceName": "blah", "type": "string"},
-                    {"sdf:choiceName": "foo", "type": "number"},
-                ],
-            },
         },
         "sdf:objectKey": "Test",
     }
 
     perform_conversion_test(input, expected_result)
     perform_sdf_roundtrip_test(input)
+
+
+def test_sdf_tm_invalid_sdf_choice():
+    input = {
+        "sdfObject": {
+            "Test": {
+                "sdfProperty": {
+                    "foobaz": {
+                        "observable": True,
+                        "enum": ["blargh"],
+                        "sdfChoice": {
+                            "blah": {"type": "string"},
+                            "foo": {"type": "number"},
+                        },
+                    },
+                }
+            }
+        }
+    }
+
+    expected_result = None
+
+    with pytest.raises(ValidationError) as e_info:
+        perform_conversion_test(input, expected_result)
+
+    error_message = "sdfChoice and enum can't be used simultaneously."
+
+    assert str(e_info.value) == error_message
 
 
 def test_sdf_tm_sdf_data_conversion():
