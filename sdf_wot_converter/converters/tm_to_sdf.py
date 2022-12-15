@@ -270,8 +270,6 @@ def map_data_schema_fields(
     map_content_format(wot_definition, sdf_definition, mapped_fields)
     map_nullable(wot_definition, sdf_definition, mapped_fields)
     map_sdf_type(wot_definition, sdf_definition, mapped_fields)
-    _map_exclusive_maximum(wot_definition, sdf_definition, mapped_fields)
-    _map_exclusive_minimum(wot_definition, sdf_definition, mapped_fields)
 
     map_items(
         thing_model,
@@ -294,28 +292,6 @@ def map_data_schema_fields(
 
     map_additional_fields(
         sdf_mapping_file, wot_definition, mapping_file_path, mapped_fields
-    )
-
-
-def _map_exclusive_maximum(
-    source_definition, target_definition, mapped_fields: List[str]
-):
-    map_common_field(
-        source_definition,
-        target_definition,
-        "exclusiveMaximum",
-        mapped_fields=mapped_fields,
-    )
-
-
-def _map_exclusive_minimum(
-    source_definition, target_definition, mapped_fields: List[str]
-):
-    map_common_field(
-        source_definition,
-        target_definition,
-        "exclusiveMinimum",
-        mapped_fields=mapped_fields,
     )
 
 
