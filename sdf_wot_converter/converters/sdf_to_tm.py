@@ -267,7 +267,7 @@ def map_sdf_choice(
 ):
     if "sdfChoice" in data_qualities:
         mapped_fields.append("sdfChoice")
-        enum = initialize_list_field(data_schema, "enum")
+        enum = initialize_list_field(data_schema, "enum", raise_error_if_exists=True)
         for choice_name, choice in data_qualities["sdfChoice"].items():
             mapped_choice = {}
             if not suppress_roundtripping:

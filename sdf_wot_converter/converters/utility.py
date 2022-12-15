@@ -1,5 +1,7 @@
 from typing import Dict
 
+from jsonschema import ValidationError
+
 
 def initialize_object_field(model: Dict, field_name: str) -> Dict:
     if field_name not in model:
@@ -8,9 +10,14 @@ def initialize_object_field(model: Dict, field_name: str) -> Dict:
     return model[field_name]
 
 
-def initialize_list_field(model: Dict, field_name: str) -> list:
+def initialize_list_field(
+    model: Dict, field_name: str, raise_error_if_exists=False
+) -> list:
     if field_name not in model:
         model[field_name] = []
+    elif raise_error_if_exists:
+        # TODO: Revisit once decision on sdfChoice and enum has been made
+        raise ValidationError("sdfChoice and enum can't be used simultaneously.")
 
     return model[field_name]
 
