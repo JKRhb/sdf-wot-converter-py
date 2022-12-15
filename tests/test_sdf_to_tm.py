@@ -62,20 +62,30 @@ def test_sdf_tm_example_conversion():
                 "label": "Switch",
                 "sdfProperty": {
                     "value": {
-                        "description": "The state of the switch; false for off and true for on.",
+                        "description": (
+                            "The state of the switch; false for off and true for on."
+                        ),
                         "type": "boolean",
                         "observable": False,
                     }
                 },
                 "sdfAction": {
                     "on": {
-                        "description": "Turn the switch on; equivalent to setting value to true."
+                        "description": (
+                            "Turn the switch on; equivalent to setting value to true."
+                        )
                     },
                     "off": {
-                        "description": "Turn the switch off; equivalent to setting value to false."
+                        "description": (
+                            "Turn the switch off; equivalent to setting value to "
+                            "false."
+                        )
                     },
                     "toggle": {
-                        "description": "Toggle the switch; equivalent to setting value to its complement."
+                        "description": (
+                            "Toggle the switch; equivalent to setting value to its "
+                            "complement."
+                        )
                     },
                 },
             }
@@ -99,18 +109,22 @@ def test_sdf_tm_example_conversion():
         "sdf:defaultNamespace": "cap",
         "actions": {
             "on": {
-                "description": "Turn the switch on; equivalent to setting value to true.",
+                "description": "Turn the switch on; equivalent to setting value "
+                "to true.",
             },
             "off": {
-                "description": "Turn the switch off; equivalent to setting value to false.",
+                "description": "Turn the switch off; equivalent to setting value "
+                "to false.",
             },
             "toggle": {
-                "description": "Toggle the switch; equivalent to setting value to its complement.",
+                "description": "Toggle the switch; equivalent to setting value to "
+                "its complement.",
             },
         },
         "properties": {
             "value": {
-                "description": "The state of the switch; false for off and true for on.",
+                "description": "The state of the switch; false for off and true for "
+                "on.",
                 "type": "boolean",
                 "observable": False,
             }
@@ -551,9 +565,12 @@ def test_sdf_tm_nested_model():
                                             "foobar": {"label": "hi"},
                                         },
                                         "sdfRequired": [
-                                            "#/sdfThing/blah/sdfThing/foo/sdfThing/bar/sdfObject/baz/sdfProperty/foobar",
-                                            "#/sdfThing/blah/sdfThing/foo/sdfThing/bar/sdfObject/baz/sdfAction/foobar",
-                                            "#/sdfThing/blah/sdfThing/foo/sdfThing/bar/sdfObject/baz/sdfEvent/foobar",
+                                            "#/sdfThing/blah/sdfThing/foo/sdfThing/bar/"
+                                            "sdfObject/baz/sdfProperty/foobar",
+                                            "#/sdfThing/blah/sdfThing/foo/sdfThing/bar/"
+                                            "sdfObject/baz/sdfAction/foobar",
+                                            "#/sdfThing/blah/sdfThing/foo/sdfThing/bar/"
+                                            "sdfObject/baz/sdfEvent/foobar",
                                         ],
                                     }
                                 }
@@ -600,7 +617,8 @@ def test_sdf_tm_nested_model():
             "sdf:thingKey": "bar",
             "links": [
                 {
-                    "href": "#/sdfThing~1blah~1sdfThing~1foo~1sdfThing~1bar~1sdfObject~1baz",
+                    "href": "#/sdfThing~1blah~1sdfThing~1foo~1sdfThing~1"
+                    "bar~1sdfObject~1baz",
                     "rel": "tm:submodel",
                 }
             ],
@@ -692,7 +710,10 @@ def test_sdf_tm_failing_URL_sdf_ref():
 
 
 def test_sdf_tm_succeeding_URL_sdf_ref():
-    test_url = "https://raw.githubusercontent.com/one-data-model/playground/master/sdfObject/sdfobject-accelerometer.sdf.json"
+    test_url = (
+        "https://raw.githubusercontent.com/one-data-model/playground/"
+        "master/sdfObject/sdfobject-accelerometer.sdf.json"
+    )
 
     input = {
         "namespace": {"test": test_url},
@@ -851,7 +872,8 @@ def test_sdf_tm_sdf_data_conversion():
             "foobaz": {
                 "title": "hi",
                 "input": {
-                    "tm:ref": "#/schemaDefinitions/sdfObject~1Test~1sdfAction~1foobaz~1sdfData~1barfoo"
+                    "tm:ref": "#/schemaDefinitions/sdfObject~1Test~1sdfAction~1"
+                    "foobaz~1sdfData~1barfoo"
                 },
             },
         },
@@ -865,7 +887,8 @@ def test_sdf_tm_sdf_data_conversion():
             "foobaz": {
                 "title": "hi",
                 "data": {
-                    "tm:ref": "#/schemaDefinitions/sdfObject~1Test~1sdfEvent~1foobaz~1sdfData~1barfoo"
+                    "tm:ref": "#/schemaDefinitions/sdfObject~1Test~1sdfEvent~1"
+                    "foobaz~1sdfData~1barfoo"
                 },
             },
         },
@@ -1037,20 +1060,24 @@ def test_sdf_tm_duplicate_keys():
                             "Switch": {
                                 "sdfProperty": {
                                     "value": {
-                                        "description": "The state of the switch; false for off and true for on.",
+                                        "description": "The state of the switch; "
+                                        "false for off and true for on.",
                                         "type": "boolean",
                                         "observable": True,
                                     }
                                 },
                                 "sdfAction": {
                                     "on": {
-                                        "description": "Turn the switch on; equivalent to setting value to true."
+                                        "description": "Turn the switch on; "
+                                        "equivalent to setting value to true."
                                     },
                                     "off": {
-                                        "description": "Turn the switch off; equivalent to setting value to false."
+                                        "description": "Turn the switch off; "
+                                        "equivalent to setting value to false."
                                     },
                                     "toggle": {
-                                        "description": "Toggle the switch; equivalent to setting value to its complement."
+                                        "description": "Toggle the switch; equivalent "
+                                        "to setting value to its complement."
                                     },
                                 },
                             }
@@ -1120,18 +1147,22 @@ def test_sdf_tm_duplicate_keys():
             "sdf:defaultNamespace": "cap",
             "actions": {
                 "on": {
-                    "description": "Turn the switch on; equivalent to setting value to true."
+                    "description": "Turn the switch on; equivalent to setting "
+                    "value to true."
                 },
                 "off": {
-                    "description": "Turn the switch off; equivalent to setting value to false."
+                    "description": "Turn the switch off; equivalent to setting "
+                    "value to false."
                 },
                 "toggle": {
-                    "description": "Toggle the switch; equivalent to setting value to its complement."
+                    "description": "Toggle the switch; equivalent to setting value to "
+                    "its complement."
                 },
             },
             "properties": {
                 "value": {
-                    "description": "The state of the switch; false for off and true for on.",
+                    "description": "The state of the switch; false for off and true "
+                    "for on.",
                     "type": "boolean",
                     "observable": True,
                 }

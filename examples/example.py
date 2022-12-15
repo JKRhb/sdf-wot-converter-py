@@ -16,19 +16,28 @@ sdf_model = {
         "Switch": {
             "sdfProperty": {
                 "value": {
-                    "description": "The state of the switch; false for off and true for on.",
+                    "description": (
+                        "The state of the switch; false for off and true for on."
+                    ),
                     "type": "boolean",
                 }
             },
             "sdfAction": {
                 "on": {
-                    "description": "Turn the switch on; equivalent to setting value to true."
+                    "description": (
+                        "Turn the switch on; equivalent to setting value to true."
+                    )
                 },
                 "off": {
-                    "description": "Turn the switch off; equivalent to setting value to false."
+                    "description": (
+                        "Turn the switch off; equivalent to setting value to false."
+                    )
                 },
                 "toggle": {
-                    "description": "Toggle the switch; equivalent to setting value to its complement."
+                    "description": (
+                        "Toggle the switch; equivalent to setting value to its "
+                        "complement."
+                    )
                 },
             },
         }
@@ -59,7 +68,9 @@ expected_thing_model = {
             "description": "Turn the switch off; equivalent to setting value to false.",
         },
         "toggle": {
-            "description": "Toggle the switch; equivalent to setting value to its complement.",
+            "description": (
+                "Toggle the switch; equivalent to setting value to its " "complement."
+            ),
         },
     },
     "properties": {
