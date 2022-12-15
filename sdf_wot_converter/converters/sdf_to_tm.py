@@ -309,8 +309,6 @@ def map_data_qualities(
         sdf_model, data_qualities, data_schema, suppress_roundtripping, mapped_fields
     )
     map_content_format(data_qualities, data_schema, mapped_fields)
-    _map_exclusive_maximum(data_qualities, data_schema, mapped_fields)
-    _map_exclusive_minimum(data_qualities, data_schema, mapped_fields)
 
     map_items(
         sdf_model, data_qualities, data_schema, suppress_roundtripping, mapped_fields
@@ -326,54 +324,6 @@ def map_data_qualities(
         map_readable(data_qualities, data_schema, mapped_fields)
 
     map_additional_fields(data_schema, data_qualities, mapped_fields)
-
-
-def _map_exclusive_min_max(
-    source_definition,
-    target_definition,
-    key: str,
-    exclusiveKey: str,
-    mapped_fields: List[str],
-):
-    exclusive_min_max = source_definition.get(exclusiveKey)
-
-    if exclusive_min_max is None:
-        return
-
-    mapped_fields.append(exclusiveKey)
-
-    if isinstance(exclusive_min_max, bool):
-        target_min_max = target_definition.get(key)
-
-        if exclusive_min_max:
-            target_definition[exclusiveKey] = target_min_max
-            del target_definition[key]
-    else:
-        target_definition[exclusiveKey] = exclusive_min_max
-
-
-def _map_exclusive_maximum(
-    source_definition, target_definition, mapped_fields: List[str]
-):
-    _map_exclusive_min_max(
-        source_definition,
-        target_definition,
-        "maximum",
-        "exclusiveMaximum",
-        mapped_fields,
-    )
-
-
-def _map_exclusive_minimum(
-    source_definition, target_definition, mapped_fields: List[str]
-):
-    _map_exclusive_min_max(
-        source_definition,
-        target_definition,
-        "minimum",
-        "exclusiveMinimum",
-        mapped_fields,
-    )
 
 
 def map_writable(sdf_property, wot_property, mapped_fields):
