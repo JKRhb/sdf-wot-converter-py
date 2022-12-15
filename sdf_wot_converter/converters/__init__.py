@@ -45,16 +45,19 @@ def convert_sdf_to_wot_td(
     origin_url: Optional[str] = None,
     suppress_roundtripping=False,
 ) -> Dict:
-    """Converts an SDF model and one or more SDF mapping files to a Thing Description or Thing Description collection.
+    """Converts an SDF model and one or more SDF mapping files to a Thing Description or
+    Thing Description collection.
 
     Args:
         sdf_model (Dict): An SDF model.
-        sdf_mapping_files (Optional[Union[Dict, List[Dict]]], optional): One or more SDF mapping files. Defaults to None.
-        origin_url (str, optional): The URL the SDF model originated from. Defaults to None.
+        sdf_mapping_files (Optional[Union[Dict, List[Dict]]], optional): One or more SDF
+        mapping files. Defaults to None.
+        origin_url (str, optional): The URL the SDF model originated from. Defaults to
+        None.
 
     Returns:
-        Dict: A Thing Description or Thing Description collection that is equivalent to the input SDF model and (optional)
-                SDF mapping file(s).
+        Dict: A Thing Description or Thing Description collection that is equivalent to
+        the input SDF model and (optional) SDF mapping file(s).
     """
 
     wot_tm = convert_sdf_to_wot_tm(

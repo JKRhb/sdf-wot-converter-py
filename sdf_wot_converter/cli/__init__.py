@@ -133,8 +133,11 @@ def _add_mapping_file_input_argument(parser):
         "--mapping-files",
         nargs="*",
         dest="mapping_file_input_path",
-        help="File paths or HTTP(S) URLs pointing to one or more SDF mapping files. "
-        "These will be used during the conversion process to augment the given SDF model.",
+        help=(
+            "File paths or HTTP(S) URLs pointing to one or more SDF mapping files. "
+            "These will be used during the conversion process to augment the given "
+            "SDF model."
+        ),
     )
 
 
@@ -162,7 +165,10 @@ def _add_sdf_arguments(subparser):
     )
     sdf_to_wot_td = subparser.add_parser(
         "sdf-to-td",
-        help="Converts an SDF model and mapping files to one or more WoT Thing Descriptions.",
+        help=(
+            "Converts an SDF model and mapping files to one or more WoT Thing "
+            "Descriptions."
+        ),
     )
 
     _add_output_argument(
@@ -183,7 +189,10 @@ def _add_sdf_arguments(subparser):
 def _add_tm_arguments(subparser):
     wot_tm_to_sdf = subparser.add_parser(
         "tm-to-sdf",
-        help="Converts a WoT Thing Model to an SDF model and zero or more mapping files.",
+        help=(
+            "Converts a WoT Thing Model to an SDF model and zero or more mapping "
+            "files."
+        ),
     )
     wot_tm_to_wot_td = subparser.add_parser(
         "tm-to-td",
@@ -194,17 +203,20 @@ def _add_tm_arguments(subparser):
     _add_sdf_infoblock_arguments(wot_tm_to_sdf)
     _add_output_argument(
         wot_tm_to_sdf,
-        f"Output path for the converted SDF model and mapping files. {_output_path_help_text_suffix}",
+        "Output path for the converted SDF model and mapping files. "
+        f"{_output_path_help_text_suffix}",
     )
     _add_output_argument(
         wot_tm_to_wot_td,
-        f"Output path for the converted WoT Thing Description. {_output_path_help_text_suffix}",
+        "Output path for the converted WoT Thing Description. "
+        f"{_output_path_help_text_suffix}",
     )
 
     wot_tm_to_wot_td.add_argument(
         "--remove-not-required-affordances",
         action="store_true",
-        help="Lets the converter remove all affordances which do not appear in a tm:required array.",
+        help="Lets the converter remove all affordances which do not appear in a "
+        "tm:required array.",
     )
 
     for parser in [wot_tm_to_sdf, wot_tm_to_wot_td]:
@@ -237,22 +249,26 @@ def _add_tm_arguments(subparser):
 def _add_td_arguments(subparser):
     wot_td_to_sdf = subparser.add_parser(
         "td-to-sdf",
-        help="Converts one or more WoT Thing Models to an SDF model and zero or more mapping files.",
+        help="Converts one or more WoT Thing Models to an SDF model and zero or more "
+        "mapping files.",
     )
     wot_td_to_wot_tm = subparser.add_parser(
         "td-to-tm",
-        help="Converts one or more WoT Thing Descriptions to one or more WoT Thing Models.",
+        help="Converts one or more WoT Thing Descriptions to one or more WoT "
+        "Thing Models.",
     )
 
     _add_mapping_file_output_argument(wot_td_to_sdf)
     _add_sdf_infoblock_arguments(wot_td_to_sdf)
     _add_output_argument(
         wot_td_to_sdf,
-        f"Output path for the converted SDF model and mapping files. {_output_path_help_text_suffix}",
+        "Output path for the converted SDF model and mapping files. "
+        f"{_output_path_help_text_suffix}",
     )
     _add_output_argument(
         wot_td_to_wot_tm,
-        f"Output path for the converted WoT Thing Model. {_output_path_help_text_suffix}",
+        "Output path for the converted WoT Thing Model. "
+        f"{_output_path_help_text_suffix}",
     )
 
     for parser in [wot_td_to_sdf, wot_td_to_wot_tm]:
@@ -335,7 +351,8 @@ def parse_arguments(args):
     parser.add_argument(
         "--suppress-roundtripping",
         action="store_true",
-        help='Suppresses the addition of additional fields for enabling roundtripping, like "sdf:objectKey".',
+        help="Suppresses the addition of additional fields for enabling roundtripping, "
+        'like "sdf:objectKey".',
     )
 
     return parser.parse_args(args)

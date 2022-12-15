@@ -679,4 +679,6 @@ def test_tm_td_tm_required_removal():
         },
     }
 
-    perform_conversion_test(input, expected_result, remove_not_required_affordances=True)
+    perform_conversion_test(
+        input, expected_result, remove_not_required_affordances=True
+    )

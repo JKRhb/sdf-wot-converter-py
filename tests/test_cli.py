@@ -102,8 +102,8 @@ def test_tm_sdf_minimal_example_print():
 
 
 def test_wot_multiple_minimal_examples_conversion():
-    """Test for a WoT TM to SDF conversion with multiple inputs, which does not lead to the creation of a
-    mapping file."""
+    """Test for a WoT TM to SDF conversion with multiple inputs, which does not lead to
+    the creation of a mapping file."""
 
     make_test_output_dir()
     args = [
@@ -254,7 +254,10 @@ def test_wot_td_sdf_from_url_conversion():
     args = [
         "td-to-sdf",
         "-i",
-        "https://raw.githubusercontent.com/JKRhb/sdf-wot-converter-py/main/examples/wot/example.td.jsonld",
+        (
+            "https://raw.githubusercontent.com/JKRhb/sdf-wot-converter-py/"
+            "main/examples/wot/example.td.jsonld"
+        ),
         "-o",
         "test_output/example-td-from-url.sdf.json",
         "--mapping-file-output",
@@ -319,7 +322,10 @@ def test_wot_td_sdf_custom_infoblock():
     args = [
         "td-to-sdf",
         "-i",
-        "https://raw.githubusercontent.com/JKRhb/sdf-wot-converter-py/main/examples/wot/example.td.jsonld",
+        (
+            "https://raw.githubusercontent.com/JKRhb/sdf-wot-converter-py/main"
+            "/examples/wot/example.td.jsonld"
+        ),
         "--title",
         "Test",
         "--version",
