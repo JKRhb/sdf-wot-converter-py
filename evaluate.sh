@@ -21,6 +21,7 @@ cd ..
 # Install nlohmann/json-schema-validator
 git clone https://github.com/pboettch/json-schema-validator.git
 cd json-schema-validator
+git checkout 4f67636
 mkdir build
 cd build
 cmake -DJSON_VALIDATOR_HUNTER=ON ..
