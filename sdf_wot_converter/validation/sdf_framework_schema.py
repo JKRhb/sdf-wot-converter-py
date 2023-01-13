@@ -1,5 +1,5 @@
 sdf_framework_schema = {
-    "title": "sdf-framework.cddl -- Generated: 2022-06-06T12:50:46Z",
+    "title": "sdf-framework.cddl -- Generated: 2023-01-12T12:53:22Z",
     "$schema": "http://json-schema.org/draft-07/schema#",
     "$ref": "#/definitions/sdf-syntax",
     "definitions": {
@@ -144,12 +144,8 @@ sdf_framework_schema = {
                         "default": {"$ref": "#/definitions/allowed-types"},
                         "minimum": {"type": "number"},
                         "maximum": {"type": "number"},
-                        "exclusiveMinimum": {
-                            "anyOf": [{"type": "boolean"}, {"type": "number"}]
-                        },
-                        "exclusiveMaximum": {
-                            "anyOf": [{"type": "boolean"}, {"type": "number"}]
-                        },
+                        "exclusiveMinimum": {"type": "number"},
+                        "exclusiveMaximum": {"type": "number"},
                         "multipleOf": {"type": "number"},
                         "minLength": {"$ref": "#/definitions/uint"},
                         "maxLength": {"$ref": "#/definitions/uint"},
@@ -318,12 +314,8 @@ sdf_framework_schema = {
                         "default": {"$ref": "#/definitions/allowed-types"},
                         "minimum": {"type": "number"},
                         "maximum": {"type": "number"},
-                        "exclusiveMinimum": {
-                            "anyOf": [{"type": "boolean"}, {"type": "number"}]
-                        },
-                        "exclusiveMaximum": {
-                            "anyOf": [{"type": "boolean"}, {"type": "number"}]
-                        },
+                        "exclusiveMinimum": {"type": "number"},
+                        "exclusiveMaximum": {"type": "number"},
                         "multipleOf": {"type": "number"},
                         "minLength": {"$ref": "#/definitions/uint"},
                         "maxLength": {"$ref": "#/definitions/uint"},
@@ -481,12 +473,8 @@ sdf_framework_schema = {
                         "default": {"$ref": "#/definitions/allowed-types"},
                         "minimum": {"type": "number"},
                         "maximum": {"type": "number"},
-                        "exclusiveMinimum": {
-                            "anyOf": [{"type": "boolean"}, {"type": "number"}]
-                        },
-                        "exclusiveMaximum": {
-                            "anyOf": [{"type": "boolean"}, {"type": "number"}]
-                        },
+                        "exclusiveMinimum": {"type": "number"},
+                        "exclusiveMaximum": {"type": "number"},
                         "multipleOf": {"type": "number"},
                         "minLength": {"$ref": "#/definitions/uint"},
                         "maxLength": {"$ref": "#/definitions/uint"},
@@ -651,12 +639,8 @@ sdf_framework_schema = {
                         "default": {"$ref": "#/definitions/allowed-types"},
                         "minimum": {"type": "number"},
                         "maximum": {"type": "number"},
-                        "exclusiveMinimum": {
-                            "anyOf": [{"type": "boolean"}, {"type": "number"}]
-                        },
-                        "exclusiveMaximum": {
-                            "anyOf": [{"type": "boolean"}, {"type": "number"}]
-                        },
+                        "exclusiveMinimum": {"type": "number"},
+                        "exclusiveMaximum": {"type": "number"},
                         "multipleOf": {"type": "number"},
                         "minLength": {"$ref": "#/definitions/uint"},
                         "maxLength": {"$ref": "#/definitions/uint"},
@@ -822,12 +806,8 @@ sdf_framework_schema = {
                         "default": {"$ref": "#/definitions/allowed-types"},
                         "minimum": {"type": "number"},
                         "maximum": {"type": "number"},
-                        "exclusiveMinimum": {
-                            "anyOf": [{"type": "boolean"}, {"type": "number"}]
-                        },
-                        "exclusiveMaximum": {
-                            "anyOf": [{"type": "boolean"}, {"type": "number"}]
-                        },
+                        "exclusiveMinimum": {"type": "number"},
+                        "exclusiveMaximum": {"type": "number"},
                         "multipleOf": {"type": "number"},
                         "minLength": {"$ref": "#/definitions/uint"},
                         "maxLength": {"$ref": "#/definitions/uint"},
@@ -982,12 +962,8 @@ sdf_framework_schema = {
                         "default": {"$ref": "#/definitions/allowed-types"},
                         "minimum": {"type": "number"},
                         "maximum": {"type": "number"},
-                        "exclusiveMinimum": {
-                            "anyOf": [{"type": "boolean"}, {"type": "number"}]
-                        },
-                        "exclusiveMaximum": {
-                            "anyOf": [{"type": "boolean"}, {"type": "number"}]
-                        },
+                        "exclusiveMinimum": {"type": "number"},
+                        "exclusiveMaximum": {"type": "number"},
                         "multipleOf": {"type": "number"},
                         "minLength": {"$ref": "#/definitions/uint"},
                         "maxLength": {"$ref": "#/definitions/uint"},
