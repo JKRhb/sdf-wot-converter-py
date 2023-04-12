@@ -130,6 +130,12 @@ def test_sdf_tm_example_conversion():
             }
         },
         "sdf:objectKey": "Switch",
+        "tm:optional": [
+            "/actions/off",
+            "/actions/on",
+            "/actions/toggle",
+            "/properties/value",
+        ],
     }
 
     perform_conversion_test(input, expected_result)
@@ -408,6 +414,13 @@ def test_sdf_tm_type_conversion():
             },
         },
         "sdf:objectKey": "Test",
+        "tm:optional": [
+            "/properties/bar",
+            "/properties/barfoo",
+            "/properties/baz",
+            "/properties/foo",
+            "/properties/foobar",
+        ],
     }
 
     perform_conversion_test(input, expected_result)
@@ -440,6 +453,9 @@ def test_sdf_tm_action_conversion():
             }
         },
         "sdf:objectKey": "Test",
+        "tm:optional": [
+            "/actions/foobar",
+        ],
     }
 
     perform_conversion_test(input, expected_result)
@@ -471,6 +487,10 @@ def test_sdf_tm_event_conversion():
             "foobaz": {},
         },
         "sdf:objectKey": "Test",
+        "tm:optional": [
+            "/events/foobar",
+            "/events/foobaz",
+        ],
     }
 
     perform_conversion_test(input, expected_result)
@@ -536,6 +556,14 @@ def test_sdf_tm_sdf_ref_conversion():
             },
         },
         "sdf:objectKey": "Test",
+        "tm:optional": [
+            "/actions/foobar",
+            "/actions/foobaz",
+            "/events/foobar",
+            "/events/foobaz",
+            "/properties/foobar",
+            "/properties/foobaz",
+        ],
     }
 
     perform_conversion_test(input, expected_result)
@@ -566,11 +594,11 @@ def test_sdf_tm_nested_model():
                                         },
                                         "sdfRequired": [
                                             "#/sdfThing/blah/sdfThing/foo/sdfThing/bar/"
-                                            "sdfObject/baz/sdfProperty/foobar",
-                                            "#/sdfThing/blah/sdfThing/foo/sdfThing/bar/"
                                             "sdfObject/baz/sdfAction/foobar",
                                             "#/sdfThing/blah/sdfThing/foo/sdfThing/bar/"
                                             "sdfObject/baz/sdfEvent/foobar",
+                                            "#/sdfThing/blah/sdfThing/foo/sdfThing/bar/"
+                                            "sdfObject/baz/sdfProperty/foobar",
                                         ],
                                     }
                                 }
@@ -630,11 +658,6 @@ def test_sdf_tm_nested_model():
             ],
             "@type": "tm:ThingModel",
             "sdf:objectKey": "baz",
-            "tm:required": [
-                "/properties/foobar",
-                "/actions/foobar",
-                "/events/foobar",
-            ],
             "actions": {"foobar": {"title": "hi"}},
             "properties": {"foobar": {"title": "hi", "observable": True}},
             "events": {"foobar": {"title": "hi"}},
@@ -747,6 +770,9 @@ def test_sdf_tm_succeeding_URL_sdf_ref():
             },
         },
         "sdf:objectKey": "Test",
+        "tm:optional": [
+            "/properties/foo",
+        ],
     }
 
     perform_conversion_test(input, expected_result)
@@ -783,6 +809,7 @@ def test_sdf_tm_sdf_choice():
             },
         },
         "sdf:objectKey": "Test",
+        "tm:optional": ["/properties/foobar"],
     }
 
     perform_conversion_test(input, expected_result)
@@ -904,6 +931,12 @@ def test_sdf_tm_sdf_data_conversion():
                 },
             },
         },
+        "tm:optional": [
+            "/actions/foobar",
+            "/actions/foobaz",
+            "/events/foobar",
+            "/events/foobaz",
+        ],
     }
 
     perform_conversion_test(input, expected_result)
@@ -980,7 +1013,12 @@ def test_sdf_tm_nested_sdf_conversion():
             ],
             "@type": "tm:ThingModel",
             "sdf:thingKey": "foo",
-            "properties": {"status": {"observable": True}},
+            "properties": {
+                "status": {
+                    "observable": True,
+                }
+            },
+            "tm:optional": ["/properties/status"],
             "links": [
                 {"href": "#/sdfThing~1foo~1sdfObject~1bar", "rel": "tm:submodel"}
             ],
@@ -993,6 +1031,7 @@ def test_sdf_tm_nested_sdf_conversion():
             "@type": "tm:ThingModel",
             "sdf:objectKey": "bar",
             "actions": {"toggle": {}},
+            "tm:optional": ["/actions/toggle"],
         },
     }
 
@@ -1035,11 +1074,13 @@ def test_sdf_tm_suppress_roundtripping_fields():
             "links": [
                 {"href": "#/sdfThing~1foo~1sdfObject~1bar", "rel": "tm:submodel"}
             ],
+            "tm:optional": ["/properties/status"],
         },
         "sdfThing/foo/sdfObject/bar": {
             "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
             "@type": "tm:ThingModel",
             "actions": {"toggle": {}},
+            "tm:optional": ["/actions/toggle"],
         },
     }
 
@@ -1179,6 +1220,12 @@ def test_sdf_tm_duplicate_keys():
                     "observable": True,
                 }
             },
+            "tm:optional": [
+                "/actions/off",
+                "/actions/on",
+                "/actions/toggle",
+                "/properties/value",
+            ],
         },
     }
 

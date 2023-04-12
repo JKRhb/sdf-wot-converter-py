@@ -348,7 +348,7 @@ def test_tm_td_tm_ref():
     perform_conversion_test(input, expected_result)
 
 
-def test_tm_td_tm_required():
+def test_tm_td_tm_optional():
     input = {
         "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "@type": "tm:ThingModel",
@@ -361,7 +361,7 @@ def test_tm_td_tm_required():
                 "forms": [{"href": "https://mylamp.example.com/status"}],
             }
         },
-        "tm:required": ["#/properties/status"],
+        "tm:optional": ["#/properties/status"],
     }
 
     expected_result = {
@@ -647,7 +647,7 @@ def test_tm_td_with_nesting():
     perform_conversion_test(input, expected_result)
 
 
-def test_tm_td_tm_required_removal():
+def test_tm_td_tm_optional_removal():
     input = {
         "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
         "@type": "tm:ThingModel",
@@ -661,7 +661,7 @@ def test_tm_td_tm_required_removal():
             },
             "removedStatus": {"type": "string"},
         },
-        "tm:required": ["#/properties/status"],
+        "tm:optional": ["/properties/removedStatus"],
     }
 
     expected_result = {
