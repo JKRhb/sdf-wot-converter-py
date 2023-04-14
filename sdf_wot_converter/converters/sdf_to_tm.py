@@ -692,6 +692,7 @@ def collect_sdf_required(
     thing_model: Dict, sdf_definition: Dict, mapped_fields: List[str]
 ):
     mapped_fields.append("sdfRequired")
+    # TODO: Rework initial initialization of tm:optional
     tm_required = initialize_list_field(thing_model, "tm:required")
     tm_required.extend(sdf_definition.get("sdfRequired", []))
 
@@ -734,10 +735,21 @@ def map_sdf_required(thing_model: Dict):
     tm_required = initialize_list_field(thing_model, "tm:required")
     tm_required = [mappings[pointer][1:] for pointer in tm_required]
 
-    thing_model["tm:required"] = tm_required
+    affordance_paths = set()
+    for affordance_type in ["actions", "properties", "events"]:
+        affordances = [
+            f"/{affordance_type}/{affordance}"
+            for affordance in thing_model.get(affordance_type, dict()).keys()
+        ]
+        affordance_paths.update(affordances)
 
-    if len(thing_model["tm:required"]) == 0:
-        del thing_model["tm:required"]
+    thing_model["tm:optional"] = list(affordance_paths - set(tm_required))
+    # TODO: Is there a more elegant solution?
+    thing_model["tm:optional"].sort()
+    del thing_model["tm:required"]
+
+    if len(thing_model["tm:optional"]) == 0:
+        del thing_model["tm:optional"]
 
 
 def map_sdf_ref(thing_model: Dict, current_definition: Dict):

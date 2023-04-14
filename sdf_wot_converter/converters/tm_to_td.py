@@ -1,5 +1,6 @@
 from typing import (
     Dict,
+    List,
 )
 import copy
 import json_merge_patch
@@ -35,30 +36,39 @@ def _replace_version(partial_td):
         version["instance"] = version["model"]
 
 
-def _assert_tm_required(partial_td: Dict, remove_not_required_affordances: bool):
-    if "tm:required" not in partial_td:
+def _assert_tm_optional(partial_td: Dict, remove_not_required_affordances: bool):
+    if "tm:optional" not in partial_td:
         return
 
-    tm_required = partial_td["tm:required"]
+    optional_affordances = partial_td["tm:optional"]
 
-    for required_affordance_pointer in tm_required:
-        assert required_affordance_pointer.startswith("#/")
-        pointer = required_affordance_pointer[1:]
-        assert resolve_pointer(partial_td, pointer, None) is not None
+    all_affordances = set()
+    for affordance_type in ["actions", "properties", "events"]:
+        affordances = [
+            f"/{affordance_type}/{affordance}"
+            for affordance in partial_td.get(affordance_type, dict()).keys()
+        ]
+        all_affordances.update(affordances)
+
+    tm_required = list(all_affordances.difference(optional_affordances))
+
+    for required_affordance_pointer in list(tm_required):
+        assert (
+            resolve_pointer(partial_td, required_affordance_pointer, None) is not None
+        )
 
     if remove_not_required_affordances:
         for affordance_type in ["properties", "actions", "events"]:
-            pointer = f"#/{affordance_type}"
             affordances = partial_td.get(affordance_type, {})
-            not_required_affordance_keys = []
+            not_required_affordance_keys: List[str] = []
             for affordance_key in affordances:
-                affordance_pointer = f"{pointer}/{affordance_key}"
+                affordance_pointer = f"/{affordance_type}/{affordance_key}"
                 if affordance_pointer not in tm_required:
                     not_required_affordance_keys.append(affordance_key)
             for affordance_key in not_required_affordance_keys:
                 del affordances[affordance_key]
 
-    del partial_td["tm:required"]
+    del partial_td["tm:optional"]
 
 
 def _replace_meta_data(partial_td, meta_data) -> Dict:
@@ -136,7 +146,7 @@ def convert_tm_to_td(
 
     _replace_version(partial_td)
 
-    _assert_tm_required(partial_td, remove_not_required_affordances)
+    _assert_tm_optional(partial_td, remove_not_required_affordances)
 
     validate_thing_description(partial_td)
 

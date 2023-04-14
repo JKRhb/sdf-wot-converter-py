@@ -568,23 +568,32 @@ def map_tm_ref(
     sdf_definition["sdfRef"] = convert_pointer(pointer, current_path)
 
 
-def map_tm_required(
+def map_tm_optional(
     wot_model: Dict,
     wot_definition: Dict,
     sdf_definition: Dict,
     current_path: str,
     mapped_fields: List[str],
 ):
-    pointers = wot_definition.get("tm:required")
+    pointers = wot_definition.get("tm:optional", [])
 
-    if pointers is None:
-        return
+    affordance_paths = set()
+    for affordance_type in ["actions", "properties", "events"]:
+        affordances = [
+            f"/{affordance_type}/{affordance}"
+            for affordance in wot_model.get(affordance_type, dict()).keys()
+        ]
+        affordance_paths.update(affordances)
+
+    pointers = list(affordance_paths.difference(pointers))
+    pointers.sort()
 
     pointers = ["#" + pointer for pointer in pointers]
 
-    mapped_fields.append("tm:required")
+    mapped_fields.append("tm:optional")
     converted_pointers = [convert_pointer(x, current_path) for x in pointers]
-    sdf_definition["sdfRequired"] = converted_pointers
+    if len(converted_pointers) > 0:
+        sdf_definition["sdfRequired"] = converted_pointers
 
 
 def map_thing_model_to_sdf_object(
@@ -622,7 +631,7 @@ def map_thing_model_to_sdf_object(
     map_version(thing_model, sdf_object, sdf_mapping_file, mapped_fields)
 
     map_sdf_comment(thing_model, sdf_object, mapped_fields)
-    map_tm_required(
+    map_tm_optional(
         thing_model, thing_model, sdf_object, sdf_object_path, mapped_fields
     )
 
@@ -716,7 +725,7 @@ def map_thing_model_to_sdf_thing(
 
     sdf_thing_path = f"{current_path}/sdfThing/{thing_model_key}"
 
-    map_tm_required(thing_model, thing_model, sdf_thing, sdf_thing_path, mapped_fields)
+    map_tm_optional(thing_model, thing_model, sdf_thing, sdf_thing_path, mapped_fields)
 
     map_title(thing_model, sdf_thing, mapped_fields)
     map_description(thing_model, sdf_thing, mapped_fields)

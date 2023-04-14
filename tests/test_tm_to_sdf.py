@@ -88,6 +88,11 @@ def test_wot_tm_to_sdf_conversion():
                             "writable": False,
                         }
                     },
+                    "sdfRequired": [
+                        "#/sdfObject/sdfObject0/sdfAction/toggle",
+                        "#/sdfObject/sdfObject0/sdfEvent/overheating",
+                        "#/sdfObject/sdfObject0/sdfProperty/status",
+                    ],
                 }
             },
         },
@@ -244,7 +249,16 @@ def test_tm_sdf_property_conversion():
                             "observable": False,
                             "type": "array",
                         },
-                    }
+                    },
+                    "sdfRequired": [
+                        "#/sdfObject/sdfObject0/sdfProperty/bar",
+                        "#/sdfObject/sdfObject0/sdfProperty/barfoo",
+                        "#/sdfObject/sdfObject0/sdfProperty/baz",
+                        "#/sdfObject/sdfObject0/sdfProperty/boo",
+                        "#/sdfObject/sdfObject0/sdfProperty/fizzbuzz",
+                        "#/sdfObject/sdfObject0/sdfProperty/foo",
+                        "#/sdfObject/sdfObject0/sdfProperty/foobar",
+                    ],
                 }
             }
         },
@@ -361,6 +375,11 @@ def test_tm_sdf_relative_tm_ref_conversion():
                         "sdfRef": "#/sdfObject/sdfObject0/sdfProperty/status1",
                     },
                 },
+                "sdfRequired": [
+                    "#/sdfObject/sdfObject0/sdfAction/toggle",
+                    "#/sdfObject/sdfObject0/sdfProperty/status1",
+                    "#/sdfObject/sdfObject0/sdfProperty/status2",
+                ],
                 "sdfData": {"foobar": {"type": "string"}},
             }
         },
@@ -412,6 +431,12 @@ def test_tm_sdf_composited_conversion():
                         "sdfProperty": {
                             "status": {"observable": False, "type": "string"}
                         },
+                        "sdfRequired": [
+                            "#/sdfThing/sdfThing0/sdfObject/example/sdfAction/toggle",
+                            "#/sdfThing/sdfThing0/sdfObject/example/sdfEvent/"
+                            "overheating",
+                            "#/sdfThing/sdfThing0/sdfObject/example/sdfProperty/status",
+                        ],
                     }
                 }
             }
@@ -469,6 +494,9 @@ def test_tm_sdf_composited_conversion_with_affordance():
             "sdfThing0": {
                 "label": "Top Level Lamp Thing",
                 "sdfProperty": {"status": {"type": "string", "observable": False}},
+                "sdfRequired": [
+                    "#/sdfThing/sdfThing0/sdfProperty/status",
+                ],
                 "sdfObject": {
                     "smartlamp": {
                         "label": "MyLampThing",
@@ -479,6 +507,13 @@ def test_tm_sdf_composited_conversion_with_affordance():
                         "sdfProperty": {
                             "status": {"type": "string", "observable": False}
                         },
+                        "sdfRequired": [
+                            "#/sdfThing/sdfThing0/sdfObject/smartlamp/sdfAction/toggle",
+                            "#/sdfThing/sdfThing0/sdfObject/smartlamp/sdfEvent/"
+                            "overheating",
+                            "#/sdfThing/sdfThing0/sdfObject/smartlamp/sdfProperty/"
+                            "status",
+                        ],
                     },
                 },
             }
@@ -574,6 +609,11 @@ def test_tm_collection_sdf_conversion():
                         "sdfProperty": {
                             "status": {"type": "string", "observable": False}
                         },
+                        "sdfRequired": [
+                            "#/sdfThing/baseModel/sdfObject/led/sdfAction/toggle",
+                            "#/sdfThing/baseModel/sdfObject/led/sdfEvent/overheating",
+                            "#/sdfThing/baseModel/sdfObject/led/sdfProperty/status",
+                        ],
                     }
                 },
                 "sdfThing": {
