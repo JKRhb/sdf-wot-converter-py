@@ -112,6 +112,56 @@ def test_tm_td_with_meta_data_and_bindings_conversion():
     )
 
 
+def test_tm_td_with_illegal_field_removal():
+    input = {
+        "@context": "https://www.w3.org/2022/wot/td/v1.1",
+        "@type": "tm:ThingModel",
+        "title": "Lamp Thing Model",
+        "properties": {
+            "status": {
+                "description": "current status of the lamp (on|off)",
+                "type": "string",
+                "readOnly": True,
+            }
+        },
+    }
+
+    meta_data = {
+        "title": "MyLampThing",
+        "id": "urn:dev:ops:32473-WoTLamp-1234",
+    }
+
+    bindings = {
+        "securityDefinitions": {"basic_sc": {"scheme": "basic", "in": "header"}},
+        "security": "basic_sc",
+        "properties": {
+            "status": {
+                "forms": [{"href": "https://mylamp.example.com/status"}],
+                "description": None,
+            }
+        },
+    }
+
+    expected_result = {
+        "@context": "https://www.w3.org/2022/wot/td/v1.1",
+        "id": "urn:dev:ops:32473-WoTLamp-1234",
+        "title": "MyLampThing",
+        "securityDefinitions": {"basic_sc": {"scheme": "basic", "in": "header"}},
+        "security": "basic_sc",
+        "properties": {
+            "status": {
+                "type": "string",
+                "readOnly": True,
+                "forms": [{"href": "https://mylamp.example.com/status"}],
+            }
+        },
+    }
+    with pytest.raises(ValidationError):
+        perform_conversion_test(
+            input, expected_result, meta_data=meta_data, bindings=bindings
+        )
+
+
 def test_tm_td_with_placeholder_conversion():
     input = {
         "@context": ["https://www.w3.org/2022/wot/td/v1.1"],
