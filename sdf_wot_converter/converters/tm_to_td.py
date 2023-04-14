@@ -5,6 +5,7 @@ from typing import (
 import copy
 import json_merge_patch
 from jsonpointer import resolve_pointer
+from jsonschema import ValidationError
 
 from .utility import ensure_value_is_list
 from ..validation import validate_thing_description, validate_thing_model
@@ -71,16 +72,37 @@ def _assert_tm_optional(partial_td: Dict, remove_not_required_affordances: bool)
     del partial_td["tm:optional"]
 
 
+def _prevent_required_tm_field_removal(document_to_apply: dict):
+    """Checks that none of the values within the dictionary is `None` to prevent the
+    JSON Merge Patch algorithm from removing any fields, which is forbidden during the
+    TM -> TD derivation process.
+    """
+    for key, value in document_to_apply.items():
+        if value is None:
+            raise ValidationError(
+                "All required fields in a TM MUST be taken over into the resulting TD."
+                "Applying th additional information to the TD would have resulted in"
+                f'the removal the field "{key}", which is not allowed.'
+            )
+
+        if isinstance(value, dict):
+            _prevent_required_tm_field_removal(value)
+
+
 def _replace_meta_data(partial_td, meta_data) -> Dict:
     if meta_data is None:
         return partial_td
 
+    _prevent_required_tm_field_removal(meta_data)
+
     return json_merge_patch.merge(partial_td, meta_data)
 
 
-def _replace_bindings(partial_td, bindings) -> Dict:
+def _replace_bindings(partial_td: dict, bindings: dict) -> Dict:
     if bindings is None:
         return partial_td
+
+    _prevent_required_tm_field_removal(bindings)
 
     return json_merge_patch.merge(partial_td, bindings)
 
